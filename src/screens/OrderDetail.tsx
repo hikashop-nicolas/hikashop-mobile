@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
+import { useCached } from '../app/use-cached';
 import type { OrderDetail as OrderDetailType } from '../core';
 import { Screen, StatusChip, Money, Spinner } from '../ui';
 import { fmtDate } from '../app/utils';
@@ -8,21 +8,17 @@ import { fmtDate } from '../app/utils';
 export function OrderDetail() {
 	const { id } = useParams();
 	const nav = useNavigate();
-	const { client } = useStores();
-	const [order, setOrder] = useState<OrderDetailType | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [err, setErr] = useState('');
+	const { client, active, cache } = useStores();
+	const storeId = active?.id ?? '';
+	const orderId = Number(id);
 
-	useEffect(() => {
-		if (!client || !id) return;
-		let cancelled = false;
-		setLoading(true);
-		client.getOrder(Number(id))
-			.then((o) => { if (!cancelled) setOrder(o); })
-			.catch((e) => { if (!cancelled) setErr(e instanceof Error ? e.message : 'Failed to load.'); })
-			.finally(() => { if (!cancelled) setLoading(false); });
-		return () => { cancelled = true; };
-	}, [client, id]);
+	const { data: order, loading, error } = useCached<OrderDetailType>({
+		enabled: !!client && !!active && !!id,
+		read: () => cache.getOrderDetail(storeId, orderId),
+		fetch: () => client!.getOrder(orderId),
+		write: async (o) => { await cache.putOrderDetail(storeId, orderId, o); },
+		deps: [storeId, orderId],
+	});
 
 	return (
 		<Screen
@@ -32,8 +28,8 @@ export function OrderDetail() {
 		>
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>
-			) : err ? (
-				<div className="hk-error-note">{err}</div>
+			) : error ? (
+				<div className="hk-error-note">{error}</div>
 			) : order ? (
 				<>
 					<div className="hk-card hk-card--pad">

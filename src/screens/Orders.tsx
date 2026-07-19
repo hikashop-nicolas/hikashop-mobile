@@ -1,34 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStores } from '../app/store-context';
-import type { OrderSummary } from '../core';
+import { useCached } from '../app/use-cached';
+import { ordersFilterKey } from '../core';
+import type { OrderSummary, Paginated } from '../core';
 import { Screen, Search, StatusChip, Money, Spinner } from '../ui';
 import { fmtDate } from '../app/utils';
 
 const FILTERS = ['', 'confirmed', 'created', 'shipped', 'cancelled'];
 
 export function Orders() {
-	const { client } = useStores();
+	const { client, active, cache } = useStores();
 	const [status, setStatus] = useState('');
 	const [search, setSearch] = useState('');
-	const [items, setItems] = useState<OrderSummary[]>([]);
-	const [total, setTotal] = useState(0);
-	const [loading, setLoading] = useState(true);
-	const [err, setErr] = useState('');
+	const storeId = active?.id ?? '';
+	const filterKey = ordersFilterKey(status, search);
 
-	useEffect(() => {
-		if (!client) return;
-		let cancelled = false;
-		setLoading(true);
-		setErr('');
-		const timer = setTimeout(() => {
-			client.getOrders({ status: status || undefined, search: search || undefined, limit: 30 })
-				.then((p) => { if (!cancelled) { setItems(p.items); setTotal(p.total); } })
-				.catch((e) => { if (!cancelled) setErr(e instanceof Error ? e.message : 'Failed to load.'); })
-				.finally(() => { if (!cancelled) setLoading(false); });
-		}, search ? 300 : 0);
-		return () => { cancelled = true; clearTimeout(timer); };
-	}, [client, status, search]);
+	const { data, loading, error } = useCached<Paginated<OrderSummary>>({
+		enabled: !!client && !!active,
+		read: () => cache.getOrders(storeId, filterKey),
+		fetch: () => client!.getOrders({ status: status || undefined, search: search || undefined, limit: 30 }),
+		write: async (p) => { await cache.putOrders(storeId, filterKey, p); },
+		deps: [storeId, status, search],
+		debounceMs: search ? 300 : 0,
+	});
+
+	const items = data?.items ?? [];
+	const total = data?.total ?? 0;
 
 	return (
 		<Screen title="Orders">
@@ -42,8 +40,8 @@ export function Orders() {
 			</div>
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>
-			) : err ? (
-				<div className="hk-error-note">{err}</div>
+			) : error ? (
+				<div className="hk-error-note">{error}</div>
 			) : items.length === 0 ? (
 				<div className="hk-empty">No orders found.</div>
 			) : (

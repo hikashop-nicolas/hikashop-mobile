@@ -1,10 +1,12 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { StoreRegistry, WebKeyValueStore, ApiClient } from '../core';
+import { StoreRegistry, WebKeyValueStore, ApiClient, CacheRepository } from '../core';
 import type { Store } from '../core';
 
 // One registry for the whole app: store metadata in the data namespace, tokens in the secrets one.
 const registry = new StoreRegistry(new WebKeyValueStore('hk.data.'), new WebKeyValueStore('hk.secret.'));
+// Read-model cache lives in its own namespace so clearing it never touches metadata or tokens.
+const cache = new CacheRepository(new WebKeyValueStore('hk.cache.'));
 
 interface StoreContextValue {
 	ready: boolean;
@@ -12,6 +14,7 @@ interface StoreContextValue {
 	active: Store | null;
 	client: ApiClient | null;
 	registry: StoreRegistry;
+	cache: CacheRepository;
 	refresh: () => Promise<void>;
 	setActive: (id: string) => Promise<void>;
 	remove: (id: string) => Promise<void>;
@@ -56,11 +59,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
 	const remove = useCallback(async (id: string) => {
 		await registry.remove(id);
+		await cache.clearStore(id);
 		await refresh();
 	}, [refresh]);
 
 	return (
-		<StoreContext.Provider value={{ ready, stores, active, client, registry, refresh, setActive, remove }}>
+		<StoreContext.Provider value={{ ready, stores, active, client, registry, cache, refresh, setActive, remove }}>
 			{children}
 		</StoreContext.Provider>
 	);

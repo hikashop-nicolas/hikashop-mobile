@@ -1,28 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useStores } from '../app/store-context';
+import { useCached } from '../app/use-cached';
 import type { DashboardStats } from '../core';
 import { Screen, StatCard, Spinner } from '../ui';
 
 const RANGES: [string, string][] = [['today', 'Today'], ['week', 'Week'], ['month', 'Month'], ['year', 'Year']];
 
 export function Dashboard() {
-	const { client, active } = useStores();
+	const { client, active, cache } = useStores();
 	const [range, setRange] = useState('week');
-	const [data, setData] = useState<DashboardStats | null>(null);
-	const [err, setErr] = useState('');
-	const [loading, setLoading] = useState(true);
+	const storeId = active?.id ?? '';
 
-	useEffect(() => {
-		if (!client) return;
-		let cancelled = false;
-		setLoading(true);
-		setErr('');
-		client.getDashboard(range)
-			.then((d) => { if (!cancelled) setData(d); })
-			.catch((e) => { if (!cancelled) setErr(e instanceof Error ? e.message : 'Failed to load.'); })
-			.finally(() => { if (!cancelled) setLoading(false); });
-		return () => { cancelled = true; };
-	}, [client, range]);
+	const { data, loading, error } = useCached<DashboardStats>({
+		enabled: !!client && !!active,
+		read: () => cache.getDashboard(storeId, range),
+		fetch: () => client!.getDashboard(range),
+		write: async (d) => { await cache.putDashboard(storeId, range, d); },
+		deps: [storeId, range],
+	});
 
 	return (
 		<Screen title={active?.name ?? 'Dashboard'}>
@@ -33,8 +28,8 @@ export function Dashboard() {
 			</div>
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>
-			) : err ? (
-				<div className="hk-error-note">{err}</div>
+			) : error ? (
+				<div className="hk-error-note">{error}</div>
 			) : data ? (
 				<>
 					<div className="hk-stats">
