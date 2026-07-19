@@ -3,20 +3,23 @@ import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl, WRITABLE_FIELD_TYPES } from '../core';
 import type { ProductMeta, ProductField, CategoryDetail } from '../core';
-import { Modal, Field, Button, Icon, TreeSelect, RichText } from '../ui';
+import { Modal, Screen, Field, Button, Icon, TreeSelect, RichText } from '../ui';
 import type { TreeNode } from '../ui';
 
 type Kind = 'product' | 'manufacturer';
 
 // A full create / edit form for a category or a manufacturer (both are HikaShop
 // categories): name, parent, description, image, published and category custom fields.
-export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onSaved }: {
+// Presents as a modal (inline create from the product editor) or a full screen
+// (from the category management listing).
+export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onSaved, presentation = 'modal' }: {
 	kind: Kind;
 	category?: CategoryDetail | null;
 	meta: ProductMeta | null;
 	parentNodes: TreeNode[];
 	onClose: () => void;
 	onSaved: (node: TreeNode) => void;
+	presentation?: 'modal' | 'screen';
 }) {
 	const { client } = useStores();
 	const t = useT();
@@ -88,14 +91,8 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 	const title = editing ? (brand ? t('category.editBrand') : t('category.editCategory')) : (brand ? t('category.newBrand') : t('category.newCategory'));
 	const preview = image?.preview ?? existingImage;
 
-	return (
-		<Modal title={title} onClose={onClose}
-			footer={<>
-				<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
-				<Button variant="pri" onClick={() => void submit()} disabled={busy}>{busy ? t('product.saving') : editing ? t('common.save') : t('common.create')}</Button>
-			</>}
-		>
-			<div className="hk-form">
+	const body = (
+		<div className="hk-form">
 				<Field label={t('category.name')}><input className="hk-input" autoFocus value={name} onChange={(e) => setName(e.target.value)} /></Field>
 
 				<Field label={t('category.parent')}>
@@ -134,6 +131,30 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 
 				{err && <div className="hk-error-note">{err}</div>}
 			</div>
+	);
+
+	const saveLabel = busy ? t('product.saving') : editing ? t('common.save') : t('common.create');
+
+	if (presentation === 'screen') {
+		return (
+			<Screen
+				title={title}
+				left={<button className="hk-iconbtn" onClick={onClose} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
+				right={<button className="hk-appbar-act" disabled={busy} onClick={() => void submit()}>{saveLabel}</button>}
+			>
+				{body}
+			</Screen>
+		);
+	}
+
+	return (
+		<Modal title={title} onClose={onClose}
+			footer={<>
+				<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
+				<Button variant="pri" onClick={() => void submit()} disabled={busy}>{saveLabel}</Button>
+			</>}
+		>
+			{body}
 		</Modal>
 	);
 }

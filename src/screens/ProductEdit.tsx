@@ -8,6 +8,8 @@ import { WRITABLE_FIELD_TYPES } from '../core';
 import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button, RichText } from '../ui';
 import type { TreeNode } from '../ui';
 import { CategoryEditor } from './CategoryEditor';
+import { ProductMediaSection } from './ProductMediaSection';
+import type { ProductImage, ProductFile } from '../core';
 
 type Form = Record<string, string | boolean>;
 
@@ -56,12 +58,14 @@ export function ProductEdit() {
 	const [custom, setCustom] = useState<Record<string, string>>({});
 	const [stockInput, setStockInput] = useState('');
 	const [stockBusy, setStockBusy] = useState(false);
+	const [media, setMedia] = useState<{ images: ProductImage[]; files: ProductFile[] } | null>(null);
 	useEffect(() => {
 		if (fetched && !form) {
 			setForm(toForm(fetched));
 			setCats(fetched.categories.map((c) => c.id));
 			setManufacturerId(fetched.manufacturer_id || 0);
 			setStockInput(fetched.quantity >= 0 ? String(fetched.quantity) : '');
+			setMedia({ images: fetched.images, files: fetched.files });
 			const cf: Record<string, string> = {};
 			for (const [k, v] of Object.entries(fetched.custom_fields ?? {})) cf[k] = v ?? '';
 			setCustom(cf);
@@ -258,11 +262,10 @@ export function ProductEdit() {
 						</div>
 					)}
 
-					<div className="hk-card hk-card--pad">
-						<div className="hk-sect-head"><span className="hk-muted">{t('product.editMedia')}</span>
-							<button className="hk-appbar-act" onClick={() => nav(`/products/${productId}/media`)}>{t('product.edit')}</button></div>
-						<div className="hk-row-sub">{(fetched?.images.length ?? 0)} · {(fetched?.files.length ?? 0)}</div>
-					</div>
+					{media && (
+						<ProductMediaSection productId={productId} images={media.images} files={media.files}
+							onChange={(images, files) => setMedia({ images, files })} />
+					)}
 
 					<div className="hk-card hk-card--pad">
 						<div className="hk-sect-head"><span className="hk-muted">{t('product.variants')}</span>
