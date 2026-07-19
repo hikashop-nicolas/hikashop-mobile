@@ -3,7 +3,7 @@ import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl, WRITABLE_FIELD_TYPES } from '../core';
 import type { ProductMeta, ProductField, CategoryDetail } from '../core';
-import { Modal, Field, Button, Icon, TreeSelect } from '../ui';
+import { Modal, Field, Button, Icon, TreeSelect, RichText } from '../ui';
 import type { TreeNode } from '../ui';
 
 type Kind = 'product' | 'manufacturer';
@@ -104,7 +104,7 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 						emptyLabel={brand ? t('product.noBrands') : t('product.noCategories')} />
 				</Field>
 
-				<Field label={t('category.description')}><textarea className="hk-input hk-textarea" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} /></Field>
+				<Field label={t('category.description')}><RichText value={description} onChange={setDescription} /></Field>
 
 				<Field label={t('category.image')}>
 					<input ref={imgInput} type="file" accept="image/*" hidden onChange={(e) => void pickImage(e.target.files)} />
@@ -124,6 +124,7 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 					if (!isWritable(f)) return null;
 					const val = custom[f.namekey] ?? '';
 					const setV = (v: string) => setCustom((c) => ({ ...c, [f.namekey]: v }));
+					if (f.type === 'wysiwyg') return <Field key={f.namekey} label={f.label}><RichText value={val} onChange={setV} /></Field>;
 					if (f.type === 'textarea') return <Field key={f.namekey} label={f.label}><textarea className="hk-input hk-textarea" rows={2} value={val} onChange={(e) => setV(e.target.value)} /></Field>;
 					if ((f.type === 'singledropdown' || f.type === 'radio') && f.options.length > 0) {
 						return <Field key={f.namekey} label={f.label}><select className="hk-select" value={val} onChange={(e) => setV(e.target.value)}><option value="">{t('product.none')}</option>{f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</select></Field>;

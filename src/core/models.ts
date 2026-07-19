@@ -233,7 +233,7 @@ export interface CategoryInput {
 // Scalar field types the connector accepts on write; others are read-only.
 export const WRITABLE_FIELD_TYPES = [
 	'text', 'textarea', 'number', 'integer', 'date', 'email', 'url', 'tel', 'color',
-	'singledropdown', 'radio', 'multidropdown', 'checkbox',
+	'singledropdown', 'radio', 'multidropdown', 'checkbox', 'wysiwyg',
 ];
 
 // A shop currency plus the parts needed to render a price faithfully to its settings.

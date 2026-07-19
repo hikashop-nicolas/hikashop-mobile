@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductField } from '../core';
 import { WRITABLE_FIELD_TYPES } from '../core';
-import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button } from '../ui';
+import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button, RichText } from '../ui';
 import type { TreeNode } from '../ui';
 import { CategoryEditor } from './CategoryEditor';
 
@@ -179,7 +179,7 @@ export function ProductEdit() {
 						<Field label={t('product.name')}><input className="hk-input" value={s('name')} onChange={(e) => set('name', e.target.value)} /></Field>
 						<Field label={t('product.sku')}><input className="hk-input hk-input-mono" value={s('code')} onChange={(e) => set('code', e.target.value)} /></Field>
 						<label className="hk-check"><input type="checkbox" checked={!!form.published} onChange={(e) => set('published', e.target.checked)} /><span>{t('product.publishedLabel')}</span></label>
-						<Field label={t('product.description')}><textarea className="hk-input hk-textarea" rows={4} value={s('description')} onChange={(e) => set('description', e.target.value)} /></Field>
+						<Field label={t('product.description')}><RichText value={s('description')} onChange={(html) => set('description', html)} /></Field>
 						<div className="hk-form-row">
 							<Field label={t('product.msrp')}><input className="hk-input" type="number" inputMode="decimal" value={s('msrp')} onChange={(e) => set('msrp', e.target.value)} /></Field>
 							<Field label={t('product.gtin')}><input className="hk-input" value={s('gtin')} onChange={(e) => set('gtin', e.target.value)} /></Field>
@@ -289,6 +289,9 @@ export function ProductEdit() {
 											<span className="hk-muted" style={{ fontSize: '0.8em' }}>{t('product.fieldReadOnly')}</span>
 										</Field>
 									);
+								}
+								if (f.type === 'wysiwyg') {
+									return <Field key={f.namekey} label={f.label}><RichText value={val} onChange={(html) => setCustomField(f.namekey, html)} /></Field>;
 								}
 								if (f.type === 'textarea') {
 									return <Field key={f.namekey} label={f.label}><textarea className="hk-input hk-textarea" rows={3} value={val} onChange={(e) => setCustomField(f.namekey, e.target.value)} /></Field>;

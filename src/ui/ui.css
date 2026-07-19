@@ -176,3 +176,16 @@
 .hk-row-btn { border: none; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 0; display: flex; flex-direction: column; }
 .hk-iconbtn.hk-danger { color: var(--hk-crit); }
 .hk-iconbtn.hk-danger:disabled { opacity: .4; }
+
+/* RichText: lightweight contenteditable HTML editor */
+.hk-rte { border: 1px solid var(--hk-line); border-radius: var(--hk-r2); background: var(--hk-surface); overflow: hidden; }
+.hk-rte-bar { display: flex; align-items: center; gap: 2px; padding: var(--hk-s1) var(--hk-s2); border-bottom: 1px solid var(--hk-line); background: var(--hk-surface-2); flex-wrap: wrap; }
+.hk-rte-bar button { min-width: 30px; height: 30px; border: none; background: none; border-radius: var(--hk-r1); color: var(--hk-ink); font-size: .9rem; cursor: pointer; padding: 0 6px; }
+.hk-rte-bar button:hover { background: var(--hk-surface); }
+.hk-rte-sep { width: 1px; height: 18px; background: var(--hk-line); margin: 0 4px; }
+.hk-rte-area { min-height: 6rem; max-height: 18rem; overflow-y: auto; padding: var(--hk-s3); font-size: .95rem; line-height: 1.55; color: var(--hk-ink); outline: none; }
+.hk-rte-area:focus { outline: none; }
+.hk-rte-area:empty::before { content: attr(data-placeholder); color: var(--hk-faint); }
+.hk-rte-area h3 { font-size: 1.05rem; margin: .4em 0; }
+.hk-rte-area ul, .hk-rte-area ol { padding-left: 1.4em; margin: .3em 0; }
+.hk-rte-area a { color: var(--hk-accent); }
