@@ -7,6 +7,7 @@ import type { ProductDetail, ProductMeta, ProductField } from '../core';
 import { WRITABLE_FIELD_TYPES } from '../core';
 import { Screen, Spinner, Icon, Field, TreeSelect } from '../ui';
 import type { TreeNode } from '../ui';
+import { CategoryEditor } from './CategoryEditor';
 
 type Form = Record<string, string | boolean>;
 
@@ -69,20 +70,21 @@ export function ProductEdit() {
 	const [brandNodes, setBrandNodes] = useState<TreeNode[]>([]);
 	useEffect(() => { if (meta) { setCatNodes(meta.categories); setBrandNodes(meta.manufacturers); } }, [meta]);
 
+	// Which create modal is open (a category or a manufacturer), if any.
+	const [editorKind, setEditorKind] = useState<'product' | 'manufacturer' | null>(null);
+
 	const [busy, setBusy] = useState(false);
 	const [saveErr, setSaveErr] = useState('');
 
-	async function addCategory(name: string, parentId: number): Promise<TreeNode> {
-		const c = await client!.createCategory({ name, parent_id: parentId || undefined });
-		const node: TreeNode = { id: c.id, name: c.name, parent_id: c.parent_id };
+	function onCategoryCreated(node: TreeNode) {
 		setCatNodes((ns) => [...ns, node]);
-		return node;
+		setCats((c) => (c.includes(node.id) ? c : [...c, node.id]));
+		setEditorKind(null);
 	}
-	async function addBrand(name: string, parentId: number): Promise<TreeNode> {
-		const m = await client!.createManufacturer({ name, parent_id: parentId || undefined });
-		const node: TreeNode = { id: m.id, name: m.name, parent_id: m.parent_id };
+	function onBrandCreated(node: TreeNode) {
 		setBrandNodes((ns) => [...ns, node]);
-		return node;
+		setManufacturerId(node.id);
+		setEditorKind(null);
 	}
 
 	function set<K extends string>(key: K, value: string | boolean) {
@@ -202,13 +204,13 @@ export function ProductEdit() {
 						<Field label={t('product.categories')}>
 							<TreeSelect nodes={catNodes} selected={cats} onChange={setCats}
 								searchPlaceholder={t('product.searchCategories')} emptyLabel={t('product.noCategories')}
-								onAdd={addCategory} addLabel={t('product.addCategory')} />
+								onAddRequest={() => setEditorKind('product')} addLabel={t('product.addCategory')} />
 						</Field>
 						<Field label={t('product.manufacturer')}>
 							<TreeSelect nodes={brandNodes} selected={manufacturerId ? [manufacturerId] : []}
 								onChange={(ids) => setManufacturerId(ids[0] ?? 0)} multiple={false}
 								searchPlaceholder={t('product.searchBrands')} emptyLabel={t('product.noBrands')}
-								onAdd={addBrand} addLabel={t('product.addBrand')} />
+								onAddRequest={() => setEditorKind('manufacturer')} addLabel={t('product.addBrand')} />
 						</Field>
 						<Field label={t('product.tax')}>
 							<select className="hk-select" value={s('tax_id')} onChange={(e) => set('tax_id', e.target.value)}>
@@ -263,6 +265,15 @@ export function ProductEdit() {
 
 					{saveErr && <div className="hk-error-note">{saveErr}</div>}
 				</div>
+			)}
+			{editorKind && (
+				<CategoryEditor
+					kind={editorKind}
+					meta={meta}
+					parentNodes={editorKind === 'manufacturer' ? brandNodes : catNodes}
+					onClose={() => setEditorKind(null)}
+					onCreated={editorKind === 'manufacturer' ? onBrandCreated : onCategoryCreated}
+				/>
 			)}
 		</Screen>
 	);

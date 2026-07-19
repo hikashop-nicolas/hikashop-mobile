@@ -4,6 +4,7 @@
 import type {
 	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductFile, ProductCharacteristic, ProductVariant,
+	CategoryInput,
 } from './models';
 
 export class ApiError extends Error {
@@ -203,13 +204,13 @@ export class ApiClient {
 	}
 
 	// Create a product category (write scope). No parent_id creates a top-level one.
-	async createCategory(body: { name: string; parent_id?: number }): Promise<{ id: number; name: string; parent_id: number }> {
-		return (await this.request<{ id: number; name: string; parent_id: number }>('POST', 'products/categories', { body })).data;
+	async createCategory(body: CategoryInput): Promise<{ id: number; name: string; parent_id: number; published: boolean }> {
+		return (await this.request<{ id: number; name: string; parent_id: number; published: boolean }>('POST', 'products/categories', { body })).data;
 	}
 
 	// Create a manufacturer / brand (write scope).
-	async createManufacturer(body: { name: string; parent_id?: number }): Promise<{ id: number; name: string; parent_id: number }> {
-		return (await this.request<{ id: number; name: string; parent_id: number }>('POST', 'products/manufacturers', { body })).data;
+	async createManufacturer(body: CategoryInput): Promise<{ id: number; name: string; parent_id: number; published: boolean }> {
+		return (await this.request<{ id: number; name: string; parent_id: number; published: boolean }>('POST', 'products/manufacturers', { body })).data;
 	}
 
 	async setProductVariants(id: number, variants: unknown[]): Promise<{ characteristics: ProductCharacteristic[]; variants: ProductVariant[] }> {

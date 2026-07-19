@@ -25,6 +25,27 @@ export function Screen({ title, left, right, children, center }: {
 	);
 }
 
+// A centered overlay dialog. Clicking the backdrop or the close button dismisses it.
+export function Modal({ title, onClose, footer, children }: {
+	title?: ReactNode;
+	onClose: () => void;
+	footer?: ReactNode;
+	children: ReactNode;
+}) {
+	return (
+		<div className="hk-modal-backdrop" onClick={onClose} role="presentation">
+			<div className="hk-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+				<header className="hk-modal-head">
+					{title && <div className="hk-modal-title">{title}</div>}
+					<button type="button" className="hk-iconbtn" onClick={onClose} aria-label="close"><Icon name="close" size={22} /></button>
+				</header>
+				<div className="hk-modal-body">{children}</div>
+				{footer && <footer className="hk-modal-foot">{footer}</footer>}
+			</div>
+		</div>
+	);
+}
+
 export interface TabDef {
 	key: string;
 	label: string;

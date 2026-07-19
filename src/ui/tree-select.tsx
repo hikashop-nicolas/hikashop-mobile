@@ -16,8 +16,9 @@ interface TreeSelectProps {
 	multiple?: boolean;
 	searchPlaceholder?: string;
 	emptyLabel?: string;
-	// When present, an inline row lets the user create a child of the focused node.
-	onAdd?: (name: string, parentId: number) => Promise<TreeNode>;
+	// When present, a footer button requests a full create flow (a modal/screen the
+	// consumer owns); the component stays unaware of the create form.
+	onAddRequest?: () => void;
 	addLabel?: string;
 }
 
@@ -58,13 +59,10 @@ function subtreeIds(b: Built): number[] {
 
 export function TreeSelect({
 	nodes, selected, onChange, multiple = true,
-	searchPlaceholder, emptyLabel, onAdd, addLabel,
+	searchPlaceholder, emptyLabel, onAddRequest, addLabel,
 }: TreeSelectProps) {
 	const [query, setQuery] = useState('');
 	const [expanded, setExpanded] = useState<Set<number>>(new Set());
-	const [addingUnder, setAddingUnder] = useState<number | null>(null);
-	const [addName, setAddName] = useState('');
-	const [addBusy, setAddBusy] = useState(false);
 
 	const forest = useMemo(() => buildForest(nodes), [nodes]);
 	const q = query.trim().toLowerCase();
@@ -103,24 +101,6 @@ export function TreeSelect({
 		}
 	}
 
-	async function commitAdd() {
-		if (!onAdd || addBusy) return;
-		const name = addName.trim();
-		if (!name) { setAddingUnder(null); setAddName(''); return; }
-		setAddBusy(true);
-		try {
-			const created = await onAdd(name, addingUnder ?? 0);
-			toggleSelect(created.id);
-			// Reveal the new node: expand its real parent (the backend may reparent a
-			// "top-level" add under the type's main category).
-			if (created.parent_id) setExpanded((s) => new Set(s).add(created.parent_id));
-			setAddingUnder(null);
-			setAddName('');
-		} finally {
-			setAddBusy(false);
-		}
-	}
-
 	const rows: JSX.Element[] = [];
 	const render = (b: Built) => {
 		if (visible && !visible.has(b.node.id)) return;
@@ -139,28 +119,10 @@ export function TreeSelect({
 					</span>
 					<span className="hk-tree-name">{b.node.name}</span>
 				</button>
-				{onAdd && (
-					<button type="button" className="hk-tree-add" title={addLabel} aria-label={addLabel}
-						onClick={() => { setAddingUnder(b.node.id); setAddName(''); }}>
-						<Icon name="plus" size={15} />
-					</button>
-				)}
 			</div>,
 		);
-		if (addingUnder === b.node.id) rows.push(addRow(b.depth + 1));
 		if (open) for (const c of b.children) render(c);
 	};
-
-	const addRow = (depth: number) => (
-		<div key={`add-${depth}-${addingUnder}`} className="hk-tree-row hk-tree-addrow" style={{ paddingLeft: `calc(${depth} * 1.25rem + 0.25rem)` }}>
-			<input className="hk-input" autoFocus value={addName} disabled={addBusy}
-				onChange={(e) => setAddName(e.target.value)}
-				onKeyDown={(e) => { if (e.key === 'Enter') void commitAdd(); if (e.key === 'Escape') { setAddingUnder(null); setAddName(''); } }}
-				placeholder={addLabel} />
-			<button type="button" className="hk-tree-add" disabled={addBusy} onClick={() => void commitAdd()} aria-label="confirm"><Icon name="check" size={16} /></button>
-			<button type="button" className="hk-tree-add" disabled={addBusy} onClick={() => { setAddingUnder(null); setAddName(''); }} aria-label="cancel"><Icon name="close" size={16} /></button>
-		</div>
-	);
 
 	for (const r of forest) render(r);
 
@@ -173,12 +135,11 @@ export function TreeSelect({
 			<div className="hk-tree-body">
 				{rows.length > 0 ? rows : <div className="hk-empty">{emptyLabel}</div>}
 			</div>
-			{onAdd && addingUnder === null && (
-				<button type="button" className="hk-tree-addroot" onClick={() => { setAddingUnder(0); setAddName(''); }}>
+			{onAddRequest && (
+				<button type="button" className="hk-tree-addroot" onClick={onAddRequest}>
 					<Icon name="plus" size={15} /> {addLabel}
 				</button>
 			)}
-			{onAdd && addingUnder === 0 && addRow(0)}
 		</div>
 	);
 }

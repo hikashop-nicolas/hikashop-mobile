@@ -197,6 +197,18 @@ export interface ProductField {
 	options: { value: string; label: string }[];
 }
 
+// Payload for creating a category or a manufacturer (both are HikaShop categories).
+export interface CategoryInput {
+	name: string;
+	parent_id?: number;
+	description?: string;
+	meta_description?: string;
+	published?: boolean;
+	image?: string;
+	image_name?: string;
+	custom_fields?: Record<string, string>;
+}
+
 // Scalar field types the connector accepts on write; others are read-only.
 export const WRITABLE_FIELD_TYPES = [
 	'text', 'textarea', 'number', 'integer', 'date', 'email', 'url', 'tel', 'color',
@@ -213,6 +225,7 @@ export interface ProductMeta {
 	weight_units: string[];
 	dimension_units: string[];
 	product_fields: ProductField[];
+	category_fields: ProductField[];
 }
 
 // A store the app has been paired with (its token is kept separately, in secure storage).

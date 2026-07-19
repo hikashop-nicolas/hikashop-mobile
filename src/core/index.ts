@@ -4,3 +4,4 @@ export * from './storage';
 export * from './stores';
 export * from './cache';
 export * from './poll';
+export * from './files';

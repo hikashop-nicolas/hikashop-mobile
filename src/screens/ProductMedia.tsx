@@ -4,16 +4,8 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductFile } from '../core';
+import { readAsDataUrl } from '../core';
 import { Screen, Spinner, Icon } from '../ui';
-
-function readAsDataUrl(file: File): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const r = new FileReader();
-		r.onload = () => resolve(String(r.result));
-		r.onerror = () => reject(new Error('read'));
-		r.readAsDataURL(file);
-	});
-}
 
 export function ProductMedia() {
 	const { id } = useParams();
