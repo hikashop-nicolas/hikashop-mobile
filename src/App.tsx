@@ -8,11 +8,14 @@ import { Connect } from './screens/Connect';
 import { Dashboard } from './screens/Dashboard';
 import { Orders } from './screens/Orders';
 import { OrderDetail } from './screens/OrderDetail';
+import { Products } from './screens/Products';
+import { ProductDetail } from './screens/ProductDetail';
 import { Stores } from './screens/Stores';
 
 const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
 	{ key: 'dashboard', icon: 'dashboard', labelKey: 'tabs.dashboard' },
 	{ key: 'orders', icon: 'orders', labelKey: 'tabs.orders' },
+	{ key: 'products', icon: 'products', labelKey: 'tabs.products' },
 	{ key: 'stores', icon: 'store', labelKey: 'tabs.stores' },
 ];
 
@@ -22,9 +25,11 @@ function BottomTabs() {
 	const t = useT();
 	const active = loc.pathname.startsWith('/orders')
 		? 'orders'
-		: loc.pathname.startsWith('/stores')
-			? 'stores'
-			: 'dashboard';
+		: loc.pathname.startsWith('/products')
+			? 'products'
+			: loc.pathname.startsWith('/stores')
+				? 'stores'
+				: 'dashboard';
 	const tabs: TabDef[] = TAB_DEFS.map((d) => ({ key: d.key, icon: d.icon, label: t(d.labelKey) }));
 	return <TabBar tabs={tabs} active={active} onSelect={(k) => nav(`/${k}`)} />;
 }
@@ -59,6 +64,8 @@ function Shell() {
 						<Route path="/dashboard" element={<Dashboard />} />
 						<Route path="/orders" element={<Orders />} />
 						<Route path="/orders/:id" element={<OrderDetail />} />
+						<Route path="/products" element={<Products />} />
+						<Route path="/products/:id" element={<ProductDetail />} />
 						<Route path="/stores" element={<Stores />} />
 						<Route path="/connect" element={<Connect />} />
 						<Route path="*" element={<Navigate to="/dashboard" replace />} />

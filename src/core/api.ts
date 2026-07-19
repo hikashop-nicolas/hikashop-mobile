@@ -3,6 +3,7 @@
 
 import type {
 	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
+	ProductSummary, ProductDetail,
 } from './models';
 
 export class ApiError extends Error {
@@ -136,5 +137,28 @@ export class ApiClient {
 
 	async getDashboard(range = 'week'): Promise<DashboardStats> {
 		return (await this.request<DashboardStats>('GET', 'stats/dashboard', { query: { range } })).data;
+	}
+
+	async getProducts(filters: { start?: number; limit?: number; search?: string } = {}): Promise<Paginated<ProductSummary>> {
+		const query: Query = { start: filters.start, limit: filters.limit, search: filters.search };
+		const { data, meta } = await this.request<ProductSummary[]>('GET', 'products', { query });
+		return {
+			items: data || [],
+			total: Number(meta?.total ?? 0),
+			start: Number(meta?.start ?? 0),
+			limit: Number(meta?.limit ?? 0),
+		};
+	}
+
+	async getProduct(id: number): Promise<ProductDetail> {
+		return (await this.request<ProductDetail>('GET', `products/${id}`)).data;
+	}
+
+	// Set a product's tracked quantity (write scope). A negative value means "unlimited".
+	async setProductStock(id: number, quantity: number): Promise<{ id: number; quantity: number }> {
+		const { data } = await this.request<{ id: number; quantity: number }>('POST', `products/${id}/stock`, {
+			body: { quantity },
+		});
+		return data;
 	}
 }

@@ -82,6 +82,33 @@ describe('ApiClient', () => {
 		expect(r.notified).toBe(true);
 	});
 
+	it('getProducts maps meta into pagination and builds the search query', async () => {
+		let seenUrl = '';
+		const fetchFn: FetchLike = async (url) => {
+			seenUrl = url;
+			return jsonResponse({ data: [{ id: 1 }], meta: { total: 4, start: 0, limit: 30 } });
+		};
+		const p = await new ApiClient('http://shop', 't', fetchFn).getProducts({ search: 'shirt', limit: 30 });
+		expect(seenUrl).toContain('products?');
+		expect(seenUrl).toContain('search=shirt');
+		expect(p.total).toBe(4);
+		expect(p.items.length).toBe(1);
+	});
+
+	it('setProductStock posts the quantity to the stock endpoint', async () => {
+		let seenUrl = '';
+		let seenBody: Record<string, unknown> = {};
+		const fetchFn: FetchLike = async (url, init) => {
+			seenUrl = url;
+			seenBody = JSON.parse(String(init?.body));
+			return jsonResponse({ data: { id: 7, quantity: -1 }, meta: null });
+		};
+		const r = await new ApiClient('http://shop', 't', fetchFn).setProductStock(7, -1);
+		expect(seenUrl).toBe('http://shop/index.php/hikashop-api/v1/products/7/stock');
+		expect(seenBody).toEqual({ quantity: -1 });
+		expect(r.quantity).toBe(-1);
+	});
+
 	it('wraps a transport failure as ApiError(network)', async () => {
 		const fetchFn: FetchLike = async () => {
 			throw new Error('boom');

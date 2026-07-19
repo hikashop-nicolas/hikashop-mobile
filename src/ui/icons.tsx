@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 // A small, consistent line-icon set. All icons are drawn on a 24x24 grid, stroked with
 // currentColor so they inherit text colour, and share one stroke weight and round joins.
 
-export type IconName = 'dashboard' | 'orders' | 'store' | 'search' | 'plus' | 'back' | 'scan' | 'bell';
+export type IconName = 'dashboard' | 'orders' | 'store' | 'search' | 'plus' | 'back' | 'scan' | 'bell' | 'products';
 
 const PATHS: Record<IconName, ReactNode> = {
 	dashboard: (
@@ -55,6 +55,13 @@ const PATHS: Record<IconName, ReactNode> = {
 		<>
 			<path d="M18 9a6 6 0 0 0-12 0c0 6-2 8-2 8h16s-2-2-2-8z" />
 			<path d="M10.5 20a2 2 0 0 0 3 0" />
+		</>
+	),
+	products: (
+		<>
+			<path d="M3 7.5l9-4.5 9 4.5v9l-9 4.5-9-4.5v-9z" />
+			<path d="M3 7.5l9 4.5 9-4.5" />
+			<path d="M12 12v9" />
 		</>
 	),
 };

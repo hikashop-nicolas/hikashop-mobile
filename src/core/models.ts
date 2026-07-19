@@ -83,6 +83,21 @@ export interface OrderStatusResult {
 	notified: boolean;
 }
 
+export interface ProductSummary {
+	id: number;
+	name: string;
+	code: string;
+	quantity: number; // -1 means unlimited
+	published: boolean;
+	has_variants: boolean;
+	price: number | null;
+	currency_id: number;
+}
+
+export interface ProductDetail extends ProductSummary {
+	description: string;
+}
+
 // A store the app has been paired with (its token is kept separately, in secure storage).
 export interface Store {
 	id: string;
