@@ -10,9 +10,13 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "sync": "cap sync",
+    "build:app": "npm run build && cap sync"
   },
   "dependencies": {
+    "@capacitor/android": "^7.6.8",
+    "@capacitor/app": "^7.1.2",
     "@capacitor/core": "^7.6.8",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

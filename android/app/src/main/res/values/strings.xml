@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HikaShop</string>
+    <string name="title_activity_main">HikaShop</string>
+    <string name="package_name">com.hikashop.app</string>
+    <string name="custom_url_scheme">com.hikashop.app</string>
+</resources>
