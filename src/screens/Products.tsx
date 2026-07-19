@@ -4,17 +4,19 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
-import type { ProductSummary, Paginated } from '../core';
-import { Screen, Search, Money, Spinner, Icon } from '../ui';
+import type { ProductSummary, Paginated, ProductMeta } from '../core';
+import { Screen, Search, Money, Spinner, Icon, TreeSelect } from '../ui';
 
 export function Products() {
 	const { client, active, cache } = useStores();
 	const t = useT();
 	const nav = useNavigate();
 	const [search, setSearch] = useState('');
+	const [categoryId, setCategoryId] = useState(0);
+	const [showFilter, setShowFilter] = useState(false);
 	const [creating, setCreating] = useState(false);
 	const storeId = active?.id ?? '';
-	const filterKey = ordersFilterKey('', search);
+	const filterKey = `${ordersFilterKey('', search)}|c${categoryId}`;
 
 	async function create() {
 		if (!client || creating) return;
@@ -28,12 +30,21 @@ export function Products() {
 		}
 	}
 
+	const { data: meta } = useCached<ProductMeta>({
+		enabled: !!client && !!active,
+		read: () => cache.getProductMeta(storeId),
+		fetch: () => client!.getProductMeta(),
+		write: async (m) => { await cache.putProductMeta(storeId, m); },
+		deps: [storeId],
+	});
+	const activeCategory = meta?.categories.find((c) => c.id === categoryId);
+
 	const { data, loading, error } = useCached<Paginated<ProductSummary>>({
 		enabled: !!client && !!active,
 		read: () => cache.getProducts(storeId, filterKey),
-		fetch: () => client!.getProducts({ search: search || undefined, limit: 30 }),
+		fetch: () => client!.getProducts({ search: search || undefined, category_id: categoryId || undefined, limit: 30 }),
 		write: async (p) => { await cache.putProducts(storeId, filterKey, p); },
-		deps: [storeId, search],
+		deps: [storeId, search, categoryId],
 		debounceMs: search ? 300 : 0,
 	});
 
@@ -52,6 +63,24 @@ export function Products() {
 			right={<button className="hk-appbar-act" disabled={creating} onClick={() => void create()}><span className="hk-btn-ic"><Icon name="plus" size={18} /> {t('product.newProduct')}</span></button>}
 		>
 			<Search value={search} onChange={setSearch} placeholder={t('products.search')} />
+			<div className="hk-filter-bar">
+				<button type="button" className={`hk-chip${categoryId ? ' hk-on' : ''}`} onClick={() => setShowFilter((v) => !v)}>
+					{activeCategory ? activeCategory.name : t('products.filterByCategory')}
+					<Icon name="chevron" size={14} className={showFilter ? 'hk-rot90' : ''} />
+				</button>
+				{categoryId > 0 && (
+					<button type="button" className="hk-chip" onClick={() => { setCategoryId(0); setShowFilter(false); }}>
+						{t('products.allCategories')} <Icon name="close" size={13} />
+					</button>
+				)}
+			</div>
+			{showFilter && (
+				<div style={{ marginBottom: 'var(--hk-s3)' }}>
+					<TreeSelect nodes={meta?.categories ?? []} selected={categoryId ? [categoryId] : []} multiple={false}
+						onChange={(ids) => { setCategoryId(ids[0] ?? 0); setShowFilter(false); }}
+						searchPlaceholder={t('product.searchCategories')} emptyLabel={t('product.noCategories')} />
+				</div>
+			)}
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>
 			) : error ? (

@@ -149,8 +149,8 @@ export class ApiClient {
 		return (await this.request<DashboardStats>('GET', 'stats/dashboard', { query: { range } })).data;
 	}
 
-	async getProducts(filters: { start?: number; limit?: number; search?: string } = {}): Promise<Paginated<ProductSummary>> {
-		const query: Query = { start: filters.start, limit: filters.limit, search: filters.search };
+	async getProducts(filters: { start?: number; limit?: number; search?: string; category_id?: number } = {}): Promise<Paginated<ProductSummary>> {
+		const query: Query = { start: filters.start, limit: filters.limit, search: filters.search, category_id: filters.category_id };
 		const { data, meta } = await this.request<ProductSummary[]>('GET', 'products', { query });
 		return {
 			items: data || [],
@@ -200,6 +200,16 @@ export class ApiClient {
 
 	async createCharacteristic(body: { parent_id?: number; value: string }): Promise<{ id: number; value: string; parent_id: number }> {
 		return (await this.request<{ id: number; value: string; parent_id: number }>('POST', 'products/characteristics', { body })).data;
+	}
+
+	// Create a product category (write scope). No parent_id creates a top-level one.
+	async createCategory(body: { name: string; parent_id?: number }): Promise<{ id: number; name: string; parent_id: number }> {
+		return (await this.request<{ id: number; name: string; parent_id: number }>('POST', 'products/categories', { body })).data;
+	}
+
+	// Create a manufacturer / brand (write scope).
+	async createManufacturer(body: { name: string; parent_id?: number }): Promise<{ id: number; name: string; parent_id: number }> {
+		return (await this.request<{ id: number; name: string; parent_id: number }>('POST', 'products/manufacturers', { body })).data;
 	}
 
 	async setProductVariants(id: number, variants: unknown[]): Promise<{ characteristics: ProductCharacteristic[]; variants: ProductVariant[] }> {

@@ -5,7 +5,8 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductField } from '../core';
 import { WRITABLE_FIELD_TYPES } from '../core';
-import { Screen, Spinner, Icon, Field } from '../ui';
+import { Screen, Spinner, Icon, Field, TreeSelect } from '../ui';
+import type { TreeNode } from '../ui';
 
 type Form = Record<string, string | boolean>;
 
@@ -50,21 +51,38 @@ export function ProductEdit() {
 
 	const [form, setForm] = useState<Form | null>(null);
 	const [cats, setCats] = useState<number[]>([]);
+	const [manufacturerId, setManufacturerId] = useState<number>(0);
 	const [custom, setCustom] = useState<Record<string, string>>({});
 	useEffect(() => {
 		if (fetched && !form) {
 			setForm(toForm(fetched));
 			setCats(fetched.categories.map((c) => c.id));
+			setManufacturerId(fetched.manufacturer_id || 0);
 			const cf: Record<string, string> = {};
 			for (const [k, v] of Object.entries(fetched.custom_fields ?? {})) cf[k] = v ?? '';
 			setCustom(cf);
 		}
 	}, [fetched, form]);
 
+	// Local copies of the pickable trees so a freshly created node shows up at once.
+	const [catNodes, setCatNodes] = useState<TreeNode[]>([]);
+	const [brandNodes, setBrandNodes] = useState<TreeNode[]>([]);
+	useEffect(() => { if (meta) { setCatNodes(meta.categories); setBrandNodes(meta.manufacturers); } }, [meta]);
+
 	const [busy, setBusy] = useState(false);
 	const [saveErr, setSaveErr] = useState('');
-	function toggleCat(cid: number) {
-		setCats((c) => (c.includes(cid) ? c.filter((x) => x !== cid) : [...c, cid]));
+
+	async function addCategory(name: string, parentId: number): Promise<TreeNode> {
+		const c = await client!.createCategory({ name, parent_id: parentId || undefined });
+		const node: TreeNode = { id: c.id, name: c.name, parent_id: c.parent_id };
+		setCatNodes((ns) => [...ns, node]);
+		return node;
+	}
+	async function addBrand(name: string, parentId: number): Promise<TreeNode> {
+		const m = await client!.createManufacturer({ name, parent_id: parentId || undefined });
+		const node: TreeNode = { id: m.id, name: m.name, parent_id: m.parent_id };
+		setBrandNodes((ns) => [...ns, node]);
+		return node;
 	}
 
 	function set<K extends string>(key: K, value: string | boolean) {
@@ -94,7 +112,7 @@ export function ProductEdit() {
 				weight: num(form.weight), weight_unit: form.weight_unit,
 				width: num(form.width), height: num(form.height), length: num(form.length), dimension_unit: form.dimension_unit,
 				min_per_order: int(form.min_per_order), max_per_order: int(form.max_per_order),
-				tax_id: int(form.tax_id), manufacturer_id: int(form.manufacturer_id),
+				tax_id: int(form.tax_id), manufacturer_id: manufacturerId,
 				page_title: form.page_title, meta_description: form.meta_description, keywords: form.keywords,
 				custom_fields: writableCustom(),
 			};
@@ -182,17 +200,15 @@ export function ProductEdit() {
 					<div className="hk-card hk-card--pad hk-form">
 						<span className="hk-muted">{t('product.organization')}</span>
 						<Field label={t('product.categories')}>
-							<div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--hk-s2)' }}>
-								{(meta?.categories ?? []).map((c) => (
-									<button key={c.id} type="button" className={`hk-chip${cats.includes(c.id) ? ' hk-on' : ''}`} onClick={() => toggleCat(c.id)}>{c.name}</button>
-								))}
-							</div>
+							<TreeSelect nodes={catNodes} selected={cats} onChange={setCats}
+								searchPlaceholder={t('product.searchCategories')} emptyLabel={t('product.noCategories')}
+								onAdd={addCategory} addLabel={t('product.addCategory')} />
 						</Field>
 						<Field label={t('product.manufacturer')}>
-							<select className="hk-select" value={s('manufacturer_id')} onChange={(e) => set('manufacturer_id', e.target.value)}>
-								<option value="0">{t('product.none')}</option>
-								{(meta?.manufacturers ?? []).map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-							</select>
+							<TreeSelect nodes={brandNodes} selected={manufacturerId ? [manufacturerId] : []}
+								onChange={(ids) => setManufacturerId(ids[0] ?? 0)} multiple={false}
+								searchPlaceholder={t('product.searchBrands')} emptyLabel={t('product.noBrands')}
+								onAdd={addBrand} addLabel={t('product.addBrand')} />
 						</Field>
 						<Field label={t('product.tax')}>
 							<select className="hk-select" value={s('tax_id')} onChange={(e) => set('tax_id', e.target.value)}>
