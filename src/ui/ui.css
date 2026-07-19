@@ -1,0 +1,73 @@
+/* Component styles, built entirely from the tokens. Class-prefixed (hk-*) atoms/molecules. */
+
+/* ---- layout: screen shell + app bar + tab bar ------------------------------ */
+.hk-app { display: flex; flex-direction: column; height: 100%; max-width: 720px; margin: 0 auto; background: var(--hk-bg); }
+.hk-appbar { display: flex; align-items: center; gap: var(--hk-s2); padding: var(--hk-s3) var(--hk-s4); border-bottom: 1px solid var(--hk-line); background: var(--hk-surface); position: sticky; top: 0; z-index: 5; }
+.hk-appbar .hk-title { font-weight: 650; font-size: 1.05rem; letter-spacing: -.01em; }
+.hk-appbar .hk-grow { flex: 1; }
+.hk-appbar .hk-iconbtn { background: none; border: none; color: var(--hk-muted); padding: var(--hk-s2); border-radius: var(--hk-r1); cursor: pointer; min-width: var(--hk-tap); min-height: var(--hk-tap); }
+.hk-body { flex: 1; overflow-y: auto; padding: var(--hk-s4); display: flex; flex-direction: column; gap: var(--hk-s3); -webkit-overflow-scrolling: touch; }
+.hk-body.hk-center { justify-content: center; align-items: center; text-align: center; gap: var(--hk-s4); }
+
+.hk-tabbar { display: flex; border-top: 1px solid var(--hk-line); background: var(--hk-surface); }
+.hk-tab { flex: 1; background: none; border: none; padding: var(--hk-s2) 0 calc(var(--hk-s2) + env(safe-area-inset-bottom, 0)); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: .68rem; color: var(--hk-faint); cursor: pointer; min-height: var(--hk-tap); }
+.hk-tab.hk-on { color: var(--hk-accent); }
+.hk-tab .hk-tab-ic { font-size: 1.15rem; line-height: 1; }
+
+/* ---- atoms ----------------------------------------------------------------- */
+.hk-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--hk-s2); border: 1px solid var(--hk-line); background: var(--hk-surface); color: var(--hk-ink); border-radius: var(--hk-r2); padding: 0 var(--hk-s4); min-height: var(--hk-tap); font-size: .92rem; font-weight: 600; cursor: pointer; text-decoration: none; }
+.hk-btn:disabled { opacity: .55; cursor: default; }
+.hk-btn--pri { background: var(--hk-accent); color: var(--hk-accent-ink); border-color: var(--hk-accent); }
+.hk-btn--ghost { background: none; border-color: transparent; color: var(--hk-accent); }
+.hk-btn--danger { color: var(--hk-crit); border-color: var(--hk-crit-soft); }
+.hk-btn--block { display: flex; width: 100%; }
+
+.hk-input { border: 1px solid var(--hk-line); border-radius: var(--hk-r2); padding: 0 var(--hk-s3); min-height: var(--hk-tap); font-size: .95rem; background: var(--hk-surface); color: var(--hk-ink); width: 100%; }
+.hk-input::placeholder { color: var(--hk-faint); }
+.hk-input:focus { border-color: var(--hk-accent); outline: none; }
+
+.hk-chip { font-size: .72rem; padding: .25rem .6rem; border-radius: var(--hk-r-pill); border: 1px solid var(--hk-line); color: var(--hk-muted); background: var(--hk-surface); cursor: pointer; white-space: nowrap; }
+.hk-chip.hk-on { background: var(--hk-accent-soft); border-color: transparent; color: var(--hk-accent); font-weight: 600; }
+
+.hk-status { font-size: .68rem; padding: .16rem .5rem; border-radius: var(--hk-r-pill); font-weight: 600; white-space: nowrap; display: inline-block; }
+.hk-status--ok { color: var(--hk-ok); background: var(--hk-ok-soft); }
+.hk-status--warn { color: var(--hk-warn); background: var(--hk-warn-soft); }
+.hk-status--crit { color: var(--hk-crit); background: var(--hk-crit-soft); }
+.hk-status--neutral { color: var(--hk-muted); background: var(--hk-surface-2); }
+
+.hk-money { font-variant-numeric: tabular-nums; font-weight: 650; }
+
+.hk-spinner { width: 1.4rem; height: 1.4rem; border: 2px solid var(--hk-line); border-top-color: var(--hk-accent); border-radius: 50%; animation: hk-spin .7s linear infinite; }
+@keyframes hk-spin { to { transform: rotate(360deg); } }
+
+/* ---- molecules ------------------------------------------------------------- */
+.hk-field { display: flex; flex-direction: column; gap: var(--hk-s1); }
+.hk-field .hk-label { font-size: .78rem; color: var(--hk-muted); }
+.hk-field .hk-hint { font-size: .74rem; color: var(--hk-faint); }
+.hk-field .hk-err { font-size: .76rem; color: var(--hk-crit); }
+
+.hk-card { background: var(--hk-surface); border: 1px solid var(--hk-line); border-radius: var(--hk-r3); box-shadow: var(--hk-shadow); }
+.hk-card--pad { padding: var(--hk-s4); }
+
+.hk-stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--hk-s3); }
+.hk-stat { border: 1px solid var(--hk-line); border-radius: var(--hk-r2); padding: var(--hk-s3); display: flex; flex-direction: column; gap: var(--hk-s1); background: var(--hk-surface); }
+.hk-stat .hk-stat-n { font-weight: 700; font-size: 1.3rem; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.hk-stat .hk-stat-k { font-size: .66rem; color: var(--hk-muted); text-transform: uppercase; letter-spacing: .05em; }
+
+.hk-row { display: flex; align-items: center; gap: var(--hk-s3); padding: var(--hk-s3) 0; border-bottom: 1px solid var(--hk-line); text-decoration: none; color: inherit; }
+.hk-row:last-child { border-bottom: none; }
+.hk-row .hk-row-grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.hk-row .hk-row-title { font-weight: 600; font-size: .92rem; }
+.hk-row .hk-row-sub { color: var(--hk-muted); font-size: .78rem; }
+.hk-row .hk-row-rt { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.hk-avatar { width: 2rem; height: 2rem; border-radius: 50%; background: var(--hk-surface-2); flex: none; display: grid; place-items: center; color: var(--hk-muted); font-size: .8rem; }
+
+.hk-search { display: flex; align-items: center; gap: var(--hk-s2); border: 1px solid var(--hk-line); border-radius: var(--hk-r2); padding: 0 var(--hk-s3); background: var(--hk-surface); }
+.hk-search input { border: none; outline: none; background: none; color: var(--hk-ink); min-height: var(--hk-tap); flex: 1; font-size: .92rem; }
+
+.hk-code { font-family: var(--hk-mono); font-size: 1.6rem; letter-spacing: .14em; font-weight: 700; text-align: center; }
+
+.hk-muted { color: var(--hk-muted); }
+.hk-center-col { display: flex; flex-direction: column; align-items: center; gap: var(--hk-s3); }
+.hk-empty { text-align: center; color: var(--hk-muted); padding: var(--hk-s6) var(--hk-s4); }
+.hk-error-note { background: var(--hk-crit-soft); color: var(--hk-crit); border-radius: var(--hk-r2); padding: var(--hk-s3); font-size: .85rem; }

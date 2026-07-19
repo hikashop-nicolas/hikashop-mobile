@@ -1,0 +1,101 @@
+/* Design tokens: the single source for color, spacing, type, radius and elevation.
+   Everything else in the UI is built from these. Theme-aware (light/dark). */
+
+:root {
+	--hk-bg: #f6f7f9;
+	--hk-surface: #ffffff;
+	--hk-surface-2: #eef1f4;
+	--hk-ink: #181c20;
+	--hk-muted: #626b73;
+	--hk-faint: #aab0b6;
+	--hk-line: #e1e6ea;
+	--hk-accent: #0c6d77;
+	--hk-accent-ink: #ffffff;
+	--hk-accent-soft: #dcedef;
+	--hk-ok: #2c7c52;
+	--hk-ok-soft: #e0f1e8;
+	--hk-warn: #a56718;
+	--hk-warn-soft: #f6ecda;
+	--hk-crit: #b0423a;
+	--hk-crit-soft: #f6e2e0;
+
+	--hk-s1: 4px;
+	--hk-s2: 8px;
+	--hk-s3: 12px;
+	--hk-s4: 16px;
+	--hk-s5: 24px;
+	--hk-s6: 32px;
+
+	--hk-r1: 6px;
+	--hk-r2: 10px;
+	--hk-r3: 14px;
+	--hk-r-pill: 999px;
+
+	--hk-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--hk-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+	--hk-shadow: 0 1px 2px rgba(20, 30, 40, .05), 0 6px 20px rgba(20, 30, 40, .06);
+	--hk-tap: 44px; /* minimum touch target */
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--hk-bg: #0f1215;
+		--hk-surface: #181d21;
+		--hk-surface-2: #1e242a;
+		--hk-ink: #e7eaec;
+		--hk-muted: #98a1a8;
+		--hk-faint: #5b636a;
+		--hk-line: #293037;
+		--hk-accent: #43b6c0;
+		--hk-accent-ink: #071e21;
+		--hk-accent-soft: #102f33;
+		--hk-ok: #5ec085;
+		--hk-ok-soft: #16281f;
+		--hk-warn: #d59f52;
+		--hk-warn-soft: #2a2113;
+		--hk-crit: #dd7a72;
+		--hk-crit-soft: #2a1917;
+		--hk-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+	}
+}
+
+:root[data-theme="light"] {
+	--hk-bg: #f6f7f9;
+	--hk-surface: #ffffff;
+	--hk-surface-2: #eef1f4;
+	--hk-ink: #181c20;
+	--hk-muted: #626b73;
+	--hk-faint: #aab0b6;
+	--hk-line: #e1e6ea;
+	--hk-accent: #0c6d77;
+	--hk-accent-ink: #ffffff;
+	--hk-accent-soft: #dcedef;
+	--hk-ok: #2c7c52;
+	--hk-ok-soft: #e0f1e8;
+	--hk-warn: #a56718;
+	--hk-warn-soft: #f6ecda;
+	--hk-crit: #b0423a;
+	--hk-crit-soft: #f6e2e0;
+	--hk-shadow: 0 1px 2px rgba(20, 30, 40, .05), 0 6px 20px rgba(20, 30, 40, .06);
+}
+
+:root[data-theme="dark"] {
+	--hk-bg: #0f1215;
+	--hk-surface: #181d21;
+	--hk-surface-2: #1e242a;
+	--hk-ink: #e7eaec;
+	--hk-muted: #98a1a8;
+	--hk-faint: #5b636a;
+	--hk-line: #293037;
+	--hk-accent: #43b6c0;
+	--hk-accent-ink: #071e21;
+	--hk-accent-soft: #102f33;
+	--hk-ok: #5ec085;
+	--hk-ok-soft: #16281f;
+	--hk-warn: #d59f52;
+	--hk-warn-soft: #2a2113;
+	--hk-crit: #dd7a72;
+	--hk-crit-soft: #2a1917;
+	--hk-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+}
