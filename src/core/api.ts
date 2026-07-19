@@ -4,7 +4,7 @@
 import type {
 	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductFile, ProductCharacteristic, ProductVariant,
-	CategoryInput,
+	CategoryInput, CategoryListItem, CategoryDetail,
 } from './models';
 
 export class ApiError extends Error {
@@ -211,6 +211,23 @@ export class ApiClient {
 	// Create a manufacturer / brand (write scope).
 	async createManufacturer(body: CategoryInput): Promise<{ id: number; name: string; parent_id: number; published: boolean }> {
 		return (await this.request<{ id: number; name: string; parent_id: number; published: boolean }>('POST', 'products/manufacturers', { body })).data;
+	}
+
+	// Category management (read/write scope).
+	async listCategories(type: 'product' | 'manufacturer' = 'product'): Promise<CategoryListItem[]> {
+		return (await this.request<CategoryListItem[]>('GET', 'categories', { query: { type } })).data;
+	}
+
+	async getCategory(id: number): Promise<CategoryDetail> {
+		return (await this.request<CategoryDetail>('GET', `categories/${id}`)).data;
+	}
+
+	async updateCategory(id: number, body: CategoryInput): Promise<CategoryDetail> {
+		return (await this.request<CategoryDetail>('PUT', `categories/${id}`, { body })).data;
+	}
+
+	async deleteCategory(id: number): Promise<{ id: number; deleted: boolean }> {
+		return (await this.request<{ id: number; deleted: boolean }>('DELETE', `categories/${id}`)).data;
 	}
 
 	async setProductVariants(id: number, variants: unknown[]): Promise<{ characteristics: ProductCharacteristic[]; variants: ProductVariant[] }> {

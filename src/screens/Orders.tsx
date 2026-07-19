@@ -61,7 +61,7 @@ export function Orders() {
 								<span className="hk-row-title">#{o.number} · {o.customer.name || o.customer.email || t('common.guest')}</span>
 								<span className="hk-row-sub">{fmtDate(o.created, locale)}</span>
 							</div>
-							<div className="hk-row-rt"><StatusChip status={o.status} /><Money value={o.total} /></div>
+							<div className="hk-row-rt"><StatusChip status={o.status} /><Money value={o.total} currency={o.currency_id} /></div>
 						</Link>
 					))}
 					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('orders.countOf', { shown: items.length, total })}</div>

@@ -98,7 +98,7 @@ export function Products() {
 								<span className="hk-row-title">{p.name}{!p.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}</span>
 								<span className="hk-row-sub">{p.code} · {stockLabel(p)}</span>
 							</div>
-							<div className="hk-row-rt">{p.price !== null && <Money value={p.price} />}</div>
+							<div className="hk-row-rt">{p.price !== null && <Money value={p.price} currency={p.currency_id} />}</div>
 						</Link>
 					))}
 					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('products.countOf', { shown: items.length, total })}</div>

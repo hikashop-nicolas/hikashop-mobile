@@ -76,16 +76,16 @@ export function OrderDetail() {
 									<span className="hk-row-title">{it.name}</span>
 									<span className="hk-row-sub">{t('order.qty', { count: it.quantity })}{it.code ? ` · ${it.code}` : ''}</span>
 								</div>
-								<Money value={it.price} />
+								<Money value={it.price} currency={order.currency_id} />
 							</div>
 						))}
 						<div className="hk-row">
 							<div className="hk-row-grow"><span className="hk-row-sub">{t('order.shipping')}</span></div>
-							<Money value={order.totals.shipping} />
+							<Money value={order.totals.shipping} currency={order.currency_id} />
 						</div>
 						<div className="hk-row">
 							<div className="hk-row-grow"><span className="hk-row-title">{t('order.total')}</span></div>
-							<span className="hk-row-title"><Money value={order.totals.total} /></span>
+							<span className="hk-row-title"><Money value={order.totals.total} currency={order.currency_id} /></span>
 						</div>
 					</div>
 

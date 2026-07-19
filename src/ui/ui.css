@@ -172,3 +172,7 @@
 .hk-cat-img { position: relative; width: 96px; height: 96px; border-radius: var(--hk-r2); overflow: hidden; border: 1px solid var(--hk-line); }
 .hk-cat-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hk-cat-imgadd { width: 96px; height: 96px; aspect-ratio: unset; }
+
+.hk-row-btn { border: none; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 0; display: flex; flex-direction: column; }
+.hk-iconbtn.hk-danger { color: var(--hk-crit); }
+.hk-iconbtn.hk-danger:disabled { opacity: .4; }

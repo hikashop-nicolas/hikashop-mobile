@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductField } from '../core';
 import { WRITABLE_FIELD_TYPES } from '../core';
-import { Screen, Spinner, Icon, Field, TreeSelect } from '../ui';
+import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button } from '../ui';
 import type { TreeNode } from '../ui';
 import { CategoryEditor } from './CategoryEditor';
 
@@ -54,16 +54,30 @@ export function ProductEdit() {
 	const [cats, setCats] = useState<number[]>([]);
 	const [manufacturerId, setManufacturerId] = useState<number>(0);
 	const [custom, setCustom] = useState<Record<string, string>>({});
+	const [stockInput, setStockInput] = useState('');
+	const [stockBusy, setStockBusy] = useState(false);
 	useEffect(() => {
 		if (fetched && !form) {
 			setForm(toForm(fetched));
 			setCats(fetched.categories.map((c) => c.id));
 			setManufacturerId(fetched.manufacturer_id || 0);
+			setStockInput(fetched.quantity >= 0 ? String(fetched.quantity) : '');
 			const cf: Record<string, string> = {};
 			for (const [k, v] of Object.entries(fetched.custom_fields ?? {})) cf[k] = v ?? '';
 			setCustom(cf);
 		}
 	}, [fetched, form]);
+
+	async function saveStock() {
+		if (!client || stockBusy) return;
+		setStockBusy(true);
+		try {
+			const q = stockInput.trim() === '' ? -1 : parseInt(stockInput, 10) || 0;
+			const res = await client.setProductStock(productId, q);
+			setStockInput(res.quantity >= 0 ? String(res.quantity) : '');
+		} catch { /* surfaced on the next fetch */ }
+		finally { setStockBusy(false); }
+	}
 
 	// Local copies of the pickable trees so a freshly created node shows up at once.
 	const [catNodes, setCatNodes] = useState<TreeNode[]>([]);
@@ -220,6 +234,42 @@ export function ProductEdit() {
 						</Field>
 					</div>
 
+					<div className="hk-card hk-card--pad">
+						<div className="hk-sect-head"><span className="hk-muted">{t('product.pricing')}</span>
+							<button className="hk-appbar-act" onClick={() => nav(`/products/${productId}/prices`)}>{t('product.edit')}</button></div>
+						{(fetched?.prices ?? []).length === 0 ? (
+							<div className="hk-empty">{t('product.noPrice')}</div>
+						) : fetched!.prices.map((p) => (
+							<div key={p.id} className="hk-row">
+								<div className="hk-row-grow"><span className="hk-row-title"><Money value={p.value} currency={p.currency_id} /></span>
+									{(p.min_quantity > 1 || p.access) && <span className="hk-row-sub">{p.min_quantity > 1 ? t('product.priceFrom', { qty: p.min_quantity }) : ''}{p.access ? ` · ${p.access}` : ''}</span>}</div>
+							</div>
+						))}
+					</div>
+
+					{fetched && fetched.variants.length === 0 && (
+						<div className="hk-card hk-card--pad hk-form">
+							<span className="hk-muted">{t('product.stock')}</span>
+							<div className="hk-form-row">
+								<input className="hk-input" type="number" inputMode="numeric" value={stockInput} placeholder={t('product.unlimited')}
+									disabled={stockBusy} onChange={(e) => setStockInput(e.target.value)} />
+								<Button variant="pri" disabled={stockBusy} onClick={() => void saveStock()}>{stockBusy ? t('product.saving') : t('product.updateStock')}</Button>
+							</div>
+						</div>
+					)}
+
+					<div className="hk-card hk-card--pad">
+						<div className="hk-sect-head"><span className="hk-muted">{t('product.editMedia')}</span>
+							<button className="hk-appbar-act" onClick={() => nav(`/products/${productId}/media`)}>{t('product.edit')}</button></div>
+						<div className="hk-row-sub">{(fetched?.images.length ?? 0)} · {(fetched?.files.length ?? 0)}</div>
+					</div>
+
+					<div className="hk-card hk-card--pad">
+						<div className="hk-sect-head"><span className="hk-muted">{t('product.variants')}</span>
+							<button className="hk-appbar-act" onClick={() => nav(`/products/${productId}/variants`)}>{t('product.edit')}</button></div>
+						<div className="hk-row-sub">{t('product.variantsSummary', { options: fetched?.characteristics.length ?? 0, count: fetched?.variants.length ?? 0 })}</div>
+					</div>
+
 					<div className="hk-card hk-card--pad hk-form">
 						<span className="hk-muted">{t('product.seo')}</span>
 						<Field label={t('product.pageTitle')}><input className="hk-input" value={s('page_title')} onChange={(e) => set('page_title', e.target.value)} /></Field>
@@ -272,7 +322,7 @@ export function ProductEdit() {
 					meta={meta}
 					parentNodes={editorKind === 'manufacturer' ? brandNodes : catNodes}
 					onClose={() => setEditorKind(null)}
-					onCreated={editorKind === 'manufacturer' ? onBrandCreated : onCategoryCreated}
+					onSaved={editorKind === 'manufacturer' ? onBrandCreated : onCategoryCreated}
 				/>
 			)}
 		</Screen>

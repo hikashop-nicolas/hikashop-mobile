@@ -47,6 +47,3 @@ export function StatusChip({ status }: { status: string }) {
 	return <span className={`hk-status hk-status--${kind}`}>{label}</span>;
 }
 
-export function Money({ value }: { value: number }) {
-	return <span className="hk-money">{Number(value ?? 0).toFixed(2)}</span>;
-}

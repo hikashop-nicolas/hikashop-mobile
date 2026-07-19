@@ -197,6 +197,27 @@ export interface ProductField {
 	options: { value: string; label: string }[];
 }
 
+// A category row for the management list (includes unpublished ones).
+export interface CategoryListItem {
+	id: number;
+	name: string;
+	parent_id: number;
+	published: boolean;
+}
+
+// Full category for the editor.
+export interface CategoryDetail {
+	id: number;
+	name: string;
+	parent_id: number;
+	type: string;
+	description: string;
+	meta_description: string;
+	published: boolean;
+	image: string;
+	custom_fields: Record<string, string | null>;
+}
+
 // Payload for creating a category or a manufacturer (both are HikaShop categories).
 export interface CategoryInput {
 	name: string;
@@ -215,8 +236,21 @@ export const WRITABLE_FIELD_TYPES = [
 	'singledropdown', 'radio', 'multidropdown', 'checkbox',
 ];
 
+// A shop currency plus the parts needed to render a price faithfully to its settings.
+export interface Currency {
+	id: number;
+	code: string;
+	symbol: string;
+	name: string;
+	decimals: number;
+	decimal_sep: string;
+	thousands_sep: string;
+	symbol_before: boolean;
+	space: boolean;
+}
+
 export interface ProductMeta {
-	currencies: { id: number; code: string; symbol: string; name: string }[];
+	currencies: Currency[];
 	tax_categories: { id: number; name: string; parent_id: number }[];
 	manufacturers: { id: number; name: string; parent_id: number }[];
 	categories: { id: number; name: string; parent_id: number }[];

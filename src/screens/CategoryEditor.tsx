@@ -2,36 +2,45 @@ import { useMemo, useRef, useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl, WRITABLE_FIELD_TYPES } from '../core';
-import type { ProductMeta, ProductField } from '../core';
+import type { ProductMeta, ProductField, CategoryDetail } from '../core';
 import { Modal, Field, Button, Icon, TreeSelect } from '../ui';
 import type { TreeNode } from '../ui';
 
 type Kind = 'product' | 'manufacturer';
 
-// A full create form for a category or a manufacturer (both are HikaShop categories):
-// name, parent, description, image, published and any shop-defined category fields.
-export function CategoryEditor({ kind, meta, parentNodes, onClose, onCreated }: {
+// A full create / edit form for a category or a manufacturer (both are HikaShop
+// categories): name, parent, description, image, published and category custom fields.
+export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onSaved }: {
 	kind: Kind;
+	category?: CategoryDetail | null;
 	meta: ProductMeta | null;
 	parentNodes: TreeNode[];
 	onClose: () => void;
-	onCreated: (node: TreeNode) => void;
+	onSaved: (node: TreeNode) => void;
 }) {
 	const { client } = useStores();
 	const t = useT();
 	const imgInput = useRef<HTMLInputElement>(null);
+	const editing = !!category;
 
-	const [name, setName] = useState('');
-	const [parent, setParent] = useState<number[]>([]);
-	const [description, setDescription] = useState('');
-	const [published, setPublished] = useState(true);
+	const [name, setName] = useState(category?.name ?? '');
+	const [parent, setParent] = useState<number[]>(category?.parent_id ? [category.parent_id] : []);
+	const [description, setDescription] = useState(category?.description ?? '');
+	const [published, setPublished] = useState(category?.published ?? true);
+	const [existingImage] = useState(category?.image ?? '');
 	const [image, setImage] = useState<{ data: string; name: string; preview: string } | null>(null);
-	const [custom, setCustom] = useState<Record<string, string>>({});
+	const [custom, setCustom] = useState<Record<string, string>>(() => {
+		const c: Record<string, string> = {};
+		for (const [k, v] of Object.entries(category?.custom_fields ?? {})) c[k] = v ?? '';
+		return c;
+	});
 	const [busy, setBusy] = useState(false);
 	const [err, setErr] = useState('');
 
 	const fields: ProductField[] = useMemo(() => meta?.category_fields ?? [], [meta]);
 	const isWritable = (f: ProductField) => WRITABLE_FIELD_TYPES.includes(f.type);
+	// Exclude the category itself (and later, ideally its subtree) from parent choices.
+	const parents = useMemo(() => (editing ? parentNodes.filter((n) => n.id !== category!.id) : parentNodes), [parentNodes, editing, category]);
 
 	async function pickImage(files: FileList | null) {
 		const file = files?.[0];
@@ -55,16 +64,19 @@ export function CategoryEditor({ kind, meta, parentNodes, onClose, onCreated }: 
 			const body = {
 				name: name.trim(),
 				parent_id: parent[0] || undefined,
-				description: description || undefined,
+				description,
 				published,
 				image: image?.data,
 				image_name: image?.name,
 				custom_fields: writableCustom(),
 			};
-			const created = kind === 'manufacturer'
-				? await client.createManufacturer(body)
-				: await client.createCategory(body);
-			onCreated({ id: created.id, name: created.name, parent_id: created.parent_id });
+			let saved: { id: number; name: string; parent_id: number };
+			if (editing) {
+				saved = await client.updateCategory(category!.id, body);
+			} else {
+				saved = kind === 'manufacturer' ? await client.createManufacturer(body) : await client.createCategory(body);
+			}
+			onSaved({ id: saved.id, name: saved.name, parent_id: saved.parent_id });
 		} catch (e) {
 			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
 			setErr(tError(t, code));
@@ -72,32 +84,34 @@ export function CategoryEditor({ kind, meta, parentNodes, onClose, onCreated }: 
 		}
 	}
 
-	const title = kind === 'manufacturer' ? t('category.newBrand') : t('category.newCategory');
+	const brand = kind === 'manufacturer';
+	const title = editing ? (brand ? t('category.editBrand') : t('category.editCategory')) : (brand ? t('category.newBrand') : t('category.newCategory'));
+	const preview = image?.preview ?? existingImage;
 
 	return (
 		<Modal title={title} onClose={onClose}
 			footer={<>
 				<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
-				<Button variant="pri" onClick={() => void submit()} disabled={busy}>{busy ? t('product.saving') : t('common.create')}</Button>
+				<Button variant="pri" onClick={() => void submit()} disabled={busy}>{busy ? t('product.saving') : editing ? t('common.save') : t('common.create')}</Button>
 			</>}
 		>
 			<div className="hk-form">
 				<Field label={t('category.name')}><input className="hk-input" autoFocus value={name} onChange={(e) => setName(e.target.value)} /></Field>
 
 				<Field label={t('category.parent')}>
-					<TreeSelect nodes={parentNodes} selected={parent} onChange={setParent} multiple={false}
-						searchPlaceholder={kind === 'manufacturer' ? t('product.searchBrands') : t('product.searchCategories')}
-						emptyLabel={kind === 'manufacturer' ? t('product.noBrands') : t('product.noCategories')} />
+					<TreeSelect nodes={parents} selected={parent} onChange={setParent} multiple={false}
+						searchPlaceholder={brand ? t('product.searchBrands') : t('product.searchCategories')}
+						emptyLabel={brand ? t('product.noBrands') : t('product.noCategories')} />
 				</Field>
 
 				<Field label={t('category.description')}><textarea className="hk-input hk-textarea" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} /></Field>
 
 				<Field label={t('category.image')}>
 					<input ref={imgInput} type="file" accept="image/*" hidden onChange={(e) => void pickImage(e.target.files)} />
-					{image ? (
+					{preview ? (
 						<div className="hk-cat-img">
-							<img src={image.preview} alt="" />
-							<button type="button" className="hk-media-del" onClick={() => setImage(null)} aria-label={t('common.cancel')}><Icon name="close" size={13} /></button>
+							<img src={preview} alt="" />
+							<button type="button" className="hk-media-del" onClick={() => imgInput.current?.click()} aria-label={t('category.image')}><Icon name="plus" size={13} /></button>
 						</div>
 					) : (
 						<button type="button" className="hk-media-add hk-cat-imgadd" onClick={() => imgInput.current?.click()}><Icon name="plus" size={20} /></button>

@@ -1,31 +1,35 @@
+import { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { StoreProvider, useStores } from './app/store-context';
 import { useOrderPoll } from './app/use-order-poll';
 import { I18nProvider, useT } from './i18n';
-import { TabBar, Spinner, Icon } from './ui';
+import { TabBar, Spinner, Icon, CurrencyProvider } from './ui';
 import type { TabDef, IconName } from './ui';
+import type { Currency } from './core';
 import { Connect } from './screens/Connect';
 import { Dashboard } from './screens/Dashboard';
 import { Orders } from './screens/Orders';
 import { OrderDetail } from './screens/OrderDetail';
 import { Products } from './screens/Products';
-import { ProductDetail } from './screens/ProductDetail';
 import { ProductEdit } from './screens/ProductEdit';
 import { ProductPricesEdit } from './screens/ProductPricesEdit';
 import { ProductMedia } from './screens/ProductMedia';
 import { ProductVariantsEdit } from './screens/ProductVariantsEdit';
+import { Categories } from './screens/Categories';
 import { Stores } from './screens/Stores';
 
 const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
 	{ key: 'dashboard', icon: 'dashboard', labelKey: 'tabs.dashboard' },
 	{ key: 'orders', icon: 'orders', labelKey: 'tabs.orders' },
 	{ key: 'products', icon: 'products', labelKey: 'tabs.products' },
+	{ key: 'categories', icon: 'categories', labelKey: 'tabs.categories' },
 	{ key: 'stores', icon: 'store', labelKey: 'tabs.stores' },
 ];
 
 function activeKey(pathname: string): string {
 	if (pathname.startsWith('/orders')) return 'orders';
 	if (pathname.startsWith('/products')) return 'products';
+	if (pathname.startsWith('/categories')) return 'categories';
 	if (pathname.startsWith('/stores')) return 'stores';
 	return 'dashboard';
 }
@@ -57,6 +61,29 @@ function SideNav() {
 	);
 }
 
+// Loads the active store's currencies (from cache, then network) and provides them
+// so the Money atom can format prices to each currency's settings.
+function CurrencyGate({ children }: { children: React.ReactNode }) {
+	const { client, active, cache } = useStores();
+	const [currencies, setCurrencies] = useState<Currency[]>([]);
+	useEffect(() => {
+		if (!client || !active) { setCurrencies([]); return; }
+		let alive = true;
+		void (async () => {
+			const cached = await cache.getProductMeta(active.id);
+			if (alive && cached?.value) setCurrencies(cached.value.currencies ?? []);
+			try {
+				const m = await client.getProductMeta();
+				if (!alive) return;
+				setCurrencies(m.currencies ?? []);
+				await cache.putProductMeta(active.id, m);
+			} catch { /* keep cached currencies */ }
+		})();
+		return () => { alive = false; };
+	}, [client, active, cache]);
+	return <CurrencyProvider currencies={currencies}>{children}</CurrencyProvider>;
+}
+
 // Runs the foreground order poller whenever a store is active and notifications are enabled.
 function OrderPoller() {
 	const { client, active, notifyEnabled } = useStores();
@@ -78,29 +105,33 @@ function Shell() {
 		<div className="hk-app">
 			{active && <SideNav />}
 			<div className="hk-main">
-				<Routes>
-					{!active ? (
-						<>
-							<Route path="/connect" element={<Connect />} />
-							<Route path="*" element={<Navigate to="/connect" replace />} />
-						</>
-					) : (
-						<>
-							<Route path="/dashboard" element={<Dashboard />} />
-							<Route path="/orders" element={<Orders />} />
-							<Route path="/orders/:id" element={<OrderDetail />} />
-							<Route path="/products" element={<Products />} />
-							<Route path="/products/:id" element={<ProductDetail />} />
-							<Route path="/products/:id/edit" element={<ProductEdit />} />
-							<Route path="/products/:id/prices" element={<ProductPricesEdit />} />
-							<Route path="/products/:id/media" element={<ProductMedia />} />
-							<Route path="/products/:id/variants" element={<ProductVariantsEdit />} />
-							<Route path="/stores" element={<Stores />} />
-							<Route path="/connect" element={<Connect />} />
-							<Route path="*" element={<Navigate to="/dashboard" replace />} />
-						</>
-					)}
-				</Routes>
+				<CurrencyGate>
+					<Routes>
+						{!active ? (
+							<>
+								<Route path="/connect" element={<Connect />} />
+								<Route path="*" element={<Navigate to="/connect" replace />} />
+							</>
+						) : (
+							<>
+								<Route path="/dashboard" element={<Dashboard />} />
+								<Route path="/orders" element={<Orders />} />
+								<Route path="/orders/:id" element={<OrderDetail />} />
+								<Route path="/products" element={<Products />} />
+								{/* Single product screen: the list links straight here (no read-only step). */}
+								<Route path="/products/:id" element={<ProductEdit />} />
+								<Route path="/products/:id/edit" element={<Navigate to=".." relative="path" replace />} />
+								<Route path="/products/:id/prices" element={<ProductPricesEdit />} />
+								<Route path="/products/:id/media" element={<ProductMedia />} />
+								<Route path="/products/:id/variants" element={<ProductVariantsEdit />} />
+								<Route path="/categories" element={<Categories />} />
+								<Route path="/stores" element={<Stores />} />
+								<Route path="/connect" element={<Connect />} />
+								<Route path="*" element={<Navigate to="/dashboard" replace />} />
+							</>
+						)}
+					</Routes>
+				</CurrencyGate>
 			</div>
 			{active && <BottomTabs />}
 			{active && <OrderPoller />}
