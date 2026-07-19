@@ -117,3 +117,11 @@
 	.hk-navitem.hk-on { background: var(--hk-accent-soft); color: var(--hk-accent); }
 	.hk-appbar, .hk-body { padding-inline: max(var(--hk-s4), calc((100% - 1140px) / 2)); }
 }
+
+.hk-appbar-act { background: none; border: none; color: var(--hk-accent); font: inherit; font-weight: 650; font-size: .95rem; cursor: pointer; padding: var(--hk-s2) var(--hk-s2); }
+.hk-appbar-act:disabled { opacity: .5; cursor: default; }
+.hk-form { display: flex; flex-direction: column; gap: var(--hk-s3); }
+.hk-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--hk-s2); }
+.hk-form-row--3 { grid-template-columns: 1fr 1fr 1fr; }
+.hk-input-mono { font-family: var(--hk-mono); font-size: .85rem; }
+.hk-textarea { min-height: unset; padding: var(--hk-s2) var(--hk-s3); line-height: 1.5; resize: vertical; font-family: inherit; }

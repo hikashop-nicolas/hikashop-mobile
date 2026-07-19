@@ -84,7 +84,12 @@ export function ProductDetail() {
 		<Screen
 			title={product ? product.name : t('product.titleFallback')}
 			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-			right={product && !product.published ? <span className="hk-status hk-status--neutral">{t('product.unpublished')}</span> : undefined}
+			right={product ? (
+				<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--hk-s2)' }}>
+					{!product.published && <span className="hk-status hk-status--neutral">{t('product.unpublished')}</span>}
+					<button className="hk-appbar-act" onClick={() => nav(`/products/${productId}/edit`)}>{t('product.edit')}</button>
+				</span>
+			) : undefined}
 		>
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>

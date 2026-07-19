@@ -34,6 +34,8 @@ export const API_PATH = '/index.php/hikashop-api/v1';
 // this.fetchFn(...) would pass the wrong `this` and throw "Illegal invocation". Wrap it.
 const defaultFetch: FetchLike = (input, init) => fetch(input, init);
 
+const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
 type Query = Record<string, string | number | undefined>;
 
 export class ApiClient {
@@ -66,16 +68,24 @@ export class ApiClient {
 		if (opts.auth !== false && this.token) headers['Authorization'] = `Bearer ${this.token}`;
 		if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
 
-		let res: Response;
-		try {
-			res = await this.fetchFn(this.url(path, opts.query), {
-				method,
-				headers,
-				body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-			});
-		} catch {
-			throw new ApiError('network', 'Could not reach the store. Check the connection and the address.', 0);
+		const url = this.url(path, opts.query);
+		const init: RequestInit = { method, headers, body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined };
+
+		// Retry transient upstream failures (a busy server returns 502/503/504, and the request
+		// usually did not run) a couple of times with a short backoff before giving up.
+		const TRANSIENT = new Set([502, 503, 504]);
+		let res: Response | null = null;
+		for (let attempt = 1; attempt <= 3; attempt++) {
+			try {
+				res = await this.fetchFn(url, init);
+			} catch {
+				if (attempt < 3) { await delay(attempt * 300); continue; }
+				throw new ApiError('network', 'Could not reach the store. Check the connection and the address.', 0);
+			}
+			if (TRANSIENT.has(res.status) && attempt < 3) { await delay(attempt * 300); continue; }
+			break;
 		}
+		if (res === null) throw new ApiError('network', 'Could not reach the store. Check the connection and the address.', 0);
 
 		let json: { data?: T; meta?: Record<string, unknown> | null; error?: { code?: string; message?: string } };
 		try {
@@ -157,6 +167,11 @@ export class ApiClient {
 	// Reference data for the product editor (currencies, taxes, categories, access levels...).
 	async getProductMeta(): Promise<ProductMeta> {
 		return (await this.request<ProductMeta>('GET', 'products/meta')).data;
+	}
+
+	// Update a product's core fields (write scope). Returns the full refreshed product.
+	async updateProduct(id: number, fields: Record<string, unknown>): Promise<ProductDetail> {
+		return (await this.request<ProductDetail>('PUT', `products/${id}`, { body: fields })).data;
 	}
 
 	// Set a product's tracked quantity (write scope). A negative value means "unlimited".

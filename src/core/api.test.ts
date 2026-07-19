@@ -109,6 +109,18 @@ describe('ApiClient', () => {
 		expect(r.quantity).toBe(-1);
 	});
 
+	it('retries a transient 503 and then succeeds', async () => {
+		let calls = 0;
+		const fetchFn: FetchLike = async () => {
+			calls += 1;
+			if (calls < 3) return new Response('busy', { status: 503 });
+			return jsonResponse({ data: { app: 'ok' }, meta: null });
+		};
+		const site = await new ApiClient('http://x', 't', fetchFn).getSite();
+		expect(calls).toBe(3);
+		expect((site as { app?: string }).app).toBe('ok');
+	});
+
 	it('wraps a transport failure as ApiError(network)', async () => {
 		const fetchFn: FetchLike = async () => {
 			throw new Error('boom');
