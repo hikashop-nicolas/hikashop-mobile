@@ -6,9 +6,13 @@ import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductPrice } from '../core';
 import { Screen, Spinner, Icon, Field } from '../ui';
 
-type Row = { value: string; currency_id: number; min_quantity: string; access: string };
+type Row = { value: string; currency_id: number; min_quantity: string; access: string; start: string; end: string };
 
-const toRow = (p: ProductPrice): Row => ({ value: String(p.value), currency_id: p.currency_id, min_quantity: String(p.min_quantity || ''), access: p.access || 'all' });
+// HikaShop stores price validity dates as unix seconds; the inputs use yyyy-mm-dd.
+const tsToDate = (ts: number): string => (ts > 0 ? new Date(ts * 1000).toISOString().slice(0, 10) : '');
+const dateToTs = (s: string): number => (s ? Math.floor(new Date(`${s}T00:00:00Z`).getTime() / 1000) : 0);
+
+const toRow = (p: ProductPrice): Row => ({ value: String(p.value), currency_id: p.currency_id, min_quantity: String(p.min_quantity || ''), access: p.access || 'all', start: tsToDate(p.start_date), end: tsToDate(p.end_date) });
 
 export function ProductPricesEdit() {
 	const { id } = useParams();
@@ -44,7 +48,7 @@ export function ProductPricesEdit() {
 		setRows((r) => (r ? r.map((row, idx) => (idx === i ? { ...row, ...patch } : row)) : r));
 	}
 	function add() {
-		setRows((r) => [...(r ?? []), { value: '', currency_id: defaultCurrency, min_quantity: '', access: 'all' }]);
+		setRows((r) => [...(r ?? []), { value: '', currency_id: defaultCurrency, min_quantity: '', access: 'all', start: '', end: '' }]);
 	}
 	function remove(i: number) {
 		setRows((r) => (r ? r.filter((_, idx) => idx !== i) : r));
@@ -57,7 +61,7 @@ export function ProductPricesEdit() {
 		try {
 			const prices = rows
 				.filter((r) => r.value.trim() !== '')
-				.map((r) => ({ value: Number(r.value) || 0, currency_id: r.currency_id, min_quantity: Number(r.min_quantity) || 0, access: r.access || 'all' }));
+				.map((r) => ({ value: Number(r.value) || 0, currency_id: r.currency_id, min_quantity: Number(r.min_quantity) || 0, access: r.access || 'all', start_date: dateToTs(r.start), end_date: dateToTs(r.end) }));
 			const updated = await client.setProductPrices(productId, prices);
 			if (product) await cache.putProduct(storeId, productId, { ...product, prices: updated });
 			nav(-1);
@@ -99,6 +103,10 @@ export function ProductPricesEdit() {
 										{(meta?.access_levels ?? []).map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
 									</select>
 								</Field>
+							</div>
+							<div className="hk-form-row">
+								<Field label={t('product.priceStart')}><input className="hk-input" type="date" value={r.start} onChange={(e) => update(i, { start: e.target.value })} /></Field>
+								<Field label={t('product.priceEnd')}><input className="hk-input" type="date" value={r.end} onChange={(e) => update(i, { end: e.target.value })} /></Field>
 							</div>
 							<button className="hk-btn hk-btn--danger" style={{ minHeight: '34px' }} onClick={() => remove(i)}>{t('common.delete')}</button>
 						</div>

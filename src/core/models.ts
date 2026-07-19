@@ -101,6 +101,7 @@ export interface ProductPrice {
 	currency_id: number;
 	min_quantity: number;
 	access: string;
+	users: string;
 	start_date: number;
 	end_date: number;
 }

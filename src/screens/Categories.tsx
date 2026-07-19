@@ -98,7 +98,7 @@ export function Categories() {
 								<span className="hk-row-title">{item.name}{!item.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}</span>
 							</button>
 							<button type="button" className="hk-iconbtn hk-danger" disabled={busyId === item.id} onClick={() => void del(item.id)} aria-label={t('common.delete')}>
-								<Icon name="close" size={18} />
+								<Icon name="trash" size={18} />
 							</button>
 						</div>
 					))}

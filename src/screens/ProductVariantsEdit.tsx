@@ -48,7 +48,20 @@ export function ProductVariantsEdit() {
 	const [err, setErr] = useState('');
 	const [newValue, setNewValue] = useState<Record<number, string>>({});
 	const [newOption, setNewOption] = useState('');
+	const [pickOption, setPickOption] = useState('');
 	const defaultCurrency = meta?.currencies[0]?.id ?? 1;
+
+	// Existing shop characteristics not already on this product.
+	const availableOptions = (meta?.characteristics ?? []).filter((mc) => !(options ?? []).some((o) => o.id === mc.id));
+
+	function addExistingOption() {
+		const optId = Number(pickOption);
+		const mc = (meta?.characteristics ?? []).find((c) => c.id === optId);
+		if (!mc) return;
+		setOptions((os) => [...(os ?? []), { id: mc.id, name: mc.name, values: [...mc.values] }]);
+		setRows((rs) => rs ? rs.map((r) => ({ ...r, valueIds: [...r.valueIds, 0] })) : rs);
+		setPickOption('');
+	}
 
 	async function addValue(optionId: number) {
 		const text = (newValue[optionId] ?? '').trim();
@@ -130,7 +143,16 @@ export function ProductVariantsEdit() {
 								</div>
 							</div>
 						))}
-						<div style={{ display: 'flex', gap: 'var(--hk-s2)', marginTop: 'var(--hk-s3)' }}>
+						{availableOptions.length > 0 && (
+							<div style={{ display: 'flex', gap: 'var(--hk-s2)', marginTop: 'var(--hk-s3)' }}>
+								<select className="hk-select" value={pickOption} onChange={(e) => setPickOption(e.target.value)}>
+									<option value="">{t('product.addExistingOption')}</option>
+									{availableOptions.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
+								</select>
+								<button className="hk-btn" disabled={busy || !pickOption} onClick={addExistingOption}>{t('common.add')}</button>
+							</div>
+						)}
+						<div style={{ display: 'flex', gap: 'var(--hk-s2)', marginTop: 'var(--hk-s2)' }}>
 							<input className="hk-input" placeholder={t('product.newOption')} value={newOption} onChange={(e) => setNewOption(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') void addOption(); }} />
 							<button className="hk-btn" disabled={busy} onClick={() => void addOption()}>{t('product.addOption')}</button>
 						</div>
