@@ -1,5 +1,6 @@
 import { HashRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { StoreProvider, useStores } from './app/store-context';
+import { useOrderPoll } from './app/use-order-poll';
 import { TabBar, Spinner } from './ui';
 import type { TabDef } from './ui';
 import { Connect } from './screens/Connect';
@@ -23,6 +24,13 @@ function BottomTabs() {
 			? 'stores'
 			: 'dashboard';
 	return <TabBar tabs={TABS} active={active} onSelect={(k) => nav(`/${k}`)} />;
+}
+
+// Runs the foreground order poller whenever a store is active and notifications are enabled.
+function OrderPoller() {
+	const { client, active, notifyEnabled } = useStores();
+	useOrderPoll(client, active, notifyEnabled);
+	return null;
 }
 
 function Shell() {
@@ -54,6 +62,7 @@ function Shell() {
 				)}
 			</Routes>
 			{active && <BottomTabs />}
+			{active && <OrderPoller />}
 		</div>
 	);
 }
