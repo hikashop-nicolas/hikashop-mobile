@@ -29,6 +29,10 @@ export type FetchLike = (input: string, init?: RequestInit) => Promise<Response>
 // merchant's SEF/rewrite settings (and before any SEF redirect).
 export const API_PATH = '/index.php/hikashop-api/v1';
 
+// Native fetch must run with the global as receiver; a stored reference invoked as
+// this.fetchFn(...) would pass the wrong `this` and throw "Illegal invocation". Wrap it.
+const defaultFetch: FetchLike = (input, init) => fetch(input, init);
+
 type Query = Record<string, string | number | undefined>;
 
 export class ApiClient {
@@ -36,7 +40,7 @@ export class ApiClient {
 	private token: string | null;
 	private fetchFn: FetchLike;
 
-	constructor(baseUrl: string, token: string | null = null, fetchFn: FetchLike = fetch) {
+	constructor(baseUrl: string, token: string | null = null, fetchFn: FetchLike = defaultFetch) {
 		this.baseUrl = baseUrl;
 		this.token = token;
 		this.fetchFn = fetchFn;
@@ -93,7 +97,7 @@ export class ApiClient {
 		code: string,
 		deviceName: string,
 		platform: string,
-		fetchFn: FetchLike = fetch,
+		fetchFn: FetchLike = defaultFetch,
 	): Promise<PairResult> {
 		const client = new ApiClient(baseUrl, null, fetchFn);
 		const { data } = await client.request<PairResult>('POST', 'pair', {

@@ -73,4 +73,23 @@ describe('ApiClient', () => {
 		};
 		await expect(new ApiClient('http://x', 't', fetchFn).getSite()).rejects.toMatchObject({ code: 'network' });
 	});
+
+	// Regression: the default transport must call the global fetch with the global as receiver.
+	// Storing native fetch and invoking it as this.fetchFn(...) passes the ApiClient as `this`,
+	// which the real fetch rejects with "Illegal invocation" (every request failed as 'network').
+	it('default transport calls global fetch with the correct receiver', async () => {
+		const realFetch = globalThis.fetch;
+		const receivers: unknown[] = [];
+		globalThis.fetch = function (this: unknown) {
+			receivers.push(this);
+			return Promise.resolve(jsonResponse({ data: { app: 'x' }, meta: null }));
+		} as typeof fetch;
+		try {
+			await new ApiClient('http://shop', 'tok').getSite(); // no fetchFn -> default transport
+		} finally {
+			globalThis.fetch = realFetch;
+		}
+		expect(receivers.length).toBe(1);
+		expect(receivers[0] === undefined || receivers[0] === globalThis).toBe(true);
+	});
 });
