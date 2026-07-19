@@ -3,11 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { ProductDetail, ProductMeta, ProductCharacteristic } from '../core';
-import { Screen, Spinner, Icon, Field } from '../ui';
+import type { ProductDetail, ProductMeta, ProductCharacteristic, ProductVariant } from '../core';
+import { Screen, Spinner, Icon, Money } from '../ui';
 
-type VRow = { id?: number; valueIds: number[]; code: string; quantity: string; published: boolean; price: string };
-
+// Variants management: the option set (characteristics + values) plus a listing of
+// variants. Editing a variant opens its own edit screen; adding one creates a blank
+// variant and opens it.
 export function ProductVariantsEdit() {
 	const { id } = useParams();
 	const nav = useNavigate();
@@ -15,13 +16,14 @@ export function ProductVariantsEdit() {
 	const t = useT();
 	const storeId = active?.id ?? '';
 	const productId = Number(id);
+	const [bump, setBump] = useState(0);
 
 	const { data: product, loading, error } = useCached<ProductDetail>({
 		enabled: !!client && !!active && !!id,
 		read: () => cache.getProduct(storeId, productId),
 		fetch: () => client!.getProduct(productId),
 		write: async (p) => { await cache.putProduct(storeId, productId, p); },
-		deps: [storeId, productId],
+		deps: [storeId, productId, bump],
 	});
 	const { data: meta } = useCached<ProductMeta>({
 		enabled: !!client && !!active,
@@ -32,36 +34,15 @@ export function ProductVariantsEdit() {
 	});
 
 	const [options, setOptions] = useState<ProductCharacteristic[] | null>(null);
-	const [rows, setRows] = useState<VRow[] | null>(null);
-	useEffect(() => {
-		if (product && options === null) {
-			setOptions(product.characteristics.map((c) => ({ ...c, values: [...c.values] })));
-			setRows(product.variants.map((v) => ({
-				id: v.id,
-				valueIds: product.characteristics.map((c) => v.values.find((x) => x.option_id === c.id)?.value_id ?? 0),
-				code: v.code, quantity: String(v.quantity < 0 ? '' : v.quantity), published: v.published, price: v.price != null ? String(v.price) : '',
-			})));
-		}
-	}, [product, options]);
+	useEffect(() => { if (product && options === null) setOptions(product.characteristics.map((c) => ({ ...c, values: [...c.values] }))); }, [product, options]);
 
 	const [busy, setBusy] = useState(false);
 	const [err, setErr] = useState('');
 	const [newValue, setNewValue] = useState<Record<number, string>>({});
 	const [newOption, setNewOption] = useState('');
 	const [pickOption, setPickOption] = useState('');
-	const defaultCurrency = meta?.currencies[0]?.id ?? 1;
 
-	// Existing shop characteristics not already on this product.
 	const availableOptions = (meta?.characteristics ?? []).filter((mc) => !(options ?? []).some((o) => o.id === mc.id));
-
-	function addExistingOption() {
-		const optId = Number(pickOption);
-		const mc = (meta?.characteristics ?? []).find((c) => c.id === optId);
-		if (!mc) return;
-		setOptions((os) => [...(os ?? []), { id: mc.id, name: mc.name, values: [...mc.values] }]);
-		setRows((rs) => rs ? rs.map((r) => ({ ...r, valueIds: [...r.valueIds, 0] })) : rs);
-		setPickOption('');
-	}
 
 	async function addValue(optionId: number) {
 		const text = (newValue[optionId] ?? '').trim();
@@ -80,50 +61,60 @@ export function ProductVariantsEdit() {
 		try {
 			const created = await client.createCharacteristic({ value: text });
 			setOptions((os) => [...(os ?? []), { id: created.id, name: created.value, values: [] }]);
-			setRows((rs) => rs ? rs.map((r) => ({ ...r, valueIds: [...r.valueIds, 0] })) : rs);
 			setNewOption('');
 		} catch (e) { setErr(codeOf(e, t)); } finally { setBusy(false); }
 	}
-
-	function addRow() {
-		setRows((rs) => [...(rs ?? []), { valueIds: (options ?? []).map(() => 0), code: '', quantity: '', published: true, price: '' }]);
-	}
-	function updateRow(i: number, patch: Partial<VRow>) {
-		setRows((rs) => rs ? rs.map((r, idx) => idx === i ? { ...r, ...patch } : r) : rs);
-	}
-	function setRowValue(i: number, optIdx: number, valueId: number) {
-		setRows((rs) => rs ? rs.map((r, idx) => idx === i ? { ...r, valueIds: r.valueIds.map((v, vi) => vi === optIdx ? valueId : v) } : r) : rs);
-	}
-	function removeRow(i: number) {
-		setRows((rs) => rs ? rs.filter((_, idx) => idx !== i) : rs);
+	function addExistingOption() {
+		const mc = (meta?.characteristics ?? []).find((c) => c.id === Number(pickOption));
+		if (!mc) return;
+		setOptions((os) => [...(os ?? []), { id: mc.id, name: mc.name, values: [...mc.values] }]);
+		setPickOption('');
 	}
 
-	async function save() {
-		if (!client || !rows || busy) return;
+	// Append a blank variant through the reconcile endpoint, then open its edit screen.
+	async function addVariant() {
+		if (!client || !product || busy) return;
 		setBusy(true); setErr('');
 		try {
-			const payload = rows.map((r) => ({
-				id: r.id,
-				value_ids: r.valueIds.filter((v) => v > 0),
-				code: r.code,
-				quantity: r.quantity.trim() === '' ? -1 : Number(r.quantity) || 0,
-				published: r.published,
-				price: r.price.trim() === '' ? null : Number(r.price),
-				currency_id: defaultCurrency,
+			const existing = product.variants.map((v) => ({
+				id: v.id,
+				value_ids: v.values.map((x) => x.value_id).filter((x) => x > 0),
+				code: v.code, quantity: v.quantity, published: v.published,
+				price: v.price, currency_id: meta?.currencies[0]?.id ?? 1,
 			}));
-			const res = await client.setProductVariants(productId, payload);
+			const oldIds = new Set(product.variants.map((v) => v.id));
+			const res = await client.setProductVariants(productId, [...existing, { value_ids: [], code: '', quantity: -1, published: false, price: null, currency_id: meta?.currencies[0]?.id ?? 1 }]);
+			const created = res.variants.find((v) => !oldIds.has(v.id));
 			if (product) await cache.putProduct(storeId, productId, { ...product, characteristics: res.characteristics, variants: res.variants });
-			nav(-1);
+			if (created) nav(`/products/${productId}/variants/${created.id}`);
+			else setBump((b) => b + 1);
+		} catch (e) { setErr(codeOf(e, t)); setBusy(false); }
+	}
+
+	async function del(variantId: number) {
+		if (!client || !product || busy) return;
+		if (!window.confirm(t('product.deleteVariantConfirm'))) return;
+		setBusy(true); setErr('');
+		try {
+			const kept = product.variants.filter((v) => v.id !== variantId).map((v) => ({
+				id: v.id, value_ids: v.values.map((x) => x.value_id).filter((x) => x > 0),
+				code: v.code, quantity: v.quantity, published: v.published, price: v.price, currency_id: meta?.currencies[0]?.id ?? 1,
+			}));
+			const res = await client.setProductVariants(productId, kept);
+			await cache.putProduct(storeId, productId, { ...product, characteristics: res.characteristics, variants: res.variants });
+			setBump((b) => b + 1);
 		} catch (e) { setErr(codeOf(e, t)); } finally { setBusy(false); }
 	}
+
+	function label(v: ProductVariant): string { return v.values.map((x) => x.value).join(' / ') || v.code || `#${v.id}`; }
 
 	return (
 		<Screen
 			title={t('product.editVariants')}
 			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-			right={rows ? <button className="hk-appbar-act" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</button> : undefined}
+			right={<button className="hk-appbar-act" disabled={busy} onClick={() => void addVariant()}><span className="hk-btn-ic"><Icon name="plus" size={18} /> {t('product.addVariant')}</span></button>}
 		>
-			{loading || options === null || rows === null ? (
+			{loading || options === null ? (
 				<div className="hk-center-col"><Spinner /></div>
 			) : error ? (
 				<div className="hk-error-note">{tError(t, error)}</div>
@@ -160,30 +151,18 @@ export function ProductVariantsEdit() {
 
 					<div className="hk-card hk-card--pad">
 						<span className="hk-muted">{t('product.variants')}</span>
-						{rows.map((r, i) => (
-							<div key={i} className="hk-form" style={{ marginTop: 'var(--hk-s3)', paddingTop: 'var(--hk-s3)', borderTop: '1px solid var(--hk-line)' }}>
-								<div className="hk-form-row">
-									{options.map((o, optIdx) => (
-										<Field key={o.id} label={o.name}>
-											<select className="hk-select" value={r.valueIds[optIdx] ?? 0} onChange={(e) => setRowValue(i, optIdx, Number(e.target.value))}>
-												<option value={0}>—</option>
-												{o.values.map((v) => <option key={v.id} value={v.id}>{v.value}</option>)}
-											</select>
-										</Field>
-									))}
-								</div>
-								<div className="hk-form-row">
-									<Field label={t('product.sku')}><input className="hk-input hk-input-mono" value={r.code} onChange={(e) => updateRow(i, { code: e.target.value })} /></Field>
-									<Field label={t('product.stock')}><input className="hk-input" type="number" inputMode="numeric" value={r.quantity} onChange={(e) => updateRow(i, { quantity: e.target.value })} /></Field>
-								</div>
-								<div className="hk-form-row">
-									<Field label={t('product.price')}><input className="hk-input" type="number" inputMode="decimal" value={r.price} onChange={(e) => updateRow(i, { price: e.target.value })} /></Field>
-									<label className="hk-check"><input type="checkbox" checked={r.published} onChange={(e) => updateRow(i, { published: e.target.checked })} /><span>{t('product.publishedLabel')}</span></label>
-								</div>
-								<button className="hk-btn hk-btn--danger" style={{ minHeight: '32px' }} onClick={() => removeRow(i)}>{t('common.delete')}</button>
+						{(product?.variants ?? []).length === 0 ? (
+							<div className="hk-empty">{t('product.noVariants')}</div>
+						) : (product?.variants ?? []).map((v) => (
+							<div key={v.id} className="hk-row">
+								<button type="button" className="hk-row-grow hk-row-btn" onClick={() => nav(`/products/${productId}/variants/${v.id}`)}>
+									<span className="hk-row-title">{label(v)}{!v.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}</span>
+									<span className="hk-row-sub hk-mono">{v.code}{v.quantity >= 0 ? ` · ${v.quantity}` : ''}</span>
+								</button>
+								{v.price != null && <span className="hk-row-rt"><Money value={v.price} currency={meta?.currencies[0]?.id} /></span>}
+								<button type="button" className="hk-iconbtn hk-danger" disabled={busy} onClick={() => void del(v.id)} aria-label={t('common.delete')}><Icon name="trash" size={18} /></button>
 							</div>
 						))}
-						<button className="hk-btn hk-btn--block" style={{ marginTop: 'var(--hk-s3)' }} onClick={addRow}><span className="hk-btn-ic"><Icon name="plus" size={18} /> {t('product.addVariant')}</span></button>
 					</div>
 
 					{err && <div className="hk-error-note">{err}</div>}

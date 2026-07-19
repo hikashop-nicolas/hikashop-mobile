@@ -14,6 +14,7 @@ import { Products } from './screens/Products';
 import { ProductEdit } from './screens/ProductEdit';
 import { ProductPricesEdit } from './screens/ProductPricesEdit';
 import { ProductVariantsEdit } from './screens/ProductVariantsEdit';
+import { VariantEdit } from './screens/VariantEdit';
 import { Categories } from './screens/Categories';
 import { CategoryEdit } from './screens/CategoryEdit';
 import { Stores } from './screens/Stores';
@@ -123,6 +124,7 @@ function Shell() {
 								<Route path="/products/:id/edit" element={<Navigate to=".." relative="path" replace />} />
 								<Route path="/products/:id/prices" element={<ProductPricesEdit />} />
 								<Route path="/products/:id/variants" element={<ProductVariantsEdit />} />
+							<Route path="/products/:id/variants/:vid" element={<VariantEdit />} />
 								<Route path="/categories" element={<Categories />} />
 							<Route path="/categories/new" element={<CategoryEdit />} />
 							<Route path="/categories/:id/edit" element={<CategoryEdit />} />

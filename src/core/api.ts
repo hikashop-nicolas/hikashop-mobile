@@ -234,6 +234,11 @@ export class ApiClient {
 		return (await this.request<{ characteristics: ProductCharacteristic[]; variants: ProductVariant[] }>('PUT', `products/${id}/variants`, { body: { variants } })).data;
 	}
 
+	// Edit a single variant (write scope). Returns the refreshed variant as a product detail.
+	async updateVariant(productId: number, variantId: number, body: Record<string, unknown>): Promise<ProductDetail> {
+		return (await this.request<ProductDetail>('PUT', `products/${productId}/variants/${variantId}`, { body })).data;
+	}
+
 	// Set a product's tracked quantity (write scope). A negative value means "unlimited".
 	async setProductStock(id: number, quantity: number): Promise<{ id: number; quantity: number }> {
 		const { data } = await this.request<{ id: number; quantity: number }>('POST', `products/${id}/stock`, {

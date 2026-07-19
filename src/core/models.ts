@@ -186,6 +186,7 @@ export interface ProductDetail {
 	characteristics: ProductCharacteristic[];
 	variants: ProductVariant[];
 	custom_fields: Record<string, string | null>;
+	value_ids?: number[]; // characteristic value ids, present when this is a variant
 }
 
 // A shop-defined custom field on the product (from GET /products/meta).
