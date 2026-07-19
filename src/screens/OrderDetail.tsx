@@ -63,7 +63,7 @@ export function OrderDetail() {
 			) : error ? (
 				<div className="hk-error-note">{tError(t, error)}</div>
 			) : order ? (
-				<>
+				<div className="hk-bento">
 					<div className="hk-card hk-card--pad">
 						<div className="hk-row-title">{order.customer.name || t('common.guest')}</div>
 						<div className="hk-row-sub">{order.customer.email}</div>
@@ -128,7 +128,7 @@ export function OrderDetail() {
 							</div>
 						))}
 					</div>
-				</>
+				</div>
 			) : null}
 		</Screen>
 	);

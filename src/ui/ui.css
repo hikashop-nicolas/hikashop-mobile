@@ -2,6 +2,15 @@
 
 /* ---- layout: screen shell + app bar + tab bar ------------------------------ */
 .hk-app { display: flex; flex-direction: column; height: 100%; max-width: 720px; margin: 0 auto; background: var(--hk-bg); }
+.hk-main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+.hk-sidenav { display: none; }
+
+/* bento: a single column of blocks on phones, height-packed masonry columns on wider screens */
+.hk-bento { display: flex; flex-direction: column; gap: var(--hk-s3); }
+@media (min-width: 760px) {
+	.hk-bento { display: block; columns: 340px 3; column-gap: var(--hk-s3); }
+	.hk-bento > * { break-inside: avoid; margin: 0 0 var(--hk-s3); }
+}
 .hk-appbar { display: flex; align-items: center; gap: var(--hk-s2); padding: var(--hk-s3) var(--hk-s4); border-bottom: 1px solid var(--hk-line); background: var(--hk-surface); position: sticky; top: 0; z-index: 5; }
 .hk-appbar .hk-title { font-weight: 650; font-size: 1.05rem; letter-spacing: -.01em; }
 .hk-appbar .hk-grow { flex: 1; }
@@ -93,3 +102,18 @@
 .hk-gallery-img { width: 84px; height: 84px; border-radius: var(--hk-r2); object-fit: cover; flex: none; border: 1px solid var(--hk-line); background: var(--hk-surface-2); }
 .hk-mono { font-family: var(--hk-mono); font-size: .74rem; }
 .hk-avatar-img { width: 2rem; height: 2rem; border-radius: var(--hk-r1); object-fit: cover; flex: none; border: 1px solid var(--hk-line); }
+
+@media (min-width: 620px) { .hk-stats { grid-template-columns: repeat(4, 1fr); } }
+
+/* tablet / desktop: left sidebar nav replaces the bottom tabs, wide centered content.
+   Placed at the end so these overrides win over the base component rules regardless of specificity. */
+@media (min-width: 900px) {
+	.hk-app { max-width: none; margin: 0; flex-direction: row; }
+	.hk-tabbar { display: none; }
+	.hk-sidenav { display: flex; flex-direction: column; gap: 3px; width: 244px; flex: none; padding: var(--hk-s3); border-right: 1px solid var(--hk-line); background: var(--hk-surface); overflow-y: auto; }
+	.hk-brand { font-weight: 700; font-size: 1.1rem; letter-spacing: -.01em; padding: var(--hk-s3) var(--hk-s3) var(--hk-s4); color: var(--hk-ink); }
+	.hk-navitem { display: flex; align-items: center; gap: var(--hk-s3); padding: 10px 12px; border-radius: var(--hk-r2); border: none; background: none; color: var(--hk-muted); font: inherit; font-weight: 600; cursor: pointer; text-align: left; width: 100%; }
+	.hk-navitem:hover { background: var(--hk-surface-2); color: var(--hk-ink); }
+	.hk-navitem.hk-on { background: var(--hk-accent-soft); color: var(--hk-accent); }
+	.hk-appbar, .hk-body { padding-inline: max(var(--hk-s4), calc((100% - 1140px) / 2)); }
+}

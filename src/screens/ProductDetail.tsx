@@ -100,6 +100,7 @@ export function ProductDetail() {
 						</div>
 					)}
 
+					<div className="hk-bento">
 					<div className="hk-card hk-card--pad">
 						<div className="hk-row-title">{product.name}</div>
 						<div className="hk-row-sub">{t('product.sku')}: {product.code || '-'}</div>
@@ -221,6 +222,7 @@ export function ProductDetail() {
 							{product.keywords && <div className="hk-row"><div className="hk-row-grow"><span className="hk-row-title">{t('product.keywords')}</span><span className="hk-row-sub">{product.keywords}</span></div></div>}
 						</div>
 					)}
+					</div>
 				</>
 			) : null}
 		</Screen>
