@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
-import { Screen, Button } from '../ui';
+import { Screen, Button, Icon } from '../ui';
 import { hostOf } from '../app/utils';
 
 export function Stores() {
@@ -44,11 +44,12 @@ export function Stores() {
 					</div>
 				</div>
 			))}
-			<Button block onClick={() => nav('/connect')}>＋ Add another store</Button>
+			<Button block onClick={() => nav('/connect')}><span className="hk-btn-ic"><Icon name="plus" size={18} /> Add another store</span></Button>
 
 			{notifySupported && (
 				<div className="hk-card hk-card--pad" style={{ marginTop: 'var(--hk-s4)' }}>
 					<div className="hk-row" style={{ borderBottom: 'none', padding: 0 }}>
+						<span className="hk-lead-ic"><Icon name="bell" size={20} /></span>
 						<div className="hk-row-grow">
 							<span className="hk-row-title">Order notifications</span>
 							<span className="hk-row-sub">Alert this device when a new order comes in.</span>

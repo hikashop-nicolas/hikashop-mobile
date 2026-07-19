@@ -5,14 +5,14 @@
 .hk-appbar { display: flex; align-items: center; gap: var(--hk-s2); padding: var(--hk-s3) var(--hk-s4); border-bottom: 1px solid var(--hk-line); background: var(--hk-surface); position: sticky; top: 0; z-index: 5; }
 .hk-appbar .hk-title { font-weight: 650; font-size: 1.05rem; letter-spacing: -.01em; }
 .hk-appbar .hk-grow { flex: 1; }
-.hk-appbar .hk-iconbtn { background: none; border: none; color: var(--hk-muted); padding: var(--hk-s2); border-radius: var(--hk-r1); cursor: pointer; min-width: var(--hk-tap); min-height: var(--hk-tap); }
+.hk-appbar .hk-iconbtn { display: inline-flex; align-items: center; justify-content: center; background: none; border: none; color: var(--hk-muted); padding: var(--hk-s2); border-radius: var(--hk-r1); cursor: pointer; min-width: var(--hk-tap); min-height: var(--hk-tap); }
 .hk-body { flex: 1; overflow-y: auto; padding: var(--hk-s4); display: flex; flex-direction: column; gap: var(--hk-s3); -webkit-overflow-scrolling: touch; }
 .hk-body.hk-center { justify-content: center; align-items: center; text-align: center; gap: var(--hk-s4); }
 
 .hk-tabbar { display: flex; border-top: 1px solid var(--hk-line); background: var(--hk-surface); }
 .hk-tab { flex: 1; background: none; border: none; padding: var(--hk-s2) 0 calc(var(--hk-s2) + env(safe-area-inset-bottom, 0)); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: .68rem; color: var(--hk-faint); cursor: pointer; min-height: var(--hk-tap); }
 .hk-tab.hk-on { color: var(--hk-accent); }
-.hk-tab .hk-tab-ic { font-size: 1.15rem; line-height: 1; }
+.hk-tab .hk-tab-ic { display: inline-flex; line-height: 0; }
 
 /* ---- atoms ----------------------------------------------------------------- */
 .hk-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--hk-s2); border: 1px solid var(--hk-line); background: var(--hk-surface); color: var(--hk-ink); border-radius: var(--hk-r2); padding: 0 var(--hk-s4); min-height: var(--hk-tap); font-size: .92rem; font-weight: 600; cursor: pointer; text-decoration: none; }
@@ -63,7 +63,10 @@
 .hk-avatar { width: 2rem; height: 2rem; border-radius: 50%; background: var(--hk-surface-2); flex: none; display: grid; place-items: center; color: var(--hk-muted); font-size: .8rem; }
 
 .hk-search { display: flex; align-items: center; gap: var(--hk-s2); border: 1px solid var(--hk-line); border-radius: var(--hk-r2); padding: 0 var(--hk-s3); background: var(--hk-surface); }
+.hk-search .hk-search-ic { display: inline-flex; color: var(--hk-faint); flex: none; }
 .hk-search input { border: none; outline: none; background: none; color: var(--hk-ink); min-height: var(--hk-tap); flex: 1; font-size: .92rem; }
+
+.hk-btn-ic { display: inline-flex; align-items: center; gap: var(--hk-s2); }
 
 .hk-code { font-family: var(--hk-mono); font-size: 1.6rem; letter-spacing: .14em; font-weight: 700; text-align: center; }
 
@@ -77,3 +80,5 @@
 .hk-scan-video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hk-scan-reticle { position: absolute; inset: 16%; border: 3px solid rgba(255, 255, 255, .9); border-radius: var(--hk-r2); box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .35); }
 .hk-scan-hint { text-align: center; }
+
+.hk-lead-ic { display: inline-flex; color: var(--hk-muted); flex: none; }

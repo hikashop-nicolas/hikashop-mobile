@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { Icon } from './icons';
+import type { IconName } from './icons';
 
 export function Screen({ title, left, right, children, center }: {
 	title?: ReactNode;
@@ -26,7 +28,7 @@ export function Screen({ title, left, right, children, center }: {
 export interface TabDef {
 	key: string;
 	label: string;
-	icon: string;
+	icon: IconName;
 }
 
 export function TabBar({ tabs, active, onSelect }: { tabs: TabDef[]; active: string; onSelect: (key: string) => void }) {
@@ -34,7 +36,7 @@ export function TabBar({ tabs, active, onSelect }: { tabs: TabDef[]; active: str
 		<nav className="hk-tabbar">
 			{tabs.map((t) => (
 				<button key={t.key} className={`hk-tab${t.key === active ? ' hk-on' : ''}`} onClick={() => onSelect(t.key)}>
-					<span className="hk-tab-ic" aria-hidden>{t.icon}</span>
+					<span className="hk-tab-ic"><Icon name={t.icon} size={22} /></span>
 					{t.label}
 				</button>
 			))}

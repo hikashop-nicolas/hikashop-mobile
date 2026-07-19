@@ -10,9 +10,9 @@ import { OrderDetail } from './screens/OrderDetail';
 import { Stores } from './screens/Stores';
 
 const TABS: TabDef[] = [
-	{ key: 'dashboard', label: 'Dashboard', icon: '▦' },
-	{ key: 'orders', label: 'Orders', icon: '🧾' },
-	{ key: 'stores', label: 'Stores', icon: '🏬' },
+	{ key: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+	{ key: 'orders', label: 'Orders', icon: 'orders' },
+	{ key: 'stores', label: 'Stores', icon: 'store' },
 ];
 
 function BottomTabs() {

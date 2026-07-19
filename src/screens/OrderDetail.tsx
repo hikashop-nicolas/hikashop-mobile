@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import type { OrderDetail as OrderDetailType } from '../core';
-import { Screen, StatusChip, Money, Spinner } from '../ui';
+import { Screen, StatusChip, Money, Spinner, Icon } from '../ui';
 import { fmtDate } from '../app/utils';
 
 export function OrderDetail() {
@@ -23,7 +23,7 @@ export function OrderDetail() {
 	return (
 		<Screen
 			title={order ? `Order #${order.number}` : 'Order'}
-			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label="Back">‹</button>}
+			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label="Back"><Icon name="back" size={24} /></button>}
 			right={order ? <StatusChip status={order.status} /> : undefined}
 		>
 			{loading ? (

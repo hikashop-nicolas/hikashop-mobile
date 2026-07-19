@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ApiClient } from '../core';
 import { useStores } from '../app/store-context';
-import { Screen, Button, Field, QrScanner, isQrScanSupported } from '../ui';
+import { Screen, Button, Field, QrScanner, isQrScanSupported, Icon } from '../ui';
 import { normalizeUrl, hostOf, deviceName } from '../app/utils';
 import { parsePairingPayload } from '../app/pairing';
 
@@ -54,7 +54,7 @@ export function Connect() {
 	return (
 		<Screen
 			title="Connect a store"
-			left={canGoBack ? <button className="hk-iconbtn" onClick={() => nav(-1)} aria-label="Back">‹</button> : undefined}
+			left={canGoBack ? <button className="hk-iconbtn" onClick={() => nav(-1)} aria-label="Back"><Icon name="back" size={24} /></button> : undefined}
 		>
 			{scanning ? (
 				<QrScanner onResult={handleScan} onClose={() => setScanning(false)} />
@@ -66,7 +66,7 @@ export function Connect() {
 					</p>
 					{scanSupported && (
 						<Button variant="pri" block disabled={busy} onClick={() => { setErr(''); setScanning(true); }}>
-							⛶ Scan QR code
+							<span className="hk-btn-ic"><Icon name="scan" size={18} /> Scan QR code</span>
 						</Button>
 					)}
 					<Field label="Store address">
