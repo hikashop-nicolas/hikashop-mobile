@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="HikaShop">
+  <rect width="512" height="512" fill="#0c6d77"/>
+  <!-- two tote handles (behind the bag body) -->
+  <path d="M196 214 L196 188 A30 30 0 0 1 256 188 L256 214" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
+  <path d="M256 214 L256 188 A30 30 0 0 1 316 188 L316 214" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
+  <!-- bag body -->
+  <path d="M150 210 h212 a20 20 0 0 1 20 20 l14 150 a26 26 0 0 1 -26 30 H142 a26 26 0 0 1 -26 -30 l14 -150 a20 20 0 0 1 20 -20 z" fill="#ffffff"/>
+</svg>
