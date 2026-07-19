@@ -184,7 +184,24 @@ export interface ProductDetail {
 	categories: { id: number; name: string }[];
 	characteristics: ProductCharacteristic[];
 	variants: ProductVariant[];
+	custom_fields: Record<string, string | null>;
 }
+
+// A shop-defined custom field on the product (from GET /products/meta).
+export interface ProductField {
+	namekey: string;
+	type: string;
+	label: string;
+	default: string;
+	required: boolean;
+	options: { value: string; label: string }[];
+}
+
+// Scalar field types the connector accepts on write; others are read-only.
+export const WRITABLE_FIELD_TYPES = [
+	'text', 'textarea', 'number', 'integer', 'date', 'email', 'url', 'tel', 'color',
+	'singledropdown', 'radio', 'multidropdown', 'checkbox',
+];
 
 export interface ProductMeta {
 	currencies: { id: number; code: string; symbol: string; name: string }[];
@@ -195,6 +212,7 @@ export interface ProductMeta {
 	characteristics: ProductCharacteristic[];
 	weight_units: string[];
 	dimension_units: string[];
+	product_fields: ProductField[];
 }
 
 // A store the app has been paired with (its token is kept separately, in secure storage).

@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { ProductDetail, ProductMeta } from '../core';
+import type { ProductDetail, ProductMeta, ProductField } from '../core';
+import { WRITABLE_FIELD_TYPES } from '../core';
 import { Screen, Spinner, Icon, Field } from '../ui';
 
 type Form = Record<string, string | boolean>;
@@ -49,8 +50,15 @@ export function ProductEdit() {
 
 	const [form, setForm] = useState<Form | null>(null);
 	const [cats, setCats] = useState<number[]>([]);
+	const [custom, setCustom] = useState<Record<string, string>>({});
 	useEffect(() => {
-		if (fetched && !form) { setForm(toForm(fetched)); setCats(fetched.categories.map((c) => c.id)); }
+		if (fetched && !form) {
+			setForm(toForm(fetched));
+			setCats(fetched.categories.map((c) => c.id));
+			const cf: Record<string, string> = {};
+			for (const [k, v] of Object.entries(fetched.custom_fields ?? {})) cf[k] = v ?? '';
+			setCustom(cf);
+		}
 	}, [fetched, form]);
 
 	const [busy, setBusy] = useState(false);
@@ -61,6 +69,18 @@ export function ProductEdit() {
 
 	function set<K extends string>(key: K, value: string | boolean) {
 		setForm((f) => (f ? { ...f, [key]: value } : f));
+	}
+
+	const fields: ProductField[] = meta?.product_fields ?? [];
+	const isWritable = (f: ProductField) => WRITABLE_FIELD_TYPES.includes(f.type);
+	function setCustomField(namekey: string, value: string) {
+		setCustom((c) => ({ ...c, [namekey]: value }));
+	}
+	// Only send the fields the connector can actually write.
+	function writableCustom(): Record<string, string> {
+		const out: Record<string, string> = {};
+		for (const f of fields) if (isWritable(f) && f.namekey in custom) out[f.namekey] = custom[f.namekey] ?? '';
+		return out;
 	}
 
 	async function save() {
@@ -76,6 +96,7 @@ export function ProductEdit() {
 				min_per_order: int(form.min_per_order), max_per_order: int(form.max_per_order),
 				tax_id: int(form.tax_id), manufacturer_id: int(form.manufacturer_id),
 				page_title: form.page_title, meta_description: form.meta_description, keywords: form.keywords,
+				custom_fields: writableCustom(),
 			};
 			const updated = await client.updateProduct(productId, body);
 			const categories = await client.setProductCategories(productId, cats);
@@ -187,6 +208,38 @@ export function ProductEdit() {
 						<Field label={t('product.metaDescription')}><textarea className="hk-input hk-textarea" rows={2} value={s('meta_description')} onChange={(e) => set('meta_description', e.target.value)} /></Field>
 						<Field label={t('product.keywords')}><input className="hk-input" value={s('keywords')} onChange={(e) => set('keywords', e.target.value)} /></Field>
 					</div>
+
+					{fields.length > 0 && (
+						<div className="hk-card hk-card--pad hk-form">
+							<span className="hk-muted">{t('product.customFields')}</span>
+							{fields.map((f) => {
+								const val = custom[f.namekey] ?? '';
+								if (!isWritable(f)) {
+									return (
+										<Field key={f.namekey} label={f.label}>
+											<input className="hk-input" value={val} disabled readOnly />
+											<span className="hk-muted" style={{ fontSize: '0.8em' }}>{t('product.fieldReadOnly')}</span>
+										</Field>
+									);
+								}
+								if (f.type === 'textarea') {
+									return <Field key={f.namekey} label={f.label}><textarea className="hk-input hk-textarea" rows={3} value={val} onChange={(e) => setCustomField(f.namekey, e.target.value)} /></Field>;
+								}
+								if ((f.type === 'singledropdown' || f.type === 'radio') && f.options.length > 0) {
+									return (
+										<Field key={f.namekey} label={f.label}>
+											<select className="hk-select" value={val} onChange={(e) => setCustomField(f.namekey, e.target.value)}>
+												<option value="">{t('product.none')}</option>
+												{f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+											</select>
+										</Field>
+									);
+								}
+								const inputType = f.type === 'number' || f.type === 'integer' ? 'number' : f.type === 'date' ? 'date' : f.type === 'email' ? 'email' : f.type === 'url' ? 'url' : f.type === 'tel' ? 'tel' : f.type === 'color' ? 'color' : 'text';
+								return <Field key={f.namekey} label={f.label}><input className="hk-input" type={inputType} value={val} onChange={(e) => setCustomField(f.namekey, e.target.value)} /></Field>;
+							})}
+						</div>
+					)}
 
 					<div className="hk-card hk-card--pad">
 						<button className="hk-btn hk-btn--danger hk-btn--block" disabled={busy} onClick={() => void del()}>{t('product.deleteProduct')}</button>

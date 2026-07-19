@@ -49,6 +49,8 @@ export const en: Messages = {
 	'product.pageTitle': 'Page title',
 	'product.metaDescription': 'Meta description',
 	'product.keywords': 'Keywords',
+	'product.customFields': 'Custom fields',
+	'product.fieldReadOnly': 'Read-only in the app',
 	'product.noPrice': 'No price set',
 	'product.priceFrom': 'from {qty}',
 	'product.variantsSummary.one': '{options} options · {count} variant',

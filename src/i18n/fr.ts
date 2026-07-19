@@ -47,6 +47,8 @@ export const fr: Messages = {
 	'product.pageTitle': 'Titre de page',
 	'product.metaDescription': 'Méta-description',
 	'product.keywords': 'Mots-clés',
+	'product.customFields': 'Champs personnalisés',
+	'product.fieldReadOnly': 'Lecture seule dans l\'application',
 	'product.noPrice': 'Aucun tarif défini',
 	'product.priceFrom': 'dès {qty}',
 	'product.variantsSummary.one': '{options} options · {count} déclinaison',
