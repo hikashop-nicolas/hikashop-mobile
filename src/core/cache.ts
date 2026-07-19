@@ -4,7 +4,7 @@
 // shapes on a schema bump until a full migration runner lands (Phase 3 queue/ledger).
 
 import type { KeyValueStore } from './storage';
-import type { OrderSummary, OrderDetail, DashboardStats, Paginated, ProductSummary, ProductDetail } from './models';
+import type { OrderSummary, OrderDetail, DashboardStats, Paginated, ProductSummary, ProductDetail, ProductMeta } from './models';
 
 export const CACHE_VERSION = 1;
 
@@ -82,6 +82,13 @@ export class CacheRepository {
 	}
 	putProduct(storeId: string, productId: number, detail: ProductDetail): Promise<Cached<ProductDetail>> {
 		return this.write(this.key(storeId, 'product', String(productId)), detail);
+	}
+
+	getProductMeta(storeId: string): Promise<Cached<ProductMeta> | null> {
+		return this.read(this.key(storeId, 'productmeta'));
+	}
+	putProductMeta(storeId: string, meta: ProductMeta): Promise<Cached<ProductMeta>> {
+		return this.write(this.key(storeId, 'productmeta'), meta);
 	}
 
 	// Drop every cached row for a store (called when the store is removed).

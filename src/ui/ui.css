@@ -88,3 +88,8 @@
 
 .hk-check { display: inline-flex; align-items: center; gap: var(--hk-s2); margin-top: var(--hk-s3); font-size: .85rem; color: var(--hk-muted); cursor: pointer; }
 .hk-check input { width: 1.05rem; height: 1.05rem; accent-color: var(--hk-accent); cursor: pointer; }
+
+.hk-gallery { display: flex; gap: var(--hk-s2); overflow-x: auto; padding-bottom: 2px; -webkit-overflow-scrolling: touch; }
+.hk-gallery-img { width: 84px; height: 84px; border-radius: var(--hk-r2); object-fit: cover; flex: none; border: 1px solid var(--hk-line); background: var(--hk-surface-2); }
+.hk-mono { font-family: var(--hk-mono); font-size: .74rem; }
+.hk-avatar-img { width: 2rem; height: 2rem; border-radius: var(--hk-r1); object-fit: cover; flex: none; border: 1px solid var(--hk-line); }

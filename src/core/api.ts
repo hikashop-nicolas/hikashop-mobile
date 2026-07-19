@@ -3,7 +3,7 @@
 
 import type {
 	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
-	ProductSummary, ProductDetail,
+	ProductSummary, ProductDetail, ProductMeta,
 } from './models';
 
 export class ApiError extends Error {
@@ -152,6 +152,11 @@ export class ApiClient {
 
 	async getProduct(id: number): Promise<ProductDetail> {
 		return (await this.request<ProductDetail>('GET', `products/${id}`)).data;
+	}
+
+	// Reference data for the product editor (currencies, taxes, categories, access levels...).
+	async getProductMeta(): Promise<ProductMeta> {
+		return (await this.request<ProductMeta>('GET', 'products/meta')).data;
 	}
 
 	// Set a product's tracked quantity (write scope). A negative value means "unlimited".

@@ -45,7 +45,9 @@ export function Products() {
 				<div>
 					{items.map((p) => (
 						<Link key={p.id} to={`/products/${p.id}`} className="hk-row">
-							<div className="hk-avatar">{(p.name || '?').charAt(0).toUpperCase()}</div>
+							{p.image
+								? <img className="hk-avatar-img" src={p.image} alt="" loading="lazy" />
+								: <div className="hk-avatar">{(p.name || '?').charAt(0).toUpperCase()}</div>}
 							<div className="hk-row-grow">
 								<span className="hk-row-title">{p.name}{!p.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}</span>
 								<span className="hk-row-sub">{p.code} · {stockLabel(p)}</span>
