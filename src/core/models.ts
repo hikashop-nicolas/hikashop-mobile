@@ -76,6 +76,13 @@ export interface Paginated<T> {
 	limit: number;
 }
 
+export interface OrderStatusResult {
+	id: number;
+	status: string;
+	changed: boolean;
+	notified: boolean;
+}
+
 // A store the app has been paired with (its token is kept separately, in secure storage).
 export interface Store {
 	id: string;

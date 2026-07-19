@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
@@ -5,6 +6,9 @@ import { useI18n, tError } from '../i18n';
 import type { OrderDetail as OrderDetailType } from '../core';
 import { Screen, StatusChip, Money, Spinner, Icon } from '../ui';
 import { fmtDate } from '../app/utils';
+
+// Standard HikaShop statuses offered as quick actions; the store validates the value.
+const STATUSES = ['created', 'confirmed', 'shipped', 'cancelled', 'refunded'];
 
 export function OrderDetail() {
 	const { id } = useParams();
@@ -14,13 +18,39 @@ export function OrderDetail() {
 	const storeId = active?.id ?? '';
 	const orderId = Number(id);
 
-	const { data: order, loading, error } = useCached<OrderDetailType>({
+	const { data: fetched, loading, error } = useCached<OrderDetailType>({
 		enabled: !!client && !!active && !!id,
 		read: () => cache.getOrderDetail(storeId, orderId),
 		fetch: () => client!.getOrder(orderId),
 		write: async (o) => { await cache.putOrderDetail(storeId, orderId, o); },
 		deps: [storeId, orderId],
 	});
+
+	// Local copy so a status change reflects instantly without a full reload.
+	const [order, setOrder] = useState<OrderDetailType | null>(null);
+	useEffect(() => { if (fetched) setOrder(fetched); }, [fetched]);
+
+	const [notify, setNotify] = useState(false);
+	const [busy, setBusy] = useState('');
+	const [updateErr, setUpdateErr] = useState('');
+
+	async function changeStatus(status: string) {
+		if (!client || !order || busy || status === order.status) return;
+		setUpdateErr('');
+		setBusy(status);
+		try {
+			await client.setOrderStatus(orderId, status, { notify });
+			const now = Math.floor(Date.now() / 1000);
+			const next: OrderDetailType = { ...order, status, history: [{ status, created: now }, ...order.history] };
+			setOrder(next);
+			await cache.putOrderDetail(storeId, orderId, next);
+		} catch (e) {
+			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
+			setUpdateErr(tError(t, code));
+		} finally {
+			setBusy('');
+		}
+	}
 
 	return (
 		<Screen
@@ -58,6 +88,28 @@ export function OrderDetail() {
 							<span className="hk-row-title"><Money value={order.totals.total} /></span>
 						</div>
 					</div>
+
+					<div className="hk-card hk-card--pad">
+						<span className="hk-muted">{t('order.changeStatus')}</span>
+						<div className="hk-chiprow" style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap', marginTop: 'var(--hk-s2)' }}>
+							{STATUSES.map((s) => (
+								<button
+									key={s}
+									className={`hk-chip${s === order.status ? ' hk-on' : ''}`}
+									disabled={!!busy}
+									onClick={() => void changeStatus(s)}
+								>
+									{busy === s ? t('order.updating') : t(`status.${s}`)}
+								</button>
+							))}
+						</div>
+						<label className="hk-check">
+							<input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} disabled={!!busy} />
+							<span>{t('order.notifyCustomer')}</span>
+						</label>
+						{updateErr && <div className="hk-error-note" style={{ marginTop: 'var(--hk-s3)' }}>{updateErr}</div>}
+					</div>
+
 					{order.billing_address && (
 						<div className="hk-card hk-card--pad">
 							<span className="hk-muted">{t('order.billing')}</span>

@@ -67,6 +67,21 @@ describe('ApiClient', () => {
 		expect(hadAuth).toBe(false);
 	});
 
+	it('setOrderStatus posts the status/notify/reason and returns the result', async () => {
+		let seenUrl = '';
+		let seenBody: Record<string, unknown> = {};
+		const fetchFn: FetchLike = async (url, init) => {
+			seenUrl = url;
+			seenBody = JSON.parse(String(init?.body));
+			return jsonResponse({ data: { id: 5, status: 'shipped', changed: true, notified: true }, meta: null });
+		};
+		const r = await new ApiClient('http://shop', 'tok', fetchFn).setOrderStatus(5, 'shipped', { notify: true, reason: 'Sent' });
+		expect(seenUrl).toBe('http://shop/index.php/hikashop-api/v1/orders/5/status');
+		expect(seenBody).toEqual({ status: 'shipped', notify: true, reason: 'Sent' });
+		expect(r.changed).toBe(true);
+		expect(r.notified).toBe(true);
+	});
+
 	it('wraps a transport failure as ApiError(network)', async () => {
 		const fetchFn: FetchLike = async () => {
 			throw new Error('boom');

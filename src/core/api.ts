@@ -2,7 +2,7 @@
 // so native builds can swap in a CORS-free HTTP bridge and tests can mock responses.
 
 import type {
-	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated,
+	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
 } from './models';
 
 export class ApiError extends Error {
@@ -124,6 +124,14 @@ export class ApiClient {
 
 	async getOrder(id: number): Promise<OrderDetail> {
 		return (await this.request<OrderDetail>('GET', `orders/${id}`)).data;
+	}
+
+	// Change an order's status (write scope). notify asks the store to email the customer.
+	async setOrderStatus(id: number, status: string, opts: { notify?: boolean; reason?: string } = {}): Promise<OrderStatusResult> {
+		const { data } = await this.request<OrderStatusResult>('POST', `orders/${id}/status`, {
+			body: { status, notify: !!opts.notify, reason: opts.reason ?? '' },
+		});
+		return data;
 	}
 
 	async getDashboard(range = 'week'): Promise<DashboardStats> {

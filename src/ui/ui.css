@@ -85,3 +85,6 @@
 
 .hk-select { border: 1px solid var(--hk-line); border-radius: var(--hk-r2); background: var(--hk-surface); color: var(--hk-ink); min-height: 36px; padding: 0 var(--hk-s3); font-size: .9rem; cursor: pointer; }
 .hk-select:focus { border-color: var(--hk-accent); outline: none; }
+
+.hk-check { display: inline-flex; align-items: center; gap: var(--hk-s2); margin-top: var(--hk-s3); font-size: .85rem; color: var(--hk-muted); cursor: pointer; }
+.hk-check input { width: 1.05rem; height: 1.05rem; accent-color: var(--hk-accent); cursor: pointer; }

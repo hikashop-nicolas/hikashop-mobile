@@ -57,6 +57,9 @@ export const fr: Messages = {
 	'order.total': 'Total',
 	'order.billing': 'Adresse de facturation',
 	'order.history': 'Historique',
+	'order.changeStatus': 'Changer le statut',
+	'order.notifyCustomer': 'Notifier le client',
+	'order.updating': 'Mise à jour…',
 
 	'stores.title': 'Vos boutiques',
 	'stores.active': 'Active',
