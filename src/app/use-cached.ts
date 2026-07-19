@@ -9,7 +9,7 @@ export interface CachedState<T> {
 	data: T | null;
 	loading: boolean; // no data yet and a fetch is in flight
 	refreshing: boolean; // showing data while a background fetch runs
-	error: string; // only set when there is no data to fall back on
+	error: string; // an error CODE (translate with tError); only set when there is no data
 	fetchedAt: number | null;
 	fromCache: boolean;
 }
@@ -62,11 +62,14 @@ export function useCached<T>(params: Params<T>): CachedState<T> {
 				void latest.current.write(data).catch(() => {});
 			}).catch((e) => {
 				if (cancelled) return;
+				const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string')
+					? (e as { code: string }).code
+					: 'generic';
 				setState((s) => ({
 					...s,
 					loading: false,
 					refreshing: false,
-					error: s.data == null ? (e instanceof Error ? e.message : 'Failed to load.') : '',
+					error: s.data == null ? code : '',
 				}));
 			});
 		};

@@ -89,7 +89,7 @@ describe('useCached', () => {
 		expect(result.current.error).toBe('');
 	});
 
-	it('surfaces the error when a network failure has no cache to fall back on', async () => {
+	it('surfaces a generic error code when a plain error has no cache to fall back on', async () => {
 		const net = deferred<string>();
 		const { result } = renderHook(() =>
 			useCached<string>({
@@ -101,7 +101,22 @@ describe('useCached', () => {
 			}),
 		);
 		net.reject(new Error('offline'));
-		await waitFor(() => expect(result.current.error).toBe('offline'));
+		await waitFor(() => expect(result.current.error).toBe('generic'));
 		expect(result.current.data).toBeNull();
+	});
+
+	it('surfaces the ApiError code so the UI can translate it', async () => {
+		const net = deferred<string>();
+		const { result } = renderHook(() =>
+			useCached<string>({
+				enabled: true,
+				read: async () => null,
+				fetch: () => net.promise,
+				write: async () => {},
+				deps: ['a'],
+			}),
+		);
+		net.reject(Object.assign(new Error('nope'), { code: 'network' }));
+		await waitFor(() => expect(result.current.error).toBe('network'));
 	});
 });

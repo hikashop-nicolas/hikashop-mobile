@@ -20,7 +20,7 @@ export function deviceName(): string {
 	return 'Web browser';
 }
 
-export function fmtDate(ts: number): string {
+export function fmtDate(ts: number, locale?: string): string {
 	if (!ts) return '-';
-	return new Date(ts * 1000).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+	return new Date(ts * 1000).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
 }

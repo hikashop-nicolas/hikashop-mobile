@@ -82,3 +82,6 @@
 .hk-scan-hint { text-align: center; }
 
 .hk-lead-ic { display: inline-flex; color: var(--hk-muted); flex: none; }
+
+.hk-select { border: 1px solid var(--hk-line); border-radius: var(--hk-r2); background: var(--hk-surface); color: var(--hk-ink); min-height: 36px; padding: 0 var(--hk-s3); font-size: .9rem; cursor: pointer; }
+.hk-select:focus { border-color: var(--hk-accent); outline: none; }

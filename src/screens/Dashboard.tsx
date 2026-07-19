@@ -1,13 +1,20 @@
 import { useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
+import { useT, tError } from '../i18n';
 import type { DashboardStats } from '../core';
 import { Screen, StatCard, Spinner } from '../ui';
 
-const RANGES: [string, string][] = [['today', 'Today'], ['week', 'Week'], ['month', 'Month'], ['year', 'Year']];
+const RANGES: [string, string][] = [
+	['today', 'dashboard.range.today'],
+	['week', 'dashboard.range.week'],
+	['month', 'dashboard.range.month'],
+	['year', 'dashboard.range.year'],
+];
 
 export function Dashboard() {
 	const { client, active, cache } = useStores();
+	const t = useT();
 	const [range, setRange] = useState('week');
 	const storeId = active?.id ?? '';
 
@@ -20,33 +27,33 @@ export function Dashboard() {
 	});
 
 	return (
-		<Screen title={active?.name ?? 'Dashboard'}>
+		<Screen title={active?.name ?? t('tabs.dashboard')}>
 			<div className="hk-chiprow" style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap' }}>
-				{RANGES.map(([k, l]) => (
-					<button key={k} className={`hk-chip${range === k ? ' hk-on' : ''}`} onClick={() => setRange(k)}>{l}</button>
+				{RANGES.map(([k, labelKey]) => (
+					<button key={k} className={`hk-chip${range === k ? ' hk-on' : ''}`} onClick={() => setRange(k)}>{t(labelKey)}</button>
 				))}
 			</div>
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>
 			) : error ? (
-				<div className="hk-error-note">{error}</div>
+				<div className="hk-error-note">{tError(t, error)}</div>
 			) : data ? (
 				<>
 					<div className="hk-stats">
-						<StatCard label="Revenue" value={data.totals.revenue.toFixed(2)} />
-						<StatCard label="Orders" value={data.totals.orders} />
-						<StatCard label="Avg. order" value={data.totals.average_order.toFixed(2)} />
-						<StatCard label="Customers" value={data.totals.customers} />
+						<StatCard label={t('dashboard.revenue')} value={data.totals.revenue.toFixed(2)} />
+						<StatCard label={t('dashboard.orders')} value={data.totals.orders} />
+						<StatCard label={t('dashboard.avgOrder')} value={data.totals.average_order.toFixed(2)} />
+						<StatCard label={t('dashboard.customers')} value={data.totals.customers} />
 					</div>
 					<div className="hk-card hk-card--pad">
-						<span className="hk-muted">Top products</span>
+						<span className="hk-muted">{t('dashboard.topProducts')}</span>
 						{data.top_products.length === 0 ? (
-							<div className="hk-empty">No sales in this range.</div>
+							<div className="hk-empty">{t('dashboard.noSales')}</div>
 						) : (
 							data.top_products.map((p, i) => (
 								<div key={i} className="hk-row">
 									<div className="hk-row-grow"><span className="hk-row-title">{p.name}</span></div>
-									<span className="hk-money">{p.quantity} sold</span>
+									<span className="hk-money">{t('dashboard.sold', { count: p.quantity })}</span>
 								</div>
 							))
 						)}

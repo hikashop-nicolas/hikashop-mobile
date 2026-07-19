@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useT } from '../i18n';
 
 // Pure-web QR scanner: BarcodeDetector over a getUserMedia stream. Works in the PWA and in the
 // Capacitor Android WebView (Chromium), so no native plugin is needed. Callers must only mount
@@ -23,15 +24,16 @@ export function isQrScanSupported(): boolean {
 }
 
 export function QrScanner({ onResult, onClose }: { onResult: (text: string) => void; onClose: () => void }) {
+	const t = useT();
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const onResultRef = useRef(onResult);
 	onResultRef.current = onResult;
-	const [error, setError] = useState('');
+	const [errorKey, setErrorKey] = useState('');
 
 	useEffect(() => {
 		const Ctor = detectorCtor();
 		if (!Ctor || !navigator.mediaDevices?.getUserMedia) {
-			setError('Scanning is not supported on this device.');
+			setErrorKey('scan.unsupported');
 			return;
 		}
 		let stream: MediaStream | null = null;
@@ -73,11 +75,7 @@ export function QrScanner({ onResult, onClose }: { onResult: (text: string) => v
 				};
 				raf = requestAnimationFrame(tick);
 			} catch (e) {
-				setError(
-					e instanceof DOMException && e.name === 'NotAllowedError'
-						? 'Camera permission was denied.'
-						: 'Could not start the camera.',
-				);
+				setErrorKey(e instanceof DOMException && e.name === 'NotAllowedError' ? 'scan.denied' : 'scan.failed');
 			}
 		})();
 
@@ -90,12 +88,12 @@ export function QrScanner({ onResult, onClose }: { onResult: (text: string) => v
 				<video ref={videoRef} className="hk-scan-video" playsInline muted />
 				<div className="hk-scan-reticle" aria-hidden="true" />
 			</div>
-			{error ? (
-				<div className="hk-error-note">{error}</div>
+			{errorKey ? (
+				<div className="hk-error-note">{t(errorKey)}</div>
 			) : (
-				<p className="hk-muted hk-scan-hint">Point the camera at the pairing QR code in your backend.</p>
+				<p className="hk-muted hk-scan-hint">{t('scan.hint')}</p>
 			)}
-			<button className="hk-btn hk-btn--block" onClick={onClose}>Cancel</button>
+			<button className="hk-btn hk-btn--block" onClick={onClose}>{t('common.cancel')}</button>
 		</div>
 	);
 }

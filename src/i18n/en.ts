@@ -1,0 +1,101 @@
+// English message catalog: the source of truth for every UI string. Other locales mirror these
+// keys; a missing key falls back to English, then to the key itself. {name} placeholders are
+// interpolated; `.one`/`.other` suffixes are selected by Intl.PluralRules on a `count` param.
+
+export type Messages = Record<string, string>;
+
+export const en: Messages = {
+	'common.back': 'Back',
+	'common.cancel': 'Cancel',
+	'common.guest': 'Guest',
+	'common.loadingFailed': 'Failed to load.',
+
+	'tabs.dashboard': 'Dashboard',
+	'tabs.orders': 'Orders',
+	'tabs.stores': 'Stores',
+
+	'connect.title': 'Connect a store',
+	'connect.intro': 'Pair this device with your HikaShop store. Generate a code in your backend under {location}, then scan the QR code or enter your store address and the code below.',
+	'connect.location': 'System › App Devices',
+	'connect.storeAddress': 'Store address',
+	'connect.pairingCode': 'Pairing code',
+	'connect.codeHint': 'Shown with the QR code in your backend.',
+	'connect.scan': 'Scan QR code',
+	'connect.pair': 'Pair device',
+	'connect.pairing': 'Pairing…',
+	'connect.errNoUrl': 'Enter your store address.',
+	'connect.errNoCode': 'Enter the pairing code.',
+	'connect.errFailed': 'Pairing failed.',
+	'connect.errQr': 'That QR code was not recognised.',
+
+	'dashboard.range.today': 'Today',
+	'dashboard.range.week': 'Week',
+	'dashboard.range.month': 'Month',
+	'dashboard.range.year': 'Year',
+	'dashboard.revenue': 'Revenue',
+	'dashboard.orders': 'Orders',
+	'dashboard.avgOrder': 'Avg. order',
+	'dashboard.customers': 'Customers',
+	'dashboard.topProducts': 'Top products',
+	'dashboard.noSales': 'No sales in this range.',
+	'dashboard.sold.one': '{count} sold',
+	'dashboard.sold.other': '{count} sold',
+
+	'orders.title': 'Orders',
+	'orders.search': 'Search order # or customer',
+	'orders.filter.all': 'All',
+	'orders.filter.confirmed': 'Confirmed',
+	'orders.filter.created': 'Created',
+	'orders.filter.shipped': 'Shipped',
+	'orders.filter.cancelled': 'Cancelled',
+	'orders.none': 'No orders found.',
+	'orders.countOf': '{shown} of {total}',
+
+	'order.title': 'Order #{number}',
+	'order.titleFallback': 'Order',
+	'order.items': 'Items',
+	'order.qty': 'Qty {count}',
+	'order.shipping': 'Shipping',
+	'order.total': 'Total',
+	'order.billing': 'Billing address',
+	'order.history': 'History',
+
+	'stores.title': 'Your stores',
+	'stores.active': 'Active',
+	'stores.remove': 'Remove',
+	'stores.removeConfirm': 'Remove {name}?',
+	'stores.add': 'Add another store',
+	'stores.notifTitle': 'Order notifications',
+	'stores.notifSub': 'Alert this device when a new order comes in.',
+	'stores.notifOn': 'On',
+	'stores.notifEnable': 'Enable',
+	'stores.notifBlocked': 'Notifications are blocked. Allow them in your device settings, then try again.',
+	'stores.language': 'Language',
+
+	'scan.unsupported': 'Scanning is not supported on this device.',
+	'scan.denied': 'Camera permission was denied.',
+	'scan.failed': 'Could not start the camera.',
+	'scan.hint': 'Point the camera at the pairing QR code in your backend.',
+
+	'notify.newOrder': 'New order #{number}',
+
+	'error.generic': 'Something went wrong. Please try again.',
+	'error.network': 'Could not reach the store. Check the connection and the address.',
+	'error.bad_response': 'The store returned an unexpected response.',
+	'error.http_error': 'The store could not complete the request.',
+	'error.unauthorized': 'This device is no longer authorised. Pair it again.',
+	'error.invalid_code': 'This pairing code is invalid or has expired.',
+	'error.not_found': 'Not found.',
+
+	'status.created': 'Created',
+	'status.confirmed': 'Confirmed',
+	'status.shipped': 'Shipped',
+	'status.cancelled': 'Cancelled',
+	'status.refunded': 'Refunded',
+	'status.pending': 'Pending',
+	'status.processing': 'Processing',
+	'status.completed': 'Completed',
+	'status.delivered': 'Delivered',
+
+	'loading': 'Loading',
+};

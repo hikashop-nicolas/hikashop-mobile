@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { ApiClient, Store } from '../core';
 import { maxOrderId, newOrdersSince } from '../core';
 import { notifier } from './notifier';
+import type { TFunc } from '../i18n';
 
 // Foreground order polling: while a store is active and notifications are enabled, poll the
 // site's own /orders on an interval and whenever the app regains focus, and raise a local
@@ -15,10 +16,13 @@ export function useOrderPoll(
 	client: ApiClient | null,
 	store: Store | null,
 	enabled: boolean,
+	t: TFunc,
 	onNew?: (count: number) => void,
 ): void {
 	const onNewRef = useRef(onNew);
 	onNewRef.current = onNew;
+	const tRef = useRef(t);
+	tRef.current = t;
 
 	useEffect(() => {
 		if (!client || !store || !enabled) return;
@@ -41,8 +45,8 @@ export function useOrderPoll(
 					if (fresh.length) {
 						for (const o of fresh) {
 							await notifier.show({
-								title: `New order #${o.number}`,
-								body: `${o.customer.name || o.customer.email || 'Guest'} · ${o.total.toFixed(2)}`,
+								title: tRef.current('notify.newOrder', { number: o.number }),
+								body: `${o.customer.name || o.customer.email || tRef.current('common.guest')} · ${o.total.toFixed(2)}`,
 								tag: `order-${o.id}`,
 							});
 						}

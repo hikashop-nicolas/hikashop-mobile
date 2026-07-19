@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
+import { useI18n, LOCALES } from '../i18n';
 import { Screen, Button, Icon } from '../ui';
 import { hostOf } from '../app/utils';
 
 export function Stores() {
 	const { stores, active, setActive, remove, notifyEnabled, notifySupported, enableNotifications, disableNotifications } = useStores();
+	const { t, locale, setLocale } = useI18n();
 	const nav = useNavigate();
 	const [notifyErr, setNotifyErr] = useState('');
 
@@ -16,11 +18,11 @@ export function Stores() {
 			return;
 		}
 		const granted = await enableNotifications();
-		if (!granted) setNotifyErr('Notifications are blocked. Allow them in your device settings, then try again.');
+		if (!granted) setNotifyErr(t('stores.notifBlocked'));
 	}
 
 	return (
-		<Screen title="Your stores">
+		<Screen title={t('stores.title')}>
 			{stores.map((s) => (
 				<div key={s.id} className="hk-row">
 					<div className="hk-avatar">{s.name.charAt(0).toUpperCase()}</div>
@@ -33,38 +35,52 @@ export function Stores() {
 						<span className="hk-row-sub">{hostOf(s.baseUrl)} · {s.role}</span>
 					</div>
 					<div className="hk-row-rt">
-						{active?.id === s.id && <span className="hk-status hk-status--ok">Active</span>}
+						{active?.id === s.id && <span className="hk-status hk-status--ok">{t('stores.active')}</span>}
 						<button
 							className="hk-btn hk-btn--danger"
 							style={{ minHeight: '32px', padding: '0 10px' }}
-							onClick={() => { if (window.confirm(`Remove ${s.name}?`)) void remove(s.id); }}
+							onClick={() => { if (window.confirm(t('stores.removeConfirm', { name: s.name }))) void remove(s.id); }}
 						>
-							Remove
+							{t('stores.remove')}
 						</button>
 					</div>
 				</div>
 			))}
-			<Button block onClick={() => nav('/connect')}><span className="hk-btn-ic"><Icon name="plus" size={18} /> Add another store</span></Button>
+			<Button block onClick={() => nav('/connect')}><span className="hk-btn-ic"><Icon name="plus" size={18} /> {t('stores.add')}</span></Button>
 
 			{notifySupported && (
 				<div className="hk-card hk-card--pad" style={{ marginTop: 'var(--hk-s4)' }}>
 					<div className="hk-row" style={{ borderBottom: 'none', padding: 0 }}>
 						<span className="hk-lead-ic"><Icon name="bell" size={20} /></span>
 						<div className="hk-row-grow">
-							<span className="hk-row-title">Order notifications</span>
-							<span className="hk-row-sub">Alert this device when a new order comes in.</span>
+							<span className="hk-row-title">{t('stores.notifTitle')}</span>
+							<span className="hk-row-sub">{t('stores.notifSub')}</span>
 						</div>
 						<button
 							className={`hk-btn${notifyEnabled ? '' : ' hk-btn--pri'}`}
 							style={{ minHeight: '36px', padding: '0 14px' }}
 							onClick={() => void toggleNotifications()}
 						>
-							{notifyEnabled ? 'On' : 'Enable'}
+							{notifyEnabled ? t('stores.notifOn') : t('stores.notifEnable')}
 						</button>
 					</div>
 					{notifyErr && <div className="hk-error-note" style={{ marginTop: 'var(--hk-s3)' }}>{notifyErr}</div>}
 				</div>
 			)}
+
+			<div className="hk-card hk-card--pad" style={{ marginTop: 'var(--hk-s4)' }}>
+				<div className="hk-row" style={{ borderBottom: 'none', padding: 0 }}>
+					<span className="hk-lead-ic"><Icon name="store" size={20} /></span>
+					<div className="hk-row-grow">
+						<span className="hk-row-title">{t('stores.language')}</span>
+					</div>
+					<select className="hk-select" value={locale} onChange={(e) => setLocale(e.target.value)}>
+						{Object.entries(LOCALES).map(([code, def]) => (
+							<option key={code} value={code}>{def.name}</option>
+						))}
+					</select>
+				</div>
+			</div>
 		</Screen>
 	);
 }

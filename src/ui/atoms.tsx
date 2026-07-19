@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes } from 'react';
+import { useT } from '../i18n';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 	variant?: 'default' | 'pri' | 'ghost' | 'danger';
@@ -20,7 +21,8 @@ export function Button({ variant = 'default', block, className = '', children, .
 }
 
 export function Spinner() {
-	return <div className="hk-spinner" role="status" aria-label="Loading" />;
+	const t = useT();
+	return <div className="hk-spinner" role="status" aria-label={t('loading')} />;
 }
 
 const STATUS_KIND: Record<string, 'ok' | 'warn' | 'crit' | 'neutral'> = {
@@ -35,8 +37,13 @@ const STATUS_KIND: Record<string, 'ok' | 'warn' | 'crit' | 'neutral'> = {
 };
 
 export function StatusChip({ status }: { status: string }) {
-	const kind = STATUS_KIND[(status || '').toLowerCase()] ?? 'neutral';
-	const label = status ? status.charAt(0).toUpperCase() + status.slice(1) : '';
+	const t = useT();
+	const norm = (status || '').toLowerCase();
+	const kind = STATUS_KIND[norm] ?? 'neutral';
+	// Use a translated status label when we have one; otherwise fall back to the raw value.
+	const key = `status.${norm}`;
+	const translated = t(key);
+	const label = translated !== key ? translated : (status ? status.charAt(0).toUpperCase() + status.slice(1) : '');
 	return <span className={`hk-status hk-status--${kind}`}>{label}</span>;
 }
 

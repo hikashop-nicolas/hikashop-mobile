@@ -2,15 +2,23 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
+import { useI18n, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { OrderSummary, Paginated } from '../core';
 import { Screen, Search, StatusChip, Money, Spinner } from '../ui';
 import { fmtDate } from '../app/utils';
 
-const FILTERS = ['', 'confirmed', 'created', 'shipped', 'cancelled'];
+const FILTERS: [string, string][] = [
+	['', 'orders.filter.all'],
+	['confirmed', 'orders.filter.confirmed'],
+	['created', 'orders.filter.created'],
+	['shipped', 'orders.filter.shipped'],
+	['cancelled', 'orders.filter.cancelled'],
+];
 
 export function Orders() {
 	const { client, active, cache } = useStores();
+	const { t, locale } = useI18n();
 	const [status, setStatus] = useState('');
 	const [search, setSearch] = useState('');
 	const storeId = active?.id ?? '';
@@ -29,34 +37,34 @@ export function Orders() {
 	const total = data?.total ?? 0;
 
 	return (
-		<Screen title="Orders">
-			<Search value={search} onChange={setSearch} placeholder="Search order # or customer" />
+		<Screen title={t('orders.title')}>
+			<Search value={search} onChange={setSearch} placeholder={t('orders.search')} />
 			<div style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap' }}>
-				{FILTERS.map((f) => (
+				{FILTERS.map(([f, labelKey]) => (
 					<button key={f || 'all'} className={`hk-chip${status === f ? ' hk-on' : ''}`} onClick={() => setStatus(f)}>
-						{f ? f.charAt(0).toUpperCase() + f.slice(1) : 'All'}
+						{t(labelKey)}
 					</button>
 				))}
 			</div>
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>
 			) : error ? (
-				<div className="hk-error-note">{error}</div>
+				<div className="hk-error-note">{tError(t, error)}</div>
 			) : items.length === 0 ? (
-				<div className="hk-empty">No orders found.</div>
+				<div className="hk-empty">{t('orders.none')}</div>
 			) : (
 				<div>
 					{items.map((o) => (
 						<Link key={o.id} to={`/orders/${o.id}`} className="hk-row">
 							<div className="hk-avatar">{(o.customer.name || o.customer.email || '?').charAt(0).toUpperCase()}</div>
 							<div className="hk-row-grow">
-								<span className="hk-row-title">#{o.number} · {o.customer.name || o.customer.email || 'Guest'}</span>
-								<span className="hk-row-sub">{fmtDate(o.created)}</span>
+								<span className="hk-row-title">#{o.number} · {o.customer.name || o.customer.email || t('common.guest')}</span>
+								<span className="hk-row-sub">{fmtDate(o.created, locale)}</span>
 							</div>
 							<div className="hk-row-rt"><StatusChip status={o.status} /><Money value={o.total} /></div>
 						</Link>
 					))}
-					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{items.length} of {total}</div>
+					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('orders.countOf', { shown: items.length, total })}</div>
 				</div>
 			)}
 		</Screen>

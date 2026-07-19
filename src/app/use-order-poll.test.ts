@@ -29,6 +29,10 @@ function fakeClient(pages: Paginated<OrderSummary>[]) {
 	return { getOrders: vi.fn(async () => pages[Math.min(i++, pages.length - 1)]) } as unknown as ApiClient;
 }
 
+// Minimal translator stub: renders the order number into the title.
+const tt = (key: string, params?: Record<string, string | number>) =>
+	key === 'notify.newOrder' && params ? `New order #${params.number}` : key;
+
 beforeEach(() => {
 	const mem = new Map<string, string>();
 	vi.stubGlobal('localStorage', {
@@ -44,7 +48,7 @@ beforeEach(() => {
 describe('useOrderPoll', () => {
 	it('baselines on the first poll, then notifies for a newer order', async () => {
 		const client = fakeClient([page([28, 26]), page([30, 28, 26])]);
-		renderHook(() => useOrderPoll(client, store, true));
+		renderHook(() => useOrderPoll(client, store, true, tt));
 
 		await waitFor(() => expect(localStorage.getItem('hk.notify.cursor.s1')).toBe('28'));
 		expect(notifier.show).not.toHaveBeenCalled();
@@ -57,7 +61,7 @@ describe('useOrderPoll', () => {
 
 	it('does not poll when disabled', async () => {
 		const client = fakeClient([page([28])]);
-		renderHook(() => useOrderPoll(client, store, false));
+		renderHook(() => useOrderPoll(client, store, false, tt));
 		await new Promise((r) => setTimeout(r, 20));
 		expect(client.getOrders).not.toHaveBeenCalled();
 	});
