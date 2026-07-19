@@ -112,7 +112,7 @@ export function ProductDetail() {
 					</div>
 
 					<div className="hk-card hk-card--pad">
-						<span className="hk-muted">{t('product.pricing')}</span>
+						<div className="hk-sect-head"><span className="hk-muted">{t('product.pricing')}</span><button className="hk-appbar-act" onClick={() => nav(`/products/${productId}/prices`)}>{t('product.edit')}</button></div>
 						{product.prices.length === 0 ? (
 							<div className="hk-empty">{t('product.noPrice')}</div>
 						) : (
@@ -177,9 +177,14 @@ export function ProductDetail() {
 						)}
 					</div>
 
-					{hasVariants && (
+					<div className="hk-card hk-card--pad">
+						<div className="hk-sect-head"><span className="hk-muted">{t('product.editMedia')}</span><button className="hk-appbar-act" onClick={() => nav(`/products/${productId}/media`)}>{t('product.edit')}</button></div>
+						<div className="hk-row-sub">{product.images.length} · {product.files.length}</div>
+					</div>
+
+					{(
 						<div className="hk-card hk-card--pad">
-							<span className="hk-muted">{t('product.variants')}</span>
+							<div className="hk-sect-head"><span className="hk-muted">{t('product.variants')}</span><button className="hk-appbar-act" onClick={() => nav(`/products/${productId}/variants`)}>{t('product.edit')}</button></div>
 							<div className="hk-row-sub" style={{ margin: '4px 0 8px' }}>{t('product.variantsSummary', { options: product.characteristics.length, count: product.variants.length })}</div>
 							{product.characteristics.map((ch) => (
 								<div key={ch.id} style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--hk-s2)', alignItems: 'center', marginBottom: 'var(--hk-s2)' }}>

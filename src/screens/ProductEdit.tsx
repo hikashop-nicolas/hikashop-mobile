@@ -48,10 +48,16 @@ export function ProductEdit() {
 	});
 
 	const [form, setForm] = useState<Form | null>(null);
-	useEffect(() => { if (fetched && !form) setForm(toForm(fetched)); }, [fetched, form]);
+	const [cats, setCats] = useState<number[]>([]);
+	useEffect(() => {
+		if (fetched && !form) { setForm(toForm(fetched)); setCats(fetched.categories.map((c) => c.id)); }
+	}, [fetched, form]);
 
 	const [busy, setBusy] = useState(false);
 	const [saveErr, setSaveErr] = useState('');
+	function toggleCat(cid: number) {
+		setCats((c) => (c.includes(cid) ? c.filter((x) => x !== cid) : [...c, cid]));
+	}
 
 	function set<K extends string>(key: K, value: string | boolean) {
 		setForm((f) => (f ? { ...f, [key]: value } : f));
@@ -72,8 +78,25 @@ export function ProductEdit() {
 				page_title: form.page_title, meta_description: form.meta_description, keywords: form.keywords,
 			};
 			const updated = await client.updateProduct(productId, body);
-			await cache.putProduct(storeId, productId, updated);
+			const categories = await client.setProductCategories(productId, cats);
+			await cache.putProduct(storeId, productId, { ...updated, categories });
 			nav(-1);
+		} catch (e) {
+			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
+			setSaveErr(tError(t, code));
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	async function del() {
+		if (!client || busy) return;
+		if (!window.confirm(t('product.deleteConfirm', { name: (form?.name as string) || '' }))) return;
+		setSaveErr('');
+		setBusy(true);
+		try {
+			await client.deleteProduct(productId);
+			nav('/products');
 		} catch (e) {
 			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
 			setSaveErr(tError(t, code));
@@ -137,6 +160,13 @@ export function ProductEdit() {
 
 					<div className="hk-card hk-card--pad hk-form">
 						<span className="hk-muted">{t('product.organization')}</span>
+						<Field label={t('product.categories')}>
+							<div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--hk-s2)' }}>
+								{(meta?.categories ?? []).map((c) => (
+									<button key={c.id} type="button" className={`hk-chip${cats.includes(c.id) ? ' hk-on' : ''}`} onClick={() => toggleCat(c.id)}>{c.name}</button>
+								))}
+							</div>
+						</Field>
 						<Field label={t('product.manufacturer')}>
 							<select className="hk-select" value={s('manufacturer_id')} onChange={(e) => set('manufacturer_id', e.target.value)}>
 								<option value="0">{t('product.none')}</option>
@@ -156,6 +186,10 @@ export function ProductEdit() {
 						<Field label={t('product.pageTitle')}><input className="hk-input" value={s('page_title')} onChange={(e) => set('page_title', e.target.value)} /></Field>
 						<Field label={t('product.metaDescription')}><textarea className="hk-input hk-textarea" rows={2} value={s('meta_description')} onChange={(e) => set('meta_description', e.target.value)} /></Field>
 						<Field label={t('product.keywords')}><input className="hk-input" value={s('keywords')} onChange={(e) => set('keywords', e.target.value)} /></Field>
+					</div>
+
+					<div className="hk-card hk-card--pad">
+						<button className="hk-btn hk-btn--danger hk-btn--block" disabled={busy} onClick={() => void del()}>{t('product.deleteProduct')}</button>
 					</div>
 
 					{saveErr && <div className="hk-error-note">{saveErr}</div>}

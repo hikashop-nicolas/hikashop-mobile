@@ -11,6 +11,9 @@ import { OrderDetail } from './screens/OrderDetail';
 import { Products } from './screens/Products';
 import { ProductDetail } from './screens/ProductDetail';
 import { ProductEdit } from './screens/ProductEdit';
+import { ProductPricesEdit } from './screens/ProductPricesEdit';
+import { ProductMedia } from './screens/ProductMedia';
+import { ProductVariantsEdit } from './screens/ProductVariantsEdit';
 import { Stores } from './screens/Stores';
 
 const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
@@ -89,6 +92,9 @@ function Shell() {
 							<Route path="/products" element={<Products />} />
 							<Route path="/products/:id" element={<ProductDetail />} />
 							<Route path="/products/:id/edit" element={<ProductEdit />} />
+							<Route path="/products/:id/prices" element={<ProductPricesEdit />} />
+							<Route path="/products/:id/media" element={<ProductMedia />} />
+							<Route path="/products/:id/variants" element={<ProductVariantsEdit />} />
 							<Route path="/stores" element={<Stores />} />
 							<Route path="/connect" element={<Connect />} />
 							<Route path="*" element={<Navigate to="/dashboard" replace />} />

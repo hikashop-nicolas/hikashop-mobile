@@ -3,7 +3,7 @@
 
 import type {
 	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
-	ProductSummary, ProductDetail, ProductMeta,
+	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductFile, ProductCharacteristic, ProductVariant,
 } from './models';
 
 export class ApiError extends Error {
@@ -172,6 +172,38 @@ export class ApiClient {
 	// Update a product's core fields (write scope). Returns the full refreshed product.
 	async updateProduct(id: number, fields: Record<string, unknown>): Promise<ProductDetail> {
 		return (await this.request<ProductDetail>('PUT', `products/${id}`, { body: fields })).data;
+	}
+
+	async createProduct(fields: Record<string, unknown>): Promise<ProductDetail> {
+		return (await this.request<ProductDetail>('POST', 'products', { body: fields })).data;
+	}
+
+	async deleteProduct(id: number): Promise<{ id: number; deleted: boolean }> {
+		return (await this.request<{ id: number; deleted: boolean }>('DELETE', `products/${id}`)).data;
+	}
+
+	async setProductPrices(id: number, prices: unknown[]): Promise<ProductPrice[]> {
+		return (await this.request<ProductPrice[]>('PUT', `products/${id}/prices`, { body: { prices } })).data;
+	}
+
+	async setProductCategories(id: number, categories: number[]): Promise<{ id: number; name: string }[]> {
+		return (await this.request<{ id: number; name: string }[]>('PUT', `products/${id}/categories`, { body: { categories } })).data;
+	}
+
+	async uploadProductMedia(id: number, kind: 'images' | 'files', file: { name: string; data: string; description?: string; access?: string }): Promise<ProductFile> {
+		return (await this.request<ProductFile>('POST', `products/${id}/${kind}`, { body: file })).data;
+	}
+
+	async deleteProductFile(id: number, fileId: number): Promise<{ id: number; deleted: boolean }> {
+		return (await this.request<{ id: number; deleted: boolean }>('DELETE', `products/${id}/files/${fileId}`)).data;
+	}
+
+	async createCharacteristic(body: { parent_id?: number; value: string }): Promise<{ id: number; value: string; parent_id: number }> {
+		return (await this.request<{ id: number; value: string; parent_id: number }>('POST', 'products/characteristics', { body })).data;
+	}
+
+	async setProductVariants(id: number, variants: unknown[]): Promise<{ characteristics: ProductCharacteristic[]; variants: ProductVariant[] }> {
+		return (await this.request<{ characteristics: ProductCharacteristic[]; variants: ProductVariant[] }>('PUT', `products/${id}/variants`, { body: { variants } })).data;
 	}
 
 	// Set a product's tracked quantity (write scope). A negative value means "unlimited".
