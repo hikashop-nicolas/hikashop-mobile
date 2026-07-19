@@ -42,7 +42,10 @@ export function useCached<T>(params: Params<T>): CachedState<T> {
 		}
 		let cancelled = false;
 		let gotNetwork = false;
-		setState((s) => ({ ...s, loading: s.data == null, error: '' }));
+		// A dep change means a different query (e.g. a new status filter). Drop the previous
+		// query's data so it cannot linger on screen (which reads as "the filter did nothing")
+		// while the new one loads; the cache read below repaints instantly when it has a hit.
+		setState({ ...IDLE, loading: true });
 
 		// Cache first: paint immediately, unless the network already won the race.
 		void latest.current.read().then((c) => {

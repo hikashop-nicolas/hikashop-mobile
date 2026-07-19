@@ -26,7 +26,7 @@
 .hk-input::placeholder { color: var(--hk-faint); }
 .hk-input:focus { border-color: var(--hk-accent); outline: none; }
 
-.hk-chip { font-size: .72rem; padding: .25rem .6rem; border-radius: var(--hk-r-pill); border: 1px solid var(--hk-line); color: var(--hk-muted); background: var(--hk-surface); cursor: pointer; white-space: nowrap; }
+.hk-chip { font-size: .8rem; padding: .5rem .85rem; min-height: 2.1rem; display: inline-flex; align-items: center; border-radius: var(--hk-r-pill); border: 1px solid var(--hk-line); color: var(--hk-muted); background: var(--hk-surface); cursor: pointer; white-space: nowrap; }
 .hk-chip.hk-on { background: var(--hk-accent-soft); border-color: transparent; color: var(--hk-accent); font-weight: 600; }
 
 .hk-status { font-size: .68rem; padding: .16rem .5rem; border-radius: var(--hk-r-pill); font-weight: 600; white-space: nowrap; display: inline-block; }
