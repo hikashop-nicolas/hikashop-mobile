@@ -109,6 +109,42 @@ describe('ApiClient', () => {
 		expect(r.quantity).toBe(-1);
 	});
 
+	it('browseMedia builds the folder + type query', async () => {
+		let seenUrl = '';
+		const fetchFn: FetchLike = async (url) => { seenUrl = url; return jsonResponse({ data: { folder: 'season', folders: [], images: [] }, meta: null }); };
+		const r = await new ApiClient('http://shop', 't', fetchFn).browseMedia('season', 'file');
+		expect(seenUrl).toContain('media/browse?');
+		expect(seenUrl).toContain('folder=season');
+		expect(seenUrl).toContain('type=file');
+		expect(r.folder).toBe('season');
+	});
+
+	it('attachProductMedia posts the path to the images endpoint', async () => {
+		let seenUrl = ''; let seenBody: Record<string, unknown> = {}; let seenMethod = '';
+		const fetchFn: FetchLike = async (url, init) => { seenUrl = url; seenMethod = String(init?.method); seenBody = JSON.parse(String(init?.body)); return jsonResponse({ data: { id: 9, name: 'a.png' }, meta: null }); };
+		await new ApiClient('http://shop', 't', fetchFn).attachProductMedia(5, 'images', { path: 'season/a.png', name: 'a.png' });
+		expect(seenUrl).toBe('http://shop/index.php/hikashop-api/v1/products/5/images');
+		expect(seenMethod).toBe('POST');
+		expect(seenBody).toEqual({ path: 'season/a.png', name: 'a.png' });
+	});
+
+	it('updateProductFile PUTs the options to the file endpoint', async () => {
+		let seenUrl = ''; let seenMethod = ''; let seenBody: Record<string, unknown> = {};
+		const fetchFn: FetchLike = async (url, init) => { seenUrl = url; seenMethod = String(init?.method); seenBody = JSON.parse(String(init?.body)); return jsonResponse({ data: { id: 3 }, meta: null }); };
+		await new ApiClient('http://shop', 't', fetchFn).updateProductFile(5, 3, { name: 'x', access: 'all' });
+		expect(seenUrl).toBe('http://shop/index.php/hikashop-api/v1/products/5/files/3');
+		expect(seenMethod).toBe('PUT');
+		expect(seenBody).toEqual({ name: 'x', access: 'all' });
+	});
+
+	it('setProductMediaOrder PUTs the ordered ids', async () => {
+		let seenUrl = ''; let seenBody: Record<string, unknown> = {};
+		const fetchFn: FetchLike = async (url, init) => { seenUrl = url; seenBody = JSON.parse(String(init?.body)); return jsonResponse({ data: { images: [], files: [] }, meta: null }); };
+		await new ApiClient('http://shop', 't', fetchFn).setProductMediaOrder(5, { images: [3, 1, 2] });
+		expect(seenUrl).toBe('http://shop/index.php/hikashop-api/v1/products/5/media/order');
+		expect(seenBody).toEqual({ images: [3, 1, 2] });
+	});
+
 	it('retries a transient 503 and then succeeds', async () => {
 		let calls = 0;
 		const fetchFn: FetchLike = async () => {

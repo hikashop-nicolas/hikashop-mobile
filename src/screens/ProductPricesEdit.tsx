@@ -4,13 +4,10 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductPrice } from '../core';
+import { tsToDate, dateToTs } from '../core';
 import { Screen, Spinner, Icon, Field } from '../ui';
 
 type Row = { value: string; currency_id: number; min_quantity: string; access: string; start: string; end: string };
-
-// HikaShop stores price validity dates as unix seconds; the inputs use yyyy-mm-dd.
-const tsToDate = (ts: number): string => (ts > 0 ? new Date(ts * 1000).toISOString().slice(0, 10) : '');
-const dateToTs = (s: string): number => (s ? Math.floor(new Date(`${s}T00:00:00Z`).getTime() / 1000) : 0);
 
 const toRow = (p: ProductPrice): Row => ({ value: String(p.value), currency_id: p.currency_id, min_quantity: String(p.min_quantity || ''), access: p.access || 'all', start: tsToDate(p.start_date), end: tsToDate(p.end_date) });
 

@@ -4,30 +4,10 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { CategoryListItem } from '../core';
+import { flattenTree } from '../core';
 import { Screen, Spinner, Icon } from '../ui';
 
 type Kind = 'product' | 'manufacturer';
-
-// Flatten a parent-linked list into depth-ordered rows for an indented tree view.
-function ordered(items: CategoryListItem[]): { item: CategoryListItem; depth: number }[] {
-	const byParent = new Map<number, CategoryListItem[]>();
-	const ids = new Set(items.map((i) => i.id));
-	for (const i of items) {
-		const key = ids.has(i.parent_id) ? i.parent_id : 0;
-		const arr = byParent.get(key) ?? [];
-		arr.push(i);
-		byParent.set(key, arr);
-	}
-	const out: { item: CategoryListItem; depth: number }[] = [];
-	const walk = (parent: number, depth: number) => {
-		for (const i of byParent.get(parent) ?? []) {
-			out.push({ item: i, depth });
-			walk(i.id, depth + 1);
-		}
-	};
-	walk(0, 0);
-	return out;
-}
 
 export function Categories() {
 	const { client, active, cache } = useStores();
@@ -46,7 +26,7 @@ export function Categories() {
 		deps: [storeId, kind, bump],
 	});
 
-	const rows = useMemo(() => ordered(data ?? []), [data]);
+	const rows = useMemo(() => flattenTree(data ?? []), [data]);
 
 	async function del(id: number) {
 		if (!client || busyId) return;

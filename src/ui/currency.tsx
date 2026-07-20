@@ -9,15 +9,16 @@ export function formatMoney(value: number, currency?: Currency | null): string {
 	const dsep = currency?.decimal_sep ?? '.';
 	const tsep = currency?.thousands_sep ?? ',';
 	const n = Number.isFinite(value) ? value : 0;
-	const fixed = Math.abs(n).toFixed(decimals);
+	const negative = n < 0;
+	const fixed = Math.abs(n).toFixed(Math.max(0, decimals));
 	const [intPart, fracPart] = fixed.split('.');
 	const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, tsep || '');
-	let num = fracPart ? `${grouped}${dsep}${fracPart}` : grouped;
-	if (n < 0) num = `-${num}`;
+	const num = fracPart ? `${grouped}${dsep}${fracPart}` : grouped;
 	const sym = currency?.symbol ?? '';
-	if (!sym) return num;
-	const space = currency?.space ? ' ' : '';
-	return currency?.symbol_before === false ? `${num}${space}${sym}` : `${sym}${space}${num}`;
+	const space = currency?.space ? ' ' : '';
+	const body = !sym ? num : (currency?.symbol_before === false ? `${num}${space}${sym}` : `${sym}${space}${num}`);
+	// Keep the sign outside the symbol so it reads -$5.00 / -1.234,50 €.
+	return negative ? `-${body}` : body;
 }
 
 // Currencies keyed by id, provided from the active store's meta.

@@ -14,7 +14,8 @@
 .hk-appbar { display: flex; align-items: center; gap: var(--hk-s2); padding: var(--hk-s3) var(--hk-s4); border-bottom: 1px solid var(--hk-line); background: var(--hk-surface); position: sticky; top: 0; z-index: 5; }
 .hk-appbar .hk-title { font-weight: 650; font-size: 1.05rem; letter-spacing: -.01em; }
 .hk-appbar .hk-grow { flex: 1; }
-.hk-appbar .hk-iconbtn { display: inline-flex; align-items: center; justify-content: center; background: none; border: none; color: var(--hk-muted); padding: var(--hk-s2); border-radius: var(--hk-r1); cursor: pointer; min-width: var(--hk-tap); min-height: var(--hk-tap); }
+.hk-iconbtn { display: inline-flex; align-items: center; justify-content: center; background: none; border: none; color: var(--hk-muted); padding: var(--hk-s2); border-radius: var(--hk-r1); cursor: pointer; min-width: var(--hk-tap); min-height: var(--hk-tap); }
+.hk-iconbtn:hover { background: var(--hk-surface-2); color: var(--hk-ink); }
 .hk-body { flex: 1; overflow-y: auto; padding: var(--hk-s4); display: flex; flex-direction: column; gap: var(--hk-s3); -webkit-overflow-scrolling: touch; }
 .hk-body.hk-center { justify-content: center; align-items: center; text-align: center; gap: var(--hk-s4); }
 
@@ -214,3 +215,6 @@
 .hk-mb-file { width: 100%; border-radius: var(--hk-r1); }
 .hk-mb-file.hk-on { background: var(--hk-accent-soft); }
 .hk-mb-file.hk-on .hk-row-title { color: var(--hk-accent); font-weight: 600; }
+
+.hk-file-preview { width: 120px; height: 120px; border: 1px solid var(--hk-line); border-radius: var(--hk-r2); overflow: hidden; background: var(--hk-surface-2); }
+.hk-file-preview img { width: 100%; height: 100%; object-fit: contain; display: block; }

@@ -47,7 +47,9 @@ export function FileOptionsModal({ productId, file, kind, accessLevels, onClose,
 			</>}
 		>
 			<div className="hk-form">
-				{kind === 'images' && file.url && <img className="hk-cat-img" src={file.url} alt="" style={{ width: '120px', height: '120px' }} />}
+				{kind === 'images' && file.url && (
+					<div className="hk-file-preview"><img src={file.url} alt={file.name} /></div>
+				)}
 				<Field label={t('media.name')}><input className="hk-input" value={name} onChange={(e) => setName(e.target.value)} /></Field>
 				<Field label={t('media.description')}><textarea className="hk-input hk-textarea" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} /></Field>
 				<Field label={t('product.access')}>
