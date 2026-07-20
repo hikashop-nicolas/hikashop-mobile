@@ -143,6 +143,7 @@ export function VariantEdit() {
 
 					{media && (
 						<ProductMediaSection productId={variantId} images={media.images} files={media.files}
+							accessLevels={meta?.access_levels ?? []}
 							onChange={(images, files) => setMedia({ images, files })} />
 					)}
 

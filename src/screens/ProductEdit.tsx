@@ -264,6 +264,7 @@ export function ProductEdit() {
 
 					{media && (
 						<ProductMediaSection productId={productId} images={media.images} files={media.files}
+							accessLevels={meta?.access_levels ?? []}
 							onChange={(images, files) => setMedia({ images, files })} />
 					)}
 

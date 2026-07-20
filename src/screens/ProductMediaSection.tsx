@@ -4,20 +4,26 @@ import { useT, tError } from '../i18n';
 import { readAsDataUrl } from '../core';
 import type { ProductImage, ProductFile } from '../core';
 import { Icon, Spinner } from '../ui';
+import { FileOptionsModal } from './FileOptionsModal';
+import { MediaBrowser } from './MediaBrowser';
 
 // Inline image + downloadable-file management for a product, embedded in the edit
-// form (upload as base64, delete). Uploads/deletes are immediate (their own writes),
-// independent of the core-field Save.
-export function ProductMediaSection({ productId, images, files, onChange }: {
+// form: upload (base64 or drag & drop), attach an already-uploaded file via the media
+// browser, edit each file's options, reorder and delete. Writes are immediate.
+export function ProductMediaSection({ productId, images, files, accessLevels = [], onChange }: {
 	productId: number;
 	images: ProductImage[];
 	files: ProductFile[];
+	accessLevels?: { id: number; name: string }[];
 	onChange: (images: ProductImage[], files: ProductFile[]) => void;
 }) {
 	const { client } = useStores();
 	const t = useT();
 	const [busy, setBusy] = useState(false);
 	const [err, setErr] = useState('');
+	const [dragOver, setDragOver] = useState(false);
+	const [browsing, setBrowsing] = useState(false);
+	const [editing, setEditing] = useState<{ file: ProductFile; kind: 'images' | 'files' } | null>(null);
 	const imgInput = useRef<HTMLInputElement>(null);
 	const fileInput = useRef<HTMLInputElement>(null);
 
@@ -33,6 +39,33 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 			if (kind === 'images') onChange([...images, ...added], files);
 			else onChange(images, [...files, ...added]);
 		} catch (e) { setErr(codeOf(e, t)); } finally { setBusy(false); }
+	}
+
+	// Drop image files onto the images area to upload them.
+	function onDrop(e: React.DragEvent) {
+		e.preventDefault();
+		setDragOver(false);
+		const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/'));
+		if (dropped.length) {
+			const dt = new DataTransfer();
+			dropped.forEach((f) => dt.items.add(f));
+			void onPick('images', dt.files);
+		}
+	}
+
+	// Attach an already-uploaded image chosen in the media browser.
+	async function attachFromBrowser(path: string, name: string) {
+		if (!client) return;
+		const added = await client.attachProductMedia(productId, 'images', { path, name });
+		onChange([...images, added], files);
+		setBrowsing(false);
+	}
+
+	function onFileEdited(updated: ProductFile) {
+		if (!editing) return;
+		if (editing.kind === 'images') onChange(images.map((i) => (i.id === updated.id ? { ...i, ...updated } : i)), files);
+		else onChange(images, files.map((f) => (f.id === updated.id ? updated : f)));
+		setEditing(null);
 	}
 
 	async function del(kind: 'images' | 'files', fileId: number) {
@@ -62,12 +95,17 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 	return (
 		<>
 			<div className="hk-card hk-card--pad">
-				<span className="hk-muted">{t('product.images')}</span>
-				<div className="hk-media-grid">
+				<div className="hk-sect-head"><span className="hk-muted">{t('product.images')}</span>
+					<button className="hk-appbar-act" disabled={busy} onClick={() => setBrowsing(true)}>{t('media.browse')}</button></div>
+				<div className={`hk-media-grid hk-dropzone${dragOver ? ' hk-dragover' : ''}`}
+					onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+					onDragLeave={() => setDragOver(false)}
+					onDrop={onDrop}>
 					{images.map((img, i) => (
 						<div key={img.id} className="hk-media-cell">
 							<img src={img.url} alt={img.description || ''} loading="lazy" />
 							<button className="hk-media-del" disabled={busy} aria-label={t('common.delete')} onClick={() => void del('images', img.id)}><Icon name="close" size={13} /></button>
+							<button className="hk-media-edit" disabled={busy} aria-label={t('media.editImage')} onClick={() => setEditing({ file: img as ProductFile, kind: 'images' })}><Icon name="edit" size={13} /></button>
 							{images.length > 1 && (
 								<div className="hk-media-move">
 									<button disabled={busy || i === 0} aria-label={t('product.moveEarlier')} onClick={() => void moveImage(i, -1)}><Icon name="chevron" size={14} className="hk-rot180" /></button>
@@ -78,6 +116,7 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 					))}
 					<button className="hk-media-add" disabled={busy} onClick={() => imgInput.current?.click()}><Icon name="plus" size={22} /></button>
 				</div>
+				{dragOver && <div className="hk-muted" style={{ textAlign: 'center', marginTop: 'var(--hk-s2)' }}>{t('media.dropHint')}</div>}
 				<input ref={imgInput} type="file" accept="image/*" multiple hidden onChange={(e) => void onPick('images', e.target.files)} />
 			</div>
 
@@ -85,7 +124,7 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 				<span className="hk-muted">{t('product.files')}</span>
 				{files.map((f) => (
 					<div key={f.id} className="hk-row">
-						<div className="hk-row-grow"><span className="hk-row-title">{f.name}</span>{f.access && <span className="hk-row-sub">{f.access}</span>}</div>
+						<button type="button" className="hk-row-grow hk-row-btn" onClick={() => setEditing({ file: f, kind: 'files' })}><span className="hk-row-title">{f.name}</span>{f.access && <span className="hk-row-sub">{f.access}</span>}</button>
 						<button className="hk-iconbtn hk-danger" disabled={busy} aria-label={t('common.delete')} onClick={() => void del('files', f.id)}><Icon name="trash" size={18} /></button>
 					</div>
 				))}
@@ -96,6 +135,9 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 				{busy && <div className="hk-center-col"><Spinner /></div>}
 				{err && <div className="hk-error-note">{err}</div>}
 			</div>
+
+			{browsing && <MediaBrowser onClose={() => setBrowsing(false)} onPick={attachFromBrowser} />}
+			{editing && <FileOptionsModal productId={productId} file={editing.file} kind={editing.kind} accessLevels={accessLevels} onClose={() => setEditing(null)} onSaved={onFileEdited} />}
 		</>
 	);
 }

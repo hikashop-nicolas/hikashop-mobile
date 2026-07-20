@@ -4,7 +4,7 @@
 import type {
 	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
-	CategoryInput, CategoryListItem, CategoryDetail,
+	CategoryInput, CategoryListItem, CategoryDetail, MediaListing,
 } from './models';
 
 export class ApiError extends Error {
@@ -195,8 +195,23 @@ export class ApiClient {
 		return (await this.request<ProductFile>('POST', `products/${id}/${kind}`, { body: file })).data;
 	}
 
+	// Attach an already-uploaded file (from the media browser) by its path.
+	async attachProductMedia(id: number, kind: 'images' | 'files', file: { path: string; name?: string; description?: string; access?: string }): Promise<ProductFile> {
+		return (await this.request<ProductFile>('POST', `products/${id}/${kind}`, { body: file })).data;
+	}
+
+	// Edit a file's options (name, description, access, free_download).
+	async updateProductFile(id: number, fileId: number, opts: { name?: string; description?: string; access?: string; free_download?: boolean }): Promise<ProductFile> {
+		return (await this.request<ProductFile>('PUT', `products/${id}/files/${fileId}`, { body: opts })).data;
+	}
+
 	async deleteProductFile(id: number, fileId: number): Promise<{ id: number; deleted: boolean }> {
 		return (await this.request<{ id: number; deleted: boolean }>('DELETE', `products/${id}/files/${fileId}`)).data;
+	}
+
+	// Browse the shop's upload folder (folders + images) for the media picker.
+	async browseMedia(folder = ''): Promise<MediaListing> {
+		return (await this.request<MediaListing>('GET', 'media/browse', { query: { folder } })).data;
 	}
 
 	// Reorder a product's images and/or files (write scope); ids in the desired order.

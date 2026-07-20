@@ -120,6 +120,15 @@ export interface ProductFile extends ProductImage {
 	free_download: boolean;
 }
 
+// A page of the shop upload folder from GET /media/browse.
+export interface MediaListing {
+	folder: string;
+	parent: string;
+	has_parent: boolean;
+	folders: { name: string; path: string }[];
+	images: { name: string; path: string; url: string }[];
+}
+
 export interface CharacteristicValue {
 	id: number;
 	value: string;
