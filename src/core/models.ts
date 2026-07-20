@@ -212,6 +212,19 @@ export interface ProductField {
 	upload_dir: string;
 	allowed_extensions: string;
 	date_format: string;
+	datepicker?: DatepickerConfig;
+}
+
+// Advanced date-picker (plg.datepickerfield) constraints, mirrored from the field's
+// datepicker_options so the app can honour them with a native date input.
+export interface DatepickerConfig {
+	allow: '' | 'future' | 'past';
+	waiting: number;
+	days_from_now: number;
+	forbidden_days: number[]; // 0 = Sunday .. 6 = Saturday
+	range: boolean;
+	range_min_nights: number;
+	range_max_nights: number;
 }
 
 // A resolved file for an ajax image/file custom field (from custom_field_files).

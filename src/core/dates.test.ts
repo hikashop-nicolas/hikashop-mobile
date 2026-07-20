@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { tsToDate, dateToTs } from './dates';
+import { tsToDate, dateToTs, hikaDateToIso, isoToHikaDate } from './dates';
 
 describe('date helpers', () => {
 	it('converts a unix timestamp to yyyy-mm-dd (UTC)', () => {
@@ -14,5 +14,23 @@ describe('date helpers', () => {
 
 	it('round-trips a date', () => {
 		expect(tsToDate(dateToTs('2026-07-20'))).toBe('2026-07-20');
+	});
+});
+
+describe('hikashop advanced datepicker format', () => {
+	it('converts yy/mm/dd storage to iso and back', () => {
+		expect(hikaDateToIso('2026/08/15')).toBe('2026-08-15');
+		expect(isoToHikaDate('2026-08-15')).toBe('2026/08/15');
+		expect(hikaDateToIso('')).toBe('');
+		expect(isoToHikaDate('')).toBe('');
+	});
+
+	it('round-trips through the native input format', () => {
+		expect(isoToHikaDate(hikaDateToIso('2026/12/31'))).toBe('2026/12/31');
+	});
+
+	it('rejects malformed values', () => {
+		expect(hikaDateToIso('2026-08-15')).toBe(''); // hyphens are not the storage format
+		expect(isoToHikaDate('15/08/2026')).toBe('');
 	});
 });

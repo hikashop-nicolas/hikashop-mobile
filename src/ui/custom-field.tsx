@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { ProductField, FieldFile } from '../core';
-import { readAsDataUrl } from '../core';
+import { readAsDataUrl, hikaDateToIso, isoToHikaDate, isoFromToday } from '../core';
+import { useT } from '../i18n';
 import { Field } from './molecules';
 import { RichText } from './rich-text';
 import { Icon } from './icons';
@@ -28,7 +29,11 @@ export function CustomFieldInput({ field, value, files, readOnlyLabel, onChange,
 	if (t === 'wysiwyg') {
 		return <Field label={field.label}><RichText value={value} onChange={onChange} /></Field>;
 	}
-	if (t === 'date' || t === 'datepicker') {
+	if (t === 'datepicker') {
+		// HikaShop's advanced picker stores yy/mm/dd; the native input works in ISO.
+		return <Field label={field.label}><DatePicker field={field} value={value} onChange={onChange} /></Field>;
+	}
+	if (t === 'date') {
 		return <Field label={field.label}><input className="hk-input" type="date" value={value} onChange={(e) => onChange(e.target.value)} /></Field>;
 	}
 	if (t === 'textarea') {
@@ -46,6 +51,45 @@ export function CustomFieldInput({ field, value, files, readOnlyLabel, onChange,
 	}
 	const inputType = t === 'number' || t === 'integer' ? 'number' : t === 'email' ? 'email' : t === 'url' ? 'url' : t === 'tel' ? 'tel' : t === 'color' ? 'color' : 'text';
 	return <Field label={field.label}><input className="hk-input" type={inputType} value={value} onChange={(e) => onChange(e.target.value)} /></Field>;
+}
+
+// Advanced date picker (plg.datepickerfield): a native date input that stores the
+// value in HikaShop's yy/mm/dd format and honours the field's allow / waiting /
+// days_from_now bounds and forbidden weekdays (native inputs can't grey out weekdays,
+// so a forbidden pick is rejected with a hint, matching the storefront's beforeShowDay).
+function DatePicker({ field, value, onChange }: {
+	field: ProductField;
+	value: string;
+	onChange: (value: string) => void;
+}) {
+	const t = useT();
+	const [warn, setWarn] = useState(false);
+	const cfg = field.datepicker;
+	const iso = hikaDateToIso(value);
+
+	let min = ''; let max = '';
+	if (cfg) {
+		const wait = cfg.waiting || 0;
+		const span = cfg.days_from_now || 0;
+		if (cfg.allow === 'future') { min = isoFromToday(wait); if (span > 0) max = isoFromToday(span); }
+		else if (cfg.allow === 'past') { max = isoFromToday(-wait); if (span > 0) min = isoFromToday(-span); }
+	}
+
+	function pick(next: string) {
+		setWarn(false);
+		if (next && cfg && cfg.forbidden_days.length > 0) {
+			const day = new Date(`${next}T00:00:00Z`).getUTCDay();
+			if (cfg.forbidden_days.includes(day)) { setWarn(true); return; }
+		}
+		onChange(next ? isoToHikaDate(next) : '');
+	}
+
+	return (
+		<>
+			<input className="hk-input" type="date" value={iso} min={min || undefined} max={max || undefined} onChange={(e) => pick(e.target.value)} />
+			{warn && <span className="hk-err">{t('field.dateUnavailable')}</span>}
+		</>
+	);
 }
 
 // Upload widget for an ajax image / file field: previews (images) or a name list

@@ -131,6 +131,7 @@ export const en: Messages = {
 	'media.noImages': 'No images in this folder',
 	'media.noFiles': 'No files in this folder',
 	'media.dropFileHint': 'Drop files to upload',
+	'field.dateUnavailable': 'This date is not available.',
 	'media.editImage': 'Image options',
 	'media.name': 'Name',
 	'media.description': 'Description',

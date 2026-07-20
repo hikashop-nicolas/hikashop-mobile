@@ -129,6 +129,7 @@ export const fr: Messages = {
 	'media.noImages': 'Aucune image dans ce dossier',
 	'media.noFiles': 'Aucun fichier dans ce dossier',
 	'media.dropFileHint': 'Déposez des fichiers pour les téléverser',
+	'field.dateUnavailable': 'Cette date n\'est pas disponible.',
 	'media.editImage': 'Options de l\'image',
 	'media.name': 'Nom',
 	'media.description': 'Description',
