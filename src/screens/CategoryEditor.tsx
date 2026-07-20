@@ -2,8 +2,8 @@ import { useMemo, useRef, useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl, WRITABLE_FIELD_TYPES } from '../core';
-import type { ProductMeta, ProductField, CategoryDetail } from '../core';
-import { Modal, Screen, Field, Button, Icon, TreeSelect, RichText } from '../ui';
+import type { ProductMeta, ProductField, CategoryDetail, FieldFile } from '../core';
+import { Modal, Screen, Field, Button, Icon, TreeSelect, RichText, CustomFieldInput } from '../ui';
 import type { TreeNode } from '../ui';
 
 type Kind = 'product' | 'manufacturer';
@@ -37,11 +37,16 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 		for (const [k, v] of Object.entries(category?.custom_fields ?? {})) c[k] = v ?? '';
 		return c;
 	});
+	const [customFiles, setCustomFiles] = useState<Record<string, FieldFile[]>>(category?.custom_field_files ?? {});
 	const [busy, setBusy] = useState(false);
 	const [err, setErr] = useState('');
 
 	const fields: ProductField[] = useMemo(() => meta?.category_fields ?? [], [meta]);
 	const isWritable = (f: ProductField) => WRITABLE_FIELD_TYPES.includes(f.type);
+	function setCustomFieldFiles(namekey: string, next: FieldFile[]) {
+		setCustomFiles((cf) => ({ ...cf, [namekey]: next }));
+		setCustom((c) => ({ ...c, [namekey]: next.map((f) => f.path).join('|') }));
+	}
 	// Exclude the category itself (and later, ideally its subtree) from parent choices.
 	const parents = useMemo(() => (editing ? parentNodes.filter((n) => n.id !== category!.id) : parentNodes), [parentNodes, editing, category]);
 
@@ -117,17 +122,13 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 
 				<label className="hk-check"><input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} /><span>{t('product.publishedLabel')}</span></label>
 
-				{fields.map((f) => {
-					if (!isWritable(f)) return null;
-					const val = custom[f.namekey] ?? '';
-					const setV = (v: string) => setCustom((c) => ({ ...c, [f.namekey]: v }));
-					if (f.type === 'wysiwyg') return <Field key={f.namekey} label={f.label}><RichText value={val} onChange={setV} /></Field>;
-					if (f.type === 'textarea') return <Field key={f.namekey} label={f.label}><textarea className="hk-input hk-textarea" rows={2} value={val} onChange={(e) => setV(e.target.value)} /></Field>;
-					if ((f.type === 'singledropdown' || f.type === 'radio') && f.options.length > 0) {
-						return <Field key={f.namekey} label={f.label}><select className="hk-select" value={val} onChange={(e) => setV(e.target.value)}><option value="">{t('product.none')}</option>{f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</select></Field>;
-					}
-					return <Field key={f.namekey} label={f.label}><input className="hk-input" value={val} onChange={(e) => setV(e.target.value)} /></Field>;
-				})}
+				{fields.map((f) => (
+					<CustomFieldInput key={f.namekey} field={f} value={custom[f.namekey] ?? ''} files={customFiles[f.namekey] ?? []}
+						readOnlyLabel={t('product.fieldReadOnly')}
+						onChange={(v) => setCustom((c) => ({ ...c, [f.namekey]: v }))}
+						onUpload={(data, name) => client!.uploadFieldFile('category', f.namekey, { data, name })}
+						onFiles={(next) => setCustomFieldFiles(f.namekey, next)} />
+				))}
 
 				{err && <div className="hk-error-note">{err}</div>}
 			</div>

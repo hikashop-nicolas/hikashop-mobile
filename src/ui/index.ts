@@ -2,6 +2,7 @@ export * from './atoms';
 export * from './molecules';
 export * from './currency';
 export * from './rich-text';
+export * from './custom-field';
 export * from './tree-select';
 export * from './layout';
 export * from './QrScanner';

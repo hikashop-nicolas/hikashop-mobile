@@ -195,17 +195,30 @@ export interface ProductDetail {
 	characteristics: ProductCharacteristic[];
 	variants: ProductVariant[];
 	custom_fields: Record<string, string | null>;
+	custom_field_files: Record<string, FieldFile[]>;
 	value_ids?: number[]; // characteristic value ids, present when this is a variant
 }
 
 // A shop-defined custom field on the product (from GET /products/meta).
 export interface ProductField {
 	namekey: string;
-	type: string;
+	type: string; // normalized: datepicker, ajaximage, ajaxfile, wysiwyg, text...
+	raw_type: string;
 	label: string;
 	default: string;
 	required: boolean;
 	options: { value: string; label: string }[];
+	multiple: boolean;
+	upload_dir: string;
+	allowed_extensions: string;
+	date_format: string;
+}
+
+// A resolved file for an ajax image/file custom field (from custom_field_files).
+export interface FieldFile {
+	path: string;
+	name: string;
+	url: string;
 }
 
 // A category row for the management list (includes unpublished ones).
@@ -227,6 +240,7 @@ export interface CategoryDetail {
 	published: boolean;
 	image: string;
 	custom_fields: Record<string, string | null>;
+	custom_field_files: Record<string, FieldFile[]>;
 }
 
 // Payload for creating a category or a manufacturer (both are HikaShop categories).
@@ -243,8 +257,8 @@ export interface CategoryInput {
 
 // Scalar field types the connector accepts on write; others are read-only.
 export const WRITABLE_FIELD_TYPES = [
-	'text', 'textarea', 'number', 'integer', 'date', 'email', 'url', 'tel', 'color',
-	'singledropdown', 'radio', 'multidropdown', 'checkbox', 'wysiwyg',
+	'text', 'textarea', 'number', 'integer', 'date', 'datepicker', 'email', 'url', 'tel', 'color',
+	'singledropdown', 'radio', 'multidropdown', 'checkbox', 'wysiwyg', 'ajaximage', 'ajaxfile',
 ];
 
 // A shop currency plus the parts needed to render a price faithfully to its settings.

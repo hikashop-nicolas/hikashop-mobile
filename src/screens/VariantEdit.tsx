@@ -3,9 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile } from '../core';
+import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile } from '../core';
 import { WRITABLE_FIELD_TYPES } from '../core';
-import { Screen, Spinner, Icon, Field, RichText } from '../ui';
+import { Screen, Spinner, Icon, Field, CustomFieldInput } from '../ui';
 import { ProductMediaSection } from './ProductMediaSection';
 
 type Form = { code: string; quantity: string; price: string; currency_id: number; published: boolean };
@@ -47,6 +47,7 @@ export function VariantEdit() {
 	const [form, setForm] = useState<Form | null>(null);
 	const [values, setValues] = useState<Record<number, number>>({});
 	const [custom, setCustom] = useState<Record<string, string>>({});
+	const [customFiles, setCustomFiles] = useState<Record<string, FieldFile[]>>({});
 	const [media, setMedia] = useState<{ images: ProductImage[]; files: ProductFile[] } | null>(null);
 	useEffect(() => {
 		if (variant && parent && !form) {
@@ -60,6 +61,7 @@ export function VariantEdit() {
 			const cf: Record<string, string> = {};
 			for (const [k, v] of Object.entries(variant.custom_fields ?? {})) cf[k] = v ?? '';
 			setCustom(cf);
+			setCustomFiles(variant.custom_field_files ?? {});
 		}
 	}, [variant, parent, form]);
 
@@ -67,6 +69,10 @@ export function VariantEdit() {
 	const [saveErr, setSaveErr] = useState('');
 	const fields: ProductField[] = meta?.product_fields ?? [];
 	const isWritable = (f: ProductField) => WRITABLE_FIELD_TYPES.includes(f.type);
+	function setCustomFieldFiles(namekey: string, next: FieldFile[]) {
+		setCustomFiles((cf) => ({ ...cf, [namekey]: next }));
+		setCustom((c) => ({ ...c, [namekey]: next.map((f) => f.path).join('|') }));
+	}
 
 	function writableCustom(): Record<string, string> {
 		const out: Record<string, string> = {};
@@ -150,17 +156,13 @@ export function VariantEdit() {
 					{fields.length > 0 && (
 						<div className="hk-card hk-card--pad hk-form">
 							<span className="hk-muted">{t('product.customFields')}</span>
-							{fields.map((f) => {
-								if (!isWritable(f)) return null;
-								const val = custom[f.namekey] ?? '';
-								const setV = (v: string) => setCustom((c) => ({ ...c, [f.namekey]: v }));
-								if (f.type === 'wysiwyg') return <Field key={f.namekey} label={f.label}><RichText value={val} onChange={setV} /></Field>;
-								if (f.type === 'textarea') return <Field key={f.namekey} label={f.label}><textarea className="hk-input hk-textarea" rows={3} value={val} onChange={(e) => setV(e.target.value)} /></Field>;
-								if ((f.type === 'singledropdown' || f.type === 'radio') && f.options.length > 0) {
-									return <Field key={f.namekey} label={f.label}><select className="hk-select" value={val} onChange={(e) => setV(e.target.value)}><option value="">{t('product.none')}</option>{f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</select></Field>;
-								}
-								return <Field key={f.namekey} label={f.label}><input className="hk-input" value={val} onChange={(e) => setV(e.target.value)} /></Field>;
-							})}
+							{fields.map((f) => (
+								<CustomFieldInput key={f.namekey} field={f} value={custom[f.namekey] ?? ''} files={customFiles[f.namekey] ?? []}
+									readOnlyLabel={t('product.fieldReadOnly')}
+									onChange={(v) => setCustom((c) => ({ ...c, [f.namekey]: v }))}
+									onUpload={(data, name) => client!.uploadFieldFile('product', f.namekey, { data, name })}
+									onFiles={(next) => setCustomFieldFiles(f.namekey, next)} />
+							))}
 						</div>
 					)}
 

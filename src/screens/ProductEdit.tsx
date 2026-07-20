@@ -3,13 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { ProductDetail, ProductMeta, ProductField } from '../core';
+import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile } from '../core';
 import { WRITABLE_FIELD_TYPES } from '../core';
-import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button, RichText } from '../ui';
+import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button, RichText, CustomFieldInput } from '../ui';
 import type { TreeNode } from '../ui';
 import { CategoryEditor } from './CategoryEditor';
 import { ProductMediaSection } from './ProductMediaSection';
-import type { ProductImage, ProductFile } from '../core';
 
 type Form = Record<string, string | boolean>;
 
@@ -56,6 +55,7 @@ export function ProductEdit() {
 	const [cats, setCats] = useState<number[]>([]);
 	const [manufacturerId, setManufacturerId] = useState<number>(0);
 	const [custom, setCustom] = useState<Record<string, string>>({});
+	const [customFiles, setCustomFiles] = useState<Record<string, FieldFile[]>>({});
 	const [stockInput, setStockInput] = useState('');
 	const [stockBusy, setStockBusy] = useState(false);
 	const [media, setMedia] = useState<{ images: ProductImage[]; files: ProductFile[] } | null>(null);
@@ -69,6 +69,7 @@ export function ProductEdit() {
 			const cf: Record<string, string> = {};
 			for (const [k, v] of Object.entries(fetched.custom_fields ?? {})) cf[k] = v ?? '';
 			setCustom(cf);
+			setCustomFiles(fetched.custom_field_files ?? {});
 		}
 	}, [fetched, form]);
 
@@ -113,6 +114,11 @@ export function ProductEdit() {
 	const isWritable = (f: ProductField) => WRITABLE_FIELD_TYPES.includes(f.type);
 	function setCustomField(namekey: string, value: string) {
 		setCustom((c) => ({ ...c, [namekey]: value }));
+	}
+	// An ajax field's column value is the pipe-joined path list of its files.
+	function setCustomFieldFiles(namekey: string, next: FieldFile[]) {
+		setCustomFiles((cf) => ({ ...cf, [namekey]: next }));
+		setCustom((c) => ({ ...c, [namekey]: next.map((f) => f.path).join('|') }));
 	}
 	// Only send the fields the connector can actually write.
 	function writableCustom(): Record<string, string> {
@@ -284,35 +290,13 @@ export function ProductEdit() {
 					{fields.length > 0 && (
 						<div className="hk-card hk-card--pad hk-form">
 							<span className="hk-muted">{t('product.customFields')}</span>
-							{fields.map((f) => {
-								const val = custom[f.namekey] ?? '';
-								if (!isWritable(f)) {
-									return (
-										<Field key={f.namekey} label={f.label}>
-											<input className="hk-input" value={val} disabled readOnly />
-											<span className="hk-muted" style={{ fontSize: '0.8em' }}>{t('product.fieldReadOnly')}</span>
-										</Field>
-									);
-								}
-								if (f.type === 'wysiwyg') {
-									return <Field key={f.namekey} label={f.label}><RichText value={val} onChange={(html) => setCustomField(f.namekey, html)} /></Field>;
-								}
-								if (f.type === 'textarea') {
-									return <Field key={f.namekey} label={f.label}><textarea className="hk-input hk-textarea" rows={3} value={val} onChange={(e) => setCustomField(f.namekey, e.target.value)} /></Field>;
-								}
-								if ((f.type === 'singledropdown' || f.type === 'radio') && f.options.length > 0) {
-									return (
-										<Field key={f.namekey} label={f.label}>
-											<select className="hk-select" value={val} onChange={(e) => setCustomField(f.namekey, e.target.value)}>
-												<option value="">{t('product.none')}</option>
-												{f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-											</select>
-										</Field>
-									);
-								}
-								const inputType = f.type === 'number' || f.type === 'integer' ? 'number' : f.type === 'date' ? 'date' : f.type === 'email' ? 'email' : f.type === 'url' ? 'url' : f.type === 'tel' ? 'tel' : f.type === 'color' ? 'color' : 'text';
-								return <Field key={f.namekey} label={f.label}><input className="hk-input" type={inputType} value={val} onChange={(e) => setCustomField(f.namekey, e.target.value)} /></Field>;
-							})}
+							{fields.map((f) => (
+								<CustomFieldInput key={f.namekey} field={f} value={custom[f.namekey] ?? ''} files={customFiles[f.namekey] ?? []}
+									readOnlyLabel={t('product.fieldReadOnly')}
+									onChange={(v) => setCustomField(f.namekey, v)}
+									onUpload={(data, name) => client!.uploadFieldFile('product', f.namekey, { data, name })}
+									onFiles={(next) => setCustomFieldFiles(f.namekey, next)} />
+							))}
 						</div>
 					)}
 

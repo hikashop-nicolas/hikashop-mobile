@@ -4,7 +4,7 @@
 import type {
 	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
-	CategoryInput, CategoryListItem, CategoryDetail, MediaListing,
+	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 } from './models';
 
 export class ApiError extends Error {
@@ -213,6 +213,11 @@ export class ApiClient {
 	// downloadable files (secure folder).
 	async browseMedia(folder = '', type: 'image' | 'file' = 'image'): Promise<MediaListing> {
 		return (await this.request<MediaListing>('GET', 'media/browse', { query: { folder, type } })).data;
+	}
+
+	// Upload a file for an ajax image/file custom field; returns its stored path + url.
+	async uploadFieldFile(table: 'product' | 'category', namekey: string, file: { data: string; name: string }): Promise<FieldFile> {
+		return (await this.request<FieldFile>('POST', `fields/${table}/${namekey}/file`, { body: file })).data;
 	}
 
 	// Reorder a product's images and/or files (write scope); ids in the desired order.
