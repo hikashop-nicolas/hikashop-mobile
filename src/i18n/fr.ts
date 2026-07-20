@@ -118,6 +118,8 @@ export const fr: Messages = {
 	'product.addValue': 'Ajouter une valeur',
 	'product.priceStart': 'Valable à partir du',
 	'product.priceEnd': 'Valable jusqu\'au',
+	'product.moveEarlier': 'Déplacer avant',
+	'product.moveLater': 'Déplacer après',
 	'product.regenerate': 'Générer les déclinaisons',
 	'product.addVariant': 'Ajouter une déclinaison',
 	'product.deleteProduct': 'Supprimer le produit',

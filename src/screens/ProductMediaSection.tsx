@@ -45,15 +45,35 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 		} catch (e) { setErr(codeOf(e, t)); } finally { setBusy(false); }
 	}
 
+	// Move an image one slot earlier/later and persist the new order.
+	async function moveImage(index: number, dir: -1 | 1) {
+		if (!client || busy) return;
+		const to = index + dir;
+		if (to < 0 || to >= images.length) return;
+		const next = images.slice();
+		[next[index], next[to]] = [next[to], next[index]];
+		onChange(next, files);
+		setErr(''); setBusy(true);
+		try {
+			await client.setProductMediaOrder(productId, { images: next.map((i) => i.id) });
+		} catch (e) { setErr(codeOf(e, t)); onChange(images, files); } finally { setBusy(false); }
+	}
+
 	return (
 		<>
 			<div className="hk-card hk-card--pad">
 				<span className="hk-muted">{t('product.images')}</span>
 				<div className="hk-media-grid">
-					{images.map((img) => (
+					{images.map((img, i) => (
 						<div key={img.id} className="hk-media-cell">
 							<img src={img.url} alt={img.description || ''} loading="lazy" />
 							<button className="hk-media-del" disabled={busy} aria-label={t('common.delete')} onClick={() => void del('images', img.id)}><Icon name="close" size={13} /></button>
+							{images.length > 1 && (
+								<div className="hk-media-move">
+									<button disabled={busy || i === 0} aria-label={t('product.moveEarlier')} onClick={() => void moveImage(i, -1)}><Icon name="chevron" size={14} className="hk-rot180" /></button>
+									<button disabled={busy || i === images.length - 1} aria-label={t('product.moveLater')} onClick={() => void moveImage(i, 1)}><Icon name="chevron" size={14} /></button>
+								</div>
+							)}
 						</div>
 					))}
 					<button className="hk-media-add" disabled={busy} onClick={() => imgInput.current?.click()}><Icon name="plus" size={22} /></button>

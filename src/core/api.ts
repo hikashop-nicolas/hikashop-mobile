@@ -3,7 +3,7 @@
 
 import type {
 	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
-	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductFile, ProductCharacteristic, ProductVariant,
+	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail,
 } from './models';
 
@@ -197,6 +197,11 @@ export class ApiClient {
 
 	async deleteProductFile(id: number, fileId: number): Promise<{ id: number; deleted: boolean }> {
 		return (await this.request<{ id: number; deleted: boolean }>('DELETE', `products/${id}/files/${fileId}`)).data;
+	}
+
+	// Reorder a product's images and/or files (write scope); ids in the desired order.
+	async setProductMediaOrder(id: number, order: { images?: number[]; files?: number[] }): Promise<{ images: ProductImage[]; files: ProductFile[] }> {
+		return (await this.request<{ images: ProductImage[]; files: ProductFile[] }>('PUT', `products/${id}/media/order`, { body: order })).data;
 	}
 
 	async createCharacteristic(body: { parent_id?: number; value: string }): Promise<{ id: number; value: string; parent_id: number }> {

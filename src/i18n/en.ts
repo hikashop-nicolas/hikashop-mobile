@@ -120,6 +120,8 @@ export const en: Messages = {
 	'product.addValue': 'Add value',
 	'product.priceStart': 'Valid from',
 	'product.priceEnd': 'Valid until',
+	'product.moveEarlier': 'Move earlier',
+	'product.moveLater': 'Move later',
 	'product.regenerate': 'Generate variants',
 	'product.addVariant': 'Add variant',
 	'product.deleteProduct': 'Delete product',

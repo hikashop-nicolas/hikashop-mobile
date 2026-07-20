@@ -189,3 +189,8 @@
 .hk-rte-area h3 { font-size: 1.05rem; margin: .4em 0; }
 .hk-rte-area ul, .hk-rte-area ol { padding-left: 1.4em; margin: .3em 0; }
 .hk-rte-area a { color: var(--hk-accent); }
+
+.hk-media-move { position: absolute; bottom: 4px; left: 4px; display: flex; gap: 2px; }
+.hk-media-move button { width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(0,0,0,.6); color: #fff; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.hk-media-move button:disabled { opacity: .35; cursor: default; }
+.hk-rot180 { transform: rotate(180deg); }
