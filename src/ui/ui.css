@@ -218,3 +218,16 @@
 
 .hk-file-preview { width: 120px; height: 120px; border: 1px solid var(--hk-line); border-radius: var(--hk-r2); overflow: hidden; background: var(--hk-surface-2); }
 .hk-file-preview img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* DateCalendar: dependency-free month grid */
+.hk-cal { border: 1px solid var(--hk-line); border-radius: var(--hk-r2); background: var(--hk-surface); padding: var(--hk-s2); }
+.hk-cal-value { font-size: .85rem; color: var(--hk-muted); margin-bottom: var(--hk-s2); }
+.hk-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--hk-s1); }
+.hk-cal-title { font-weight: 600; font-size: .92rem; text-transform: capitalize; }
+.hk-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.hk-cal-dow { text-align: center; font-size: .68rem; color: var(--hk-faint); padding: var(--hk-s1) 0; }
+.hk-cal-day { border: none; background: none; color: var(--hk-ink); border-radius: var(--hk-r1); aspect-ratio: 1; min-height: 34px; font-size: .85rem; cursor: pointer; font-variant-numeric: tabular-nums; }
+.hk-cal-day:hover:not(:disabled) { background: var(--hk-surface-2); }
+.hk-cal-day:disabled { color: var(--hk-faint); opacity: .4; cursor: default; text-decoration: line-through; }
+.hk-cal-day.hk-on { background: var(--hk-accent); color: var(--hk-accent-ink); font-weight: 700; }
+.hk-cal-day.hk-mid { background: var(--hk-accent-soft); color: var(--hk-accent); border-radius: 0; }

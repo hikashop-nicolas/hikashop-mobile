@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
 import type { ProductField, FieldFile } from '../core';
-import { readAsDataUrl, hikaDateToIso, isoToHikaDate, isoFromToday } from '../core';
+import { readAsDataUrl, hikaDateToIso, isoToHikaDate, isDateDisabled, isoRangeToHika, hikaToIsoRange, nightsBetween } from '../core';
 import { useT } from '../i18n';
 import { Field } from './molecules';
 import { RichText } from './rich-text';
+import { DateCalendar } from './date-calendar';
 import { Icon } from './icons';
 
 // Render one shop-defined custom field by its type. Scalar types report through
@@ -53,42 +54,66 @@ export function CustomFieldInput({ field, value, files, readOnlyLabel, onChange,
 	return <Field label={field.label}><input className="hk-input" type={inputType} value={value} onChange={(e) => onChange(e.target.value)} /></Field>;
 }
 
-// Advanced date picker (plg.datepickerfield): a native date input that stores the
-// value in HikaShop's yy/mm/dd format and honours the field's allow / waiting /
-// days_from_now bounds and forbidden weekdays (native inputs can't grey out weekdays,
-// so a forbidden pick is rejected with a hint, matching the storefront's beforeShowDay).
+// Advanced date picker (plg.datepickerfield): a dependency-free calendar that reproduces
+// the storefront's constraints (allow past/future bounds, forbidden weekdays and the
+// excluded day/date/range/pattern sets), storing single dates as yy/mm/dd and ranges as
+// YYYYMMDD000000-YYYYMMDD000000. Range mode enforces the min/max nights.
 function DatePicker({ field, value, onChange }: {
 	field: ProductField;
 	value: string;
 	onChange: (value: string) => void;
 }) {
 	const t = useT();
-	const [warn, setWarn] = useState(false);
 	const cfg = field.datepicker;
-	const iso = hikaDateToIso(value);
+	const disabled = (isoDay: string) => isDateDisabled(isoDay, cfg);
 
-	let min = ''; let max = '';
-	if (cfg) {
-		const wait = cfg.waiting || 0;
-		const span = cfg.days_from_now || 0;
-		if (cfg.allow === 'future') { min = isoFromToday(wait); if (span > 0) max = isoFromToday(span); }
-		else if (cfg.allow === 'past') { max = isoFromToday(-wait); if (span > 0) min = isoFromToday(-span); }
-	}
+	if (cfg?.range) return <RangePicker cfg={cfg} value={value} onChange={onChange} disabled={disabled} t={t} />;
 
-	function pick(next: string) {
-		setWarn(false);
-		if (next && cfg && cfg.forbidden_days.length > 0) {
-			const day = new Date(`${next}T00:00:00Z`).getUTCDay();
-			if (cfg.forbidden_days.includes(day)) { setWarn(true); return; }
-		}
-		onChange(next ? isoToHikaDate(next) : '');
+	const cur = hikaDateToIso(value);
+	return (
+		<div>
+			<div className="hk-cal-value">{cur || t('field.pickDate')}</div>
+			<DateCalendar isDisabled={disabled} selected={cur ? [cur] : []} openOn={cur}
+				onPick={(d) => onChange(d === cur ? '' : isoToHikaDate(d))} />
+		</div>
+	);
+}
+
+function RangePicker({ cfg, value, onChange, disabled, t }: {
+	cfg: NonNullable<ProductField['datepicker']>;
+	value: string;
+	onChange: (value: string) => void;
+	disabled: (iso: string) => boolean;
+	t: ReturnType<typeof useT>;
+}) {
+	const initial = hikaToIsoRange(value);
+	const [start, setStart] = useState(initial.start);
+	const [end, setEnd] = useState(initial.end);
+	const [warn, setWarn] = useState('');
+
+	function commit(s: string, e: string) {
+		setStart(s); setEnd(e);
+		onChange(s && e ? isoRangeToHika(s, e) : '');
 	}
+	function pick(d: string) {
+		setWarn('');
+		// First click, or restarting after a complete range, sets the start.
+		if (!start || (start && end)) { commit(d, ''); return; }
+		if (d < start) { commit(d, ''); return; }
+		const nights = nightsBetween(start, d);
+		if (cfg.range_min_nights && nights < cfg.range_min_nights) { setWarn('min'); return; }
+		if (cfg.range_max_nights && nights > cfg.range_max_nights) { setWarn('max'); return; }
+		commit(start, d);
+	}
+	const inRange = (d: string) => !!start && !!end && d > start && d < end;
 
 	return (
-		<>
-			<input className="hk-input" type="date" value={iso} min={min || undefined} max={max || undefined} onChange={(e) => pick(e.target.value)} />
-			{warn && <span className="hk-err">{t('field.dateUnavailable')}</span>}
-		</>
+		<div>
+			<div className="hk-cal-value">{start ? `${start} → ${end || '…'}` : t('field.pickRange')}</div>
+			<DateCalendar isDisabled={disabled} selected={[start, end].filter(Boolean)} inRange={inRange} openOn={start} onPick={pick} />
+			{warn === 'min' && <span className="hk-err">{t('field.minNights', { count: cfg.range_min_nights })}</span>}
+			{warn === 'max' && <span className="hk-err">{t('field.maxNights', { count: cfg.range_max_nights })}</span>}
+		</div>
 	);
 }
 

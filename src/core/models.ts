@@ -223,8 +223,13 @@ export interface DatepickerConfig {
 	days_from_now: number;
 	forbidden_days: number[]; // 0 = Sunday .. 6 = Saturday
 	range: boolean;
+	range_exclude_end: boolean;
 	range_min_nights: number;
 	range_max_nights: number;
+	exclude_days: number[]; // m*100+d, any year
+	exclude_dates: number[]; // y*10000+m*100+d
+	exclude_ranges: [number, number, number][]; // [start, end, count(2=md,3=fd)]
+	exclude_patterns: [number, number, number][]; // [month, day, year], 0 = any
 }
 
 // A resolved file for an ajax image/file custom field (from custom_field_files).
