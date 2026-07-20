@@ -209,9 +209,10 @@ export class ApiClient {
 		return (await this.request<{ id: number; deleted: boolean }>('DELETE', `products/${id}/files/${fileId}`)).data;
 	}
 
-	// Browse the shop's upload folder (folders + images) for the media picker.
-	async browseMedia(folder = ''): Promise<MediaListing> {
-		return (await this.request<MediaListing>('GET', 'media/browse', { query: { folder } })).data;
+	// Browse the shop's upload folder for the media picker: images (public folder) or
+	// downloadable files (secure folder).
+	async browseMedia(folder = '', type: 'image' | 'file' = 'image'): Promise<MediaListing> {
+		return (await this.request<MediaListing>('GET', 'media/browse', { query: { folder, type } })).data;
 	}
 
 	// Reorder a product's images and/or files (write scope); ids in the desired order.

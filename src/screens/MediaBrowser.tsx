@@ -4,9 +4,11 @@ import { useT, tError } from '../i18n';
 import type { MediaListing } from '../core';
 import { Modal, Button, Spinner, Icon } from '../ui';
 
-// A HikaShop-style media picker: folders on the left, images on the right. Selecting
-// an image and confirming attaches it (by path) to the product.
-export function MediaBrowser({ onClose, onPick }: {
+// A HikaShop-style media picker: folders on the left, items on the right. Selecting
+// one and confirming attaches it (by path) to the product. For images it shows a
+// thumbnail grid; for downloadable files (no public url) a name list.
+export function MediaBrowser({ kind = 'images', onClose, onPick }: {
+	kind?: 'images' | 'files';
 	onClose: () => void;
 	onPick: (path: string, name: string) => Promise<void>;
 }) {
@@ -18,6 +20,7 @@ export function MediaBrowser({ onClose, onPick }: {
 	const [err, setErr] = useState('');
 	const [selected, setSelected] = useState<{ path: string; name: string } | null>(null);
 	const [busy, setBusy] = useState(false);
+	const isFiles = kind === 'files';
 
 	useEffect(() => {
 		if (!client) return;
@@ -25,7 +28,7 @@ export function MediaBrowser({ onClose, onPick }: {
 		setLoading(true); setErr('');
 		void (async () => {
 			try {
-				const l = await client.browseMedia(folder);
+				const l = await client.browseMedia(folder, isFiles ? 'file' : 'image');
 				if (alive) { setListing(l); setSelected(null); }
 			} catch (e) {
 				if (alive) setErr(tError(t, codeOf(e)));
@@ -34,7 +37,7 @@ export function MediaBrowser({ onClose, onPick }: {
 			}
 		})();
 		return () => { alive = false; };
-	}, [client, folder, t]);
+	}, [client, folder, isFiles, t]);
 
 	async function attach() {
 		if (!selected || busy) return;
@@ -47,11 +50,13 @@ export function MediaBrowser({ onClose, onPick }: {
 		}
 	}
 
+	const items = listing?.images ?? [];
+
 	return (
 		<Modal title={t('media.browseTitle')} onClose={onClose}
 			footer={<>
 				<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
-				<Button variant="pri" onClick={() => void attach()} disabled={busy || !selected}>{busy ? t('product.saving') : t('media.useImage')}</Button>
+				<Button variant="pri" onClick={() => void attach()} disabled={busy || !selected}>{busy ? t('product.saving') : (isFiles ? t('media.useFile') : t('media.useImage'))}</Button>
 			</>}
 		>
 			<div className="hk-mb">
@@ -73,11 +78,19 @@ export function MediaBrowser({ onClose, onPick }: {
 				<div className="hk-mb-grid">
 					{loading ? (
 						<div className="hk-center-col"><Spinner /></div>
-					) : (listing?.images ?? []).length === 0 ? (
-						<div className="hk-empty">{t('media.noImages')}</div>
+					) : items.length === 0 ? (
+						<div className="hk-empty">{isFiles ? t('media.noFiles') : t('media.noImages')}</div>
+					) : isFiles ? (
+						<div>
+							{items.map((f) => (
+								<button key={f.path} type="button" className={`hk-row hk-row-btn hk-mb-file${selected?.path === f.path ? ' hk-on' : ''}`} onClick={() => setSelected({ path: f.path, name: f.name })}>
+									<span className="hk-row-title">{f.name}</span>
+								</button>
+							))}
+						</div>
 					) : (
 						<div className="hk-media-grid">
-							{listing!.images.map((img) => (
+							{items.map((img) => (
 								<button key={img.path} type="button" className={`hk-media-cell hk-mb-cell${selected?.path === img.path ? ' hk-on' : ''}`} onClick={() => setSelected({ path: img.path, name: img.name })} title={img.name}>
 									<img src={img.url} alt={img.name} loading="lazy" />
 								</button>

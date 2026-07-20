@@ -209,3 +209,8 @@
 .hk-mb-cell { border: 2px solid transparent; cursor: pointer; padding: 0; background: var(--hk-surface-2); }
 .hk-mb-cell.hk-on { border-color: var(--hk-accent); }
 @media (max-width: 560px) { .hk-mb { grid-template-columns: 1fr; } .hk-mb-tree { flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 1px solid var(--hk-line); padding: 0 0 var(--hk-s2); max-height: none; } }
+
+.hk-filedrop { border-radius: var(--hk-r2); }
+.hk-mb-file { width: 100%; border-radius: var(--hk-r1); }
+.hk-mb-file.hk-on { background: var(--hk-accent-soft); }
+.hk-mb-file.hk-on .hk-row-title { color: var(--hk-accent); font-weight: 600; }
