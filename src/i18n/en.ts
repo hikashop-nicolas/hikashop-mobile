@@ -268,4 +268,16 @@ export const en: Messages = {
 	'status.delivered': 'Delivered',
 
 	'loading': 'Loading',
+
+	'order.discount': 'Discount',
+	'order.paymentFee': 'Payment fee',
+	'order.tax': 'Tax',
+	'order.payment': 'Payment method',
+	'order.shippingMethod': 'Shipping method',
+	'order.invoice': 'Invoice',
+	'order.shippingAddress': 'Shipping address',
+	'order.reasonOptional': 'Reason (optional)',
+	'order.addNote': 'Add a note',
+	'order.notePlaceholder': 'Write a note for this order',
+	'order.saveNote': 'Save note',
 };

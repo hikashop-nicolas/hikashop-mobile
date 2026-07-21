@@ -2,7 +2,7 @@
 // so native builds can swap in a CORS-free HTTP bridge and tests can mock responses.
 
 import type {
-	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
+	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderHistoryEntry, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 } from './models';
@@ -159,6 +159,14 @@ export class ApiClient {
 	async setOrderStatus(id: number, status: string, opts: { notify?: boolean; reason?: string } = {}): Promise<OrderStatusResult> {
 		const { data } = await this.request<OrderStatusResult>('POST', `orders/${id}/status`, {
 			body: { status, notify: !!opts.notify, reason: opts.reason ?? '' },
+		});
+		return data;
+	}
+
+	// Add a note to the order history without changing the status (write scope).
+	async addOrderNote(id: number, note: string, opts: { notify?: boolean } = {}): Promise<{ id: number; note: OrderHistoryEntry }> {
+		const { data } = await this.request<{ id: number; note: OrderHistoryEntry }>('POST', `orders/${id}/note`, {
+			body: { note, notify: !!opts.notify },
 		});
 		return data;
 	}

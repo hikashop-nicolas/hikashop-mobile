@@ -3,12 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useI18n, tError } from '../i18n';
-import type { OrderDetail as OrderDetailType } from '../core';
-import { Screen, StatusChip, Money, Spinner, Icon } from '../ui';
+import type { OrderDetail as OrderDetailType, OrderAddress } from '../core';
+import { Screen, StatusChip, Money, Spinner, Icon, Button } from '../ui';
 import { fmtDate } from '../app/utils';
 
 // Standard HikaShop statuses offered as quick actions; the store validates the value.
 const STATUSES = ['created', 'confirmed', 'shipped', 'cancelled', 'refunded'];
+
+function codeOf(e: unknown): string {
+	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
+}
 
 export function OrderDetail() {
 	const { id } = useParams();
@@ -26,29 +30,58 @@ export function OrderDetail() {
 		deps: [storeId, orderId],
 	});
 
-	// Local copy so a status change reflects instantly without a full reload.
+	// Local copy so a status change or a new note reflects instantly without a full reload.
 	const [order, setOrder] = useState<OrderDetailType | null>(null);
 	useEffect(() => { if (fetched) setOrder(fetched); }, [fetched]);
 
 	const [notify, setNotify] = useState(false);
+	const [reason, setReason] = useState('');
 	const [busy, setBusy] = useState('');
 	const [updateErr, setUpdateErr] = useState('');
+
+	const [note, setNote] = useState('');
+	const [noteNotify, setNoteNotify] = useState(false);
+	const [noteBusy, setNoteBusy] = useState(false);
+	const [noteErr, setNoteErr] = useState('');
+
+	async function persist(next: OrderDetailType) {
+		setOrder(next);
+		await cache.putOrderDetail(storeId, orderId, next);
+	}
 
 	async function changeStatus(status: string) {
 		if (!client || !order || busy || status === order.status) return;
 		setUpdateErr('');
 		setBusy(status);
 		try {
-			await client.setOrderStatus(orderId, status, { notify });
+			await client.setOrderStatus(orderId, status, { notify, reason: reason.trim() });
 			const now = Math.floor(Date.now() / 1000);
-			const next: OrderDetailType = { ...order, status, history: [{ status, created: now }, ...order.history] };
-			setOrder(next);
-			await cache.putOrderDetail(storeId, orderId, next);
+			await persist({
+				...order,
+				status,
+				history: [{ status, created: now, type: 'update', reason: reason.trim(), notified: notify }, ...order.history],
+			});
+			setReason('');
 		} catch (e) {
-			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
-			setUpdateErr(tError(t, code));
+			setUpdateErr(tError(t, codeOf(e)));
 		} finally {
 			setBusy('');
+		}
+	}
+
+	async function addNote() {
+		if (!client || !order || noteBusy || !note.trim()) return;
+		setNoteErr('');
+		setNoteBusy(true);
+		try {
+			const { note: entry } = await client.addOrderNote(orderId, note.trim(), { notify: noteNotify });
+			await persist({ ...order, history: [entry, ...order.history] });
+			setNote('');
+			setNoteNotify(false);
+		} catch (e) {
+			setNoteErr(tError(t, codeOf(e)));
+		} finally {
+			setNoteBusy(false);
 		}
 	}
 
@@ -68,6 +101,7 @@ export function OrderDetail() {
 						<div className="hk-row-title">{order.customer.name || t('common.guest')}</div>
 						<div className="hk-row-sub">{order.customer.email}</div>
 					</div>
+
 					<div className="hk-card hk-card--pad">
 						<span className="hk-muted">{t('order.items')}</span>
 						{order.items.map((it, i) => (
@@ -76,22 +110,43 @@ export function OrderDetail() {
 									<span className="hk-row-title">{it.name}</span>
 									<span className="hk-row-sub">{t('order.qty', { count: it.quantity })}{it.code ? ` · ${it.code}` : ''}</span>
 								</div>
-								<Money value={it.price} currency={order.currency_id} />
+								<Money value={it.price * it.quantity} currency={order.currency_id} />
 							</div>
 						))}
-						<div className="hk-row">
-							<div className="hk-row-grow"><span className="hk-row-sub">{t('order.shipping')}</span></div>
-							<Money value={order.totals.shipping} currency={order.currency_id} />
-						</div>
+						{order.totals.discount > 0 && (
+							<TotalRow label={t('order.discount')} value={-order.totals.discount} currency={order.currency_id} />
+						)}
+						{order.totals.shipping > 0 && (
+							<TotalRow label={t('order.shipping')} value={order.totals.shipping} currency={order.currency_id} />
+						)}
+						{order.totals.payment > 0 && (
+							<TotalRow label={t('order.paymentFee')} value={order.totals.payment} currency={order.currency_id} />
+						)}
+						{order.totals.tax > 0 && (
+							<TotalRow label={t('order.tax')} value={order.totals.tax} currency={order.currency_id} />
+						)}
 						<div className="hk-row">
 							<div className="hk-row-grow"><span className="hk-row-title">{t('order.total')}</span></div>
 							<span className="hk-row-title"><Money value={order.totals.total} currency={order.currency_id} /></span>
 						</div>
 					</div>
 
+					{(order.payment_method || order.shipping_method || order.invoice_number) && (
+						<div className="hk-card hk-card--pad">
+							{order.payment_method && <InfoRow label={t('order.payment')} value={order.payment_method} />}
+							{order.shipping_method && <InfoRow label={t('order.shippingMethod')} value={order.shipping_method} />}
+							{order.invoice_number && (
+								<InfoRow
+									label={t('order.invoice')}
+									value={order.invoice_number + (order.invoice_created ? ` · ${fmtDate(order.invoice_created, locale)}` : '')}
+								/>
+							)}
+						</div>
+					)}
+
 					<div className="hk-card hk-card--pad">
 						<span className="hk-muted">{t('order.changeStatus')}</span>
-						<div className="hk-chiprow" style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap', marginTop: 'var(--hk-s2)' }}>
+						<div style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap', marginTop: 'var(--hk-s2)' }}>
 							{STATUSES.map((s) => (
 								<button
 									key={s}
@@ -103,6 +158,14 @@ export function OrderDetail() {
 								</button>
 							))}
 						</div>
+						<input
+							className="hk-input"
+							style={{ marginTop: 'var(--hk-s3)' }}
+							placeholder={t('order.reasonOptional')}
+							value={reason}
+							onChange={(e) => setReason(e.target.value)}
+							disabled={!!busy}
+						/>
 						<label className="hk-check">
 							<input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} disabled={!!busy} />
 							<span>{t('order.notifyCustomer')}</span>
@@ -110,26 +173,81 @@ export function OrderDetail() {
 						{updateErr && <div className="hk-error-note" style={{ marginTop: 'var(--hk-s3)' }}>{updateErr}</div>}
 					</div>
 
-					{order.billing_address && (
-						<div className="hk-card hk-card--pad">
-							<span className="hk-muted">{t('order.billing')}</span>
-							<div>{order.billing_address.name}</div>
-							<div className="hk-row-sub">
-								{order.billing_address.street}, {order.billing_address.post_code} {order.billing_address.city}
-							</div>
-						</div>
-					)}
+					<div className="hk-card hk-card--pad">
+						<span className="hk-muted">{t('order.addNote')}</span>
+						<textarea
+							className="hk-input"
+							style={{ marginTop: 'var(--hk-s2)', minHeight: 64, resize: 'vertical' }}
+							placeholder={t('order.notePlaceholder')}
+							value={note}
+							onChange={(e) => setNote(e.target.value)}
+							disabled={noteBusy}
+						/>
+						<label className="hk-check">
+							<input type="checkbox" checked={noteNotify} onChange={(e) => setNoteNotify(e.target.checked)} disabled={noteBusy} />
+							<span>{t('order.notifyCustomer')}</span>
+						</label>
+						<Button
+							variant="pri"
+							style={{ marginTop: 'var(--hk-s2)' }}
+							disabled={noteBusy || !note.trim()}
+							onClick={() => void addNote()}
+						>
+							{noteBusy ? t('order.updating') : t('order.saveNote')}
+						</Button>
+						{noteErr && <div className="hk-error-note" style={{ marginTop: 'var(--hk-s3)' }}>{noteErr}</div>}
+					</div>
+
+					<AddressCard label={t('order.billing')} address={order.billing_address} />
+					<AddressCard label={t('order.shippingAddress')} address={order.shipping_address} />
+
 					<div className="hk-card hk-card--pad">
 						<span className="hk-muted">{t('order.history')}</span>
 						{order.history.map((h, i) => (
 							<div key={i} className="hk-row">
-								<div className="hk-row-grow"><StatusChip status={h.status} /></div>
-								<span className="hk-row-sub">{fmtDate(h.created, locale)}</span>
+								<div className="hk-row-grow">
+									<StatusChip status={h.status} />
+									{h.reason && <span className="hk-row-sub" style={{ marginTop: 'var(--hk-s1)' }}>{h.reason}</span>}
+								</div>
+								<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--hk-s2)' }}>
+									{h.notified && <Icon name="bell" size={16} className="hk-muted" />}
+									<span className="hk-row-sub">{fmtDate(h.created, locale)}</span>
+								</div>
 							</div>
 						))}
 					</div>
 				</div>
 			) : null}
 		</Screen>
+	);
+}
+
+function TotalRow({ label, value, currency }: { label: string; value: number; currency: number }) {
+	return (
+		<div className="hk-row">
+			<div className="hk-row-grow"><span className="hk-row-sub">{label}</span></div>
+			<Money value={value} currency={currency} />
+		</div>
+	);
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+	return (
+		<div className="hk-row">
+			<div className="hk-row-grow"><span className="hk-row-sub">{label}</span></div>
+			<span>{value}</span>
+		</div>
+	);
+}
+
+function AddressCard({ label, address }: { label: string; address: OrderAddress | null }) {
+	if (!address) return null;
+	return (
+		<div className="hk-card hk-card--pad">
+			<span className="hk-muted">{label}</span>
+			<div>{address.name}</div>
+			{address.company && <div className="hk-row-sub">{address.company}</div>}
+			<div className="hk-row-sub">{address.street}, {address.post_code} {address.city}</div>
+		</div>
 	);
 }

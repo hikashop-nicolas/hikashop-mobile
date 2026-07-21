@@ -266,4 +266,16 @@ export const fr: Messages = {
 	'status.delivered': 'Livrée',
 
 	'loading': 'Chargement',
+
+	'order.discount': 'Remise',
+	'order.paymentFee': 'Frais de paiement',
+	'order.tax': 'Taxe',
+	'order.payment': 'Moyen de paiement',
+	'order.shippingMethod': 'Mode de livraison',
+	'order.invoice': 'Facture',
+	'order.shippingAddress': 'Adresse de livraison',
+	'order.reasonOptional': 'Motif (facultatif)',
+	'order.addNote': 'Ajouter une note',
+	'order.notePlaceholder': 'Écrire une note pour cette commande',
+	'order.saveNote': 'Enregistrer la note',
 };

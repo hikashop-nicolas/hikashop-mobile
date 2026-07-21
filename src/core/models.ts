@@ -47,6 +47,14 @@ export interface OrderAddress {
 	post_code: string;
 }
 
+export interface OrderHistoryEntry {
+	status: string;
+	created: number;
+	type: string;
+	reason: string;
+	notified: boolean;
+}
+
 export interface OrderDetail {
 	id: number;
 	number: string;
@@ -56,10 +64,14 @@ export interface OrderDetail {
 	currency_id: number;
 	totals: { total: number; discount: number; shipping: number; payment: number; tax: number };
 	customer: { name: string; email: string };
+	payment_method: string;
+	shipping_method: string;
+	invoice_number: string;
+	invoice_created: number;
 	items: OrderItem[];
 	billing_address: OrderAddress | null;
 	shipping_address: OrderAddress | null;
-	history: { status: string; created: number }[];
+	history: OrderHistoryEntry[];
 }
 
 export interface DashboardStats {
