@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './icons';
 
 // A flat node with a parent link; the component builds the tree from these.
@@ -65,6 +65,39 @@ export function TreeSelect({
 	const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
 	const forest = useMemo(() => buildForest(nodes), [nodes]);
+	const byId = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
+
+	// Ancestor id chain of a node (nearest parent first).
+	const ancestorsOf = useMemo(() => (id: number): number[] => {
+		const chain: number[] = [];
+		let cur = byId.get(id);
+		const seen = new Set<number>();
+		while (cur && cur.parent_id && byId.has(cur.parent_id) && !seen.has(cur.parent_id)) {
+			seen.add(cur.parent_id);
+			chain.push(cur.parent_id);
+			cur = byId.get(cur.parent_id);
+		}
+		return chain;
+	}, [byId]);
+
+	// Full path (root -> node) as names, for the selected-chip labels.
+	const pathOf = (id: number): string[] => {
+		const node = byId.get(id);
+		if (!node) return [];
+		return [...ancestorsOf(id).map((a) => byId.get(a)?.name ?? '').reverse(), node.name].filter(Boolean);
+	};
+
+	// Reveal selected nodes on first load by expanding their ancestors (once, so the
+	// user can still collapse afterwards).
+	const didInit = useRef(false);
+	useEffect(() => {
+		if (didInit.current || nodes.length === 0 || selected.length === 0) return;
+		didInit.current = true;
+		const open = new Set<number>();
+		for (const id of selected) for (const a of ancestorsOf(id)) open.add(a);
+		if (open.size) setExpanded((s) => new Set([...s, ...open]));
+	}, [nodes, selected, ancestorsOf]);
+
 	const q = query.trim().toLowerCase();
 
 	// A node is visible when it or any descendant matches the query; matching
@@ -88,6 +121,20 @@ export function TreeSelect({
 		return { visible: vis, autoExpand: exp };
 	}, [forest, q]);
 
+	// Count of selected strict-descendants per node, to badge collapsed parents.
+	const selectedIn = useMemo(() => {
+		const sel = new Set(selected);
+		const counts = new Map<number, number>();
+		const walk = (b: Built): number => {
+			let below = 0;
+			for (const c of b.children) below += (sel.has(c.node.id) ? 1 : 0) + walk(c);
+			counts.set(b.node.id, below);
+			return below;
+		};
+		for (const r of forest) walk(r);
+		return counts;
+	}, [forest, selected]);
+
 	const isOpen = (id: number) => autoExpand.has(id) || expanded.has(id);
 	function toggleOpen(id: number) {
 		setExpanded((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
@@ -107,6 +154,7 @@ export function TreeSelect({
 		const sel = selected.includes(b.node.id);
 		const hasChildren = b.children.length > 0;
 		const open = isOpen(b.node.id);
+		const hiddenSel = !open ? (selectedIn.get(b.node.id) ?? 0) : 0;
 		rows.push(
 			<div key={b.node.id} className="hk-tree-row" style={{ paddingLeft: `calc(${b.depth} * 1.25rem + 0.25rem)` }}>
 				<button type="button" className={`hk-tree-twist${hasChildren ? '' : ' hk-tree-twist--leaf'}`}
@@ -118,6 +166,7 @@ export function TreeSelect({
 						{sel && <Icon name="check" size={13} />}
 					</span>
 					<span className="hk-tree-name">{b.node.name}</span>
+					{hiddenSel > 0 && <span className="hk-tree-badge" title={`${hiddenSel} selected inside`}>{hiddenSel}</span>}
 				</button>
 			</div>,
 		);
@@ -126,8 +175,25 @@ export function TreeSelect({
 
 	for (const r of forest) render(r);
 
+	// The selected items shown as removable chips, so nested selections are visible
+	// without expanding the tree. Path context disambiguates same-named categories.
+	const chips = multiple
+		? selected.filter((id) => byId.has(id)).map((id) => ({ id, path: pathOf(id) }))
+		: [];
+
 	return (
 		<div className="hk-tree">
+			{chips.length > 0 && (
+				<div className="hk-tree-chips">
+					{chips.map(({ id, path }) => (
+						<button key={id} type="button" className="hk-tree-chip" title={path.join(' / ')} onClick={() => toggleSelect(id)}>
+							{path.length > 1 && <span className="hk-tree-chip-path">{path.slice(0, -1).join(' / ')} / </span>}
+							<span className="hk-tree-chip-leaf">{path[path.length - 1]}</span>
+							<Icon name="close" size={12} />
+						</button>
+					))}
+				</div>
+			)}
 			<div className="hk-search hk-tree-search">
 				<span className="hk-search-ic"><Icon name="search" size={16} /></span>
 				<input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={searchPlaceholder} />
