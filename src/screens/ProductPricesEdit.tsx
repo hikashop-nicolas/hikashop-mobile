@@ -6,6 +6,8 @@ import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductPrice, Settings } from '../core';
 import { tsToDate, dateToTs, inclFromExcl, exclFromIncl } from '../core';
 import { Screen, Spinner, Icon, Field } from '../ui';
+import { SearchPicker } from './SearchPicker';
+import type { PickItem } from './SearchPicker';
 
 // A row keeps the tax-exclusive value (what HikaShop stores) and preserves the
 // users/zone restrictions so an edit never wipes them.
@@ -53,9 +55,26 @@ export function ProductPricesEdit() {
 	const [rows, setRows] = useState<Row[] | null>(null);
 	useEffect(() => { if (product && !rows) setRows(product.prices.map(toRow)); }, [product, rows]);
 
+	// Resolve the ids used in the loaded restrictions to display names.
+	const [userNames, setUserNames] = useState<Record<number, string>>({});
+	const [zoneNames, setZoneNames] = useState<Record<number, string>>({});
+	useEffect(() => {
+		if (!client || !product) return;
+		const uids = [...new Set(product.prices.flatMap((p) => p.users ?? []))];
+		const zids = [...new Set(product.prices.flatMap((p) => p.zone_ids ?? []))];
+		let alive = true;
+		void (async () => {
+			if (uids.length) { try { const u = await client.getUsers({ ids: uids }); if (alive) setUserNames(Object.fromEntries(u.map((x) => [x.id, x.name || x.email]))); } catch { /* ignore */ } }
+			if (zids.length) { try { const z = await client.getZones({ ids: zids }); if (alive) setZoneNames(Object.fromEntries(z.map((x) => [x.id, x.name]))); } catch { /* ignore */ } }
+		})();
+		return () => { alive = false; };
+	}, [client, product]);
+
 	const [busy, setBusy] = useState(false);
 	const [saveErr, setSaveErr] = useState('');
 	const [confirmDel, setConfirmDel] = useState<number | null>(null);
+	const [restrictRow, setRestrictRow] = useState<number | null>(null);
+	const [picking, setPicking] = useState<{ row: number; kind: 'users' | 'zones' } | null>(null);
 	const defaultCurrency = meta?.currencies[0]?.id ?? 1;
 
 	// Tax entry: the product carries the tax rate; when the shop enters prices with tax
@@ -79,6 +98,22 @@ export function ProductPricesEdit() {
 	function remove(i: number) {
 		setRows((r) => (r ? r.filter((_, idx) => idx !== i) : r));
 		setConfirmDel(null);
+	}
+	function removeRestriction(i: number, kind: 'users' | 'zones', id: number) {
+		update(i, kind === 'users'
+			? { users: (rows?.[i].users ?? []).filter((x) => x !== id) }
+			: { zone_ids: (rows?.[i].zone_ids ?? []).filter((x) => x !== id) });
+	}
+	function addRestriction(item: PickItem) {
+		if (!picking) return;
+		const { row, kind } = picking;
+		const cur = kind === 'users' ? rows![row].users : rows![row].zone_ids;
+		if (!cur.includes(item.id)) {
+			update(row, kind === 'users' ? { users: [...cur, item.id] } : { zone_ids: [...cur, item.id] });
+			if (kind === 'users') setUserNames((m) => ({ ...m, [item.id]: item.label }));
+			else setZoneNames((m) => ({ ...m, [item.id]: item.label }));
+		}
+		setPicking(null);
 	}
 
 	async function save() {
@@ -156,7 +191,31 @@ export function ProductPricesEdit() {
 									<Field label={t('product.priceStart')}><input className="hk-input" type="date" value={r.start} onChange={(e) => update(i, { start: e.target.value })} /></Field>
 									<Field label={t('product.priceEnd')}><input className="hk-input" type="date" value={r.end} onChange={(e) => update(i, { end: e.target.value })} /></Field>
 								</div>
-								{restricted && <span className="hk-hint">{t('product.priceRestricted', { users: r.users.length, zones: r.zone_ids.length })}</span>}
+								<div>
+									<button type="button" className="hk-appbar-act" style={{ padding: 0 }} onClick={() => setRestrictRow(restrictRow === i ? null : i)}>
+										{t('product.restrictions')}{restricted ? ` (${r.users.length + r.zone_ids.length})` : ''} <Icon name="chevron" size={14} className={restrictRow === i ? 'hk-rot90' : ''} />
+									</button>
+									{restrictRow === i && (
+										<div className="hk-form" style={{ marginTop: 'var(--hk-s2)' }}>
+											<Field label={t('product.restrictUsers')}>
+												<div className="hk-chip-row">
+													{r.users.map((uid) => (
+														<button key={uid} type="button" className="hk-chip hk-on" onClick={() => removeRestriction(i, 'users', uid)}>{userNames[uid] ?? `#${uid}`} <Icon name="close" size={12} /></button>
+													))}
+													<button type="button" className="hk-chip" onClick={() => setPicking({ row: i, kind: 'users' })}><Icon name="plus" size={13} /> {t('common.add')}</button>
+												</div>
+											</Field>
+											<Field label={t('product.restrictZones')}>
+												<div className="hk-chip-row">
+													{r.zone_ids.map((zid) => (
+														<button key={zid} type="button" className="hk-chip hk-on" onClick={() => removeRestriction(i, 'zones', zid)}>{zoneNames[zid] ?? `#${zid}`} <Icon name="close" size={12} /></button>
+													))}
+													<button type="button" className="hk-chip" onClick={() => setPicking({ row: i, kind: 'zones' })}><Icon name="plus" size={13} /> {t('common.add')}</button>
+												</div>
+											</Field>
+										</div>
+									)}
+								</div>
 								{confirmDel === i ? (
 									<div className="hk-form-row">
 										<button className="hk-btn" onClick={() => setConfirmDel(null)}>{t('common.cancel')}</button>
@@ -170,6 +229,18 @@ export function ProductPricesEdit() {
 					})}
 					<button className="hk-btn hk-btn--block" onClick={add}><span className="hk-btn-ic"><Icon name="plus" size={18} /> {t('product.addPrice')}</span></button>
 					{saveErr && <div className="hk-error-note">{saveErr}</div>}
+					{picking && picking.kind === 'users' && (
+						<SearchPicker title={t('product.restrictUsers')} placeholder={t('product.searchUsers')} minChars={2}
+							excludeIds={rows?.[picking.row].users ?? []}
+							search={(q) => client!.getUsers({ search: q }).then((u) => u.map((x) => ({ id: x.id, label: x.name || x.email, sub: x.name ? x.email : undefined })))}
+							onClose={() => setPicking(null)} onPick={addRestriction} />
+					)}
+					{picking && picking.kind === 'zones' && (
+						<SearchPicker title={t('product.restrictZones')} placeholder={t('product.searchZones')} minChars={2}
+							excludeIds={rows?.[picking.row].zone_ids ?? []}
+							search={(q) => client!.getZones({ search: q }).then((z) => z.map((x) => ({ id: x.id, label: x.name, sub: x.type })))}
+							onClose={() => setPicking(null)} onPick={addRestriction} />
+					)}
 				</>
 			)}
 		</Screen>

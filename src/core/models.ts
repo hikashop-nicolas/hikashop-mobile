@@ -326,6 +326,20 @@ export interface ProductMeta {
 	tags: { id: number; name: string; parent_id: number }[];
 }
 
+// A zone (country / state / tax) for restricting a price to regions.
+export interface ZoneItem {
+	id: number;
+	name: string;
+	type: string;
+}
+
+// A HikaShop user for restricting a price to specific customers.
+export interface UserItem {
+	id: number;
+	name: string;
+	email: string;
+}
+
 // Whitelisted shop config flags (from GET /settings) the app uses to gate UI.
 export interface Settings {
 	product_contact: boolean;

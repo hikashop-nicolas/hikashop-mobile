@@ -2,7 +2,7 @@
 // so native builds can swap in a CORS-free HTTP bridge and tests can mock responses.
 
 import type {
-	PairResult, SiteInfo, Settings, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
+	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 } from './models';
@@ -126,6 +126,18 @@ export class ApiClient {
 	// Whitelisted shop config flags used to gate UI.
 	async getSettings(): Promise<Settings> {
 		return (await this.request<Settings>('GET', 'settings')).data;
+	}
+
+	// Search zones by name, or resolve a specific id list (for the price zone picker).
+	async getZones(params: { search?: string; ids?: number[] } = {}): Promise<ZoneItem[]> {
+		const query: Query = { search: params.search, ids: params.ids?.join(',') };
+		return (await this.request<ZoneItem[]>('GET', 'zones', { query })).data;
+	}
+
+	// Search users, or resolve a specific id list (for the price user picker).
+	async getUsers(params: { search?: string; ids?: number[] } = {}): Promise<UserItem[]> {
+		const query: Query = { search: params.search, ids: params.ids?.join(',') };
+		return (await this.request<UserItem[]>('GET', 'users', { query })).data;
 	}
 
 	async getOrders(filters: OrderFilters = {}): Promise<Paginated<OrderSummary>> {

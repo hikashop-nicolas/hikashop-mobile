@@ -242,3 +242,6 @@
 .hk-tree-badge { margin-left: var(--hk-s2); min-width: 1.15rem; height: 1.15rem; padding: 0 .3rem; border-radius: var(--hk-r-pill); background: var(--hk-accent-soft); color: var(--hk-accent); font-size: .68rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
 
 .hk-appbar-acts { display: inline-flex; align-items: center; gap: var(--hk-s1); }
+
+.hk-chip-row { display: flex; flex-wrap: wrap; gap: var(--hk-s2); align-items: center; }
+.hk-chip-row .hk-chip { gap: var(--hk-s1); }
