@@ -280,9 +280,10 @@ export const en: Messages = {
 	'order.fields': 'Order fields',
 	'order.adjustFees': 'Adjust fees',
 	'order.feeAmount': 'Amount (excl. tax)',
-	'order.taxRate': 'Tax rate',
+	'order.taxRates': 'Tax rates',
+	'order.selectRate': 'Select a rate',
+	'order.addTaxRate': 'Add tax rate',
 	'order.noTax': 'No tax',
 	'order.discountCode': 'Discount code',
 	'order.inclTax': 'Incl. tax',
-	'order.multiRateKept': 'Also keeping: {rates}',
 };

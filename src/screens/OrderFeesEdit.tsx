@@ -3,21 +3,20 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { OrderDetail, OrderFee } from '../core';
-import { Screen, Spinner, Icon, Field, Money } from '../ui';
+import type { OrderDetail, OrderFee, TaxRate } from '../core';
+import { Screen, Spinner, Icon, Field, Money, Button } from '../ui';
 
 // The three editable order-level fees, in display order.
 const FEE_TYPES = ['discount', 'shipping', 'payment'] as const;
 type FeeType = typeof FEE_TYPES[number];
 const FEE_LABEL: Record<FeeType, string> = { discount: 'order.discount', shipping: 'order.shipping', payment: 'order.paymentFee' };
 
-// One fee's editable state: ex-tax amount, a single tax rate namekey (''=no tax), and the
-// discount code. A single rate covers the usual case; multi-rate fees collapse to the first.
-type FeeRow = { amount: string; rate: string; code: string; extraRates: string[] };
+// One fee's editable state: ex-tax amount, any number of tax-rate namekeys (like HikaShop's
+// multi-rate fees), and the discount code.
+type FeeRow = { amount: string; rates: string[]; code: string };
 
 function toRow(fee: OrderFee): FeeRow {
-	const nks = fee.tax_namekeys ?? [];
-	return { amount: fee.amount ? String(fee.amount) : '', rate: nks[0] ?? '', code: fee.code ?? '', extraRates: nks.slice(1) };
+	return { amount: fee.amount ? String(fee.amount) : '', rates: [...(fee.tax_namekeys ?? [])], code: fee.code ?? '' };
 }
 
 function codeOf(e: unknown): string {
@@ -49,10 +48,31 @@ export function OrderFeesEdit() {
 	const [busy, setBusy] = useState(false);
 	const [saveErr, setSaveErr] = useState('');
 
-	const rateOf = (namekey: string): number => order?.tax_rates.find((r) => r.namekey === namekey)?.rate ?? 0;
+	const taxRates: TaxRate[] = order?.tax_rates ?? [];
+	const rateOf = (namekey: string): number => taxRates.find((r) => r.namekey === namekey)?.rate ?? 0;
 
 	function update(type: FeeType, patch: Partial<FeeRow>) {
 		setRows((r) => (r ? { ...r, [type]: { ...r[type], ...patch } } : r));
+	}
+	function setRate(type: FeeType, idx: number, namekey: string) {
+		setRows((r) => {
+			if (!r) return r;
+			const rates = r[type].rates.slice();
+			rates[idx] = namekey;
+			return { ...r, [type]: { ...r[type], rates } };
+		});
+	}
+	function addRate(type: FeeType) {
+		setRows((r) => {
+			if (!r) return r;
+			// Default the new row to the first rate not already applied to this fee.
+			const used = new Set(r[type].rates);
+			const next = taxRates.find((tr) => !used.has(tr.namekey));
+			return { ...r, [type]: { ...r[type], rates: [...r[type].rates, next ? next.namekey : ''] } };
+		});
+	}
+	function removeRate(type: FeeType, idx: number) {
+		setRows((r) => (r ? { ...r, [type]: { ...r[type], rates: r[type].rates.filter((_, i) => i !== idx) } } : r));
 	}
 
 	async function save() {
@@ -63,7 +83,8 @@ export function OrderFeesEdit() {
 			const payload = {} as Record<FeeType, { amount: number; tax_namekeys: string[]; code?: string }>;
 			for (const type of FEE_TYPES) {
 				const row = rows[type];
-				const nks = row.rate ? [row.rate, ...row.extraRates] : [...row.extraRates];
+				// Drop blanks and de-duplicate rates before sending.
+				const nks = [...new Set(row.rates.filter((nk) => nk))];
 				payload[type] = { amount: Number(row.amount) || 0, tax_namekeys: nks };
 				if (type === 'discount') payload[type].code = row.code;
 			}
@@ -92,7 +113,8 @@ export function OrderFeesEdit() {
 					{FEE_TYPES.map((type) => {
 						const row = rows[type];
 						const amount = Number(row.amount) || 0;
-						const incl = amount * (1 + rateOf(row.rate) + row.extraRates.reduce((s, nk) => s + rateOf(nk), 0));
+						const totalRate = row.rates.reduce((s, nk) => s + rateOf(nk), 0);
+						const incl = amount * (1 + totalRate);
 						return (
 							<div key={type} className="hk-card hk-card--pad hk-form">
 								<span className="hk-muted">{t(FEE_LABEL[type])}</span>
@@ -100,17 +122,28 @@ export function OrderFeesEdit() {
 									<input className="hk-input" type="number" inputMode="decimal" value={row.amount}
 										onChange={(e) => update(type, { amount: e.target.value })} />
 								</Field>
-								<Field label={t('order.taxRate')}>
-									<select className="hk-select" value={row.rate} onChange={(e) => update(type, { rate: e.target.value })}>
-										<option value="">{t('order.noTax')}</option>
-										{order.tax_rates.map((r) => (
-											<option key={r.namekey} value={r.namekey}>{r.namekey} ({Math.round(r.rate * 10000) / 100}%)</option>
-										))}
-									</select>
+								<Field label={t('order.taxRates')}>
+									{row.rates.length === 0 && <div className="hk-row-sub">{t('order.noTax')}</div>}
+									{row.rates.map((nk, i) => {
+										// Offer rates not used by the other rows of this fee (plus this row's own).
+										const otherUsed = new Set(row.rates.filter((_, j) => j !== i));
+										const opts = taxRates.filter((tr) => tr.namekey === nk || !otherUsed.has(tr.namekey));
+										return (
+											<div key={i} className="hk-row" style={{ gap: 'var(--hk-s2)', alignItems: 'center' }}>
+												<select className="hk-select hk-row-grow" value={nk} onChange={(e) => setRate(type, i, e.target.value)}>
+													{!nk && <option value="">{t('order.selectRate')}</option>}
+													{opts.map((tr) => (
+														<option key={tr.namekey} value={tr.namekey}>{tr.namekey} ({Math.round(tr.rate * 10000) / 100}%)</option>
+													))}
+												</select>
+												<button type="button" className="hk-iconbtn" aria-label={t('common.delete')} onClick={() => removeRate(type, i)}><Icon name="close" size={18} /></button>
+											</div>
+										);
+									})}
+									{row.rates.length < taxRates.length && (
+										<Button variant="ghost" style={{ marginTop: 'var(--hk-s2)' }} onClick={() => addRate(type)}>{t('order.addTaxRate')}</Button>
+									)}
 								</Field>
-								{row.extraRates.length > 0 && (
-									<div className="hk-row-sub">{t('order.multiRateKept', { rates: row.extraRates.join(', ') })}</div>
-								)}
 								{type === 'discount' && (
 									<Field label={t('order.discountCode')}>
 										<input className="hk-input" type="text" value={row.code} onChange={(e) => update(type, { code: e.target.value })} />

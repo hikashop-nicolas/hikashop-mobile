@@ -278,9 +278,10 @@ export const fr: Messages = {
 	'order.fields': 'Champs de commande',
 	'order.adjustFees': 'Ajuster les frais',
 	'order.feeAmount': 'Montant (hors taxe)',
-	'order.taxRate': 'Taux de taxe',
+	'order.taxRates': 'Taux de taxe',
+	'order.selectRate': 'Choisir un taux',
+	'order.addTaxRate': 'Ajouter un taux',
 	'order.noTax': 'Sans taxe',
 	'order.discountCode': 'Code de réduction',
 	'order.inclTax': 'TTC',
-	'order.multiRateKept': 'Conservé aussi : {rates}',
 };
