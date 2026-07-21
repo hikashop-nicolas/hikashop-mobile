@@ -4,7 +4,7 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useI18n, tError } from '../i18n';
 import type { OrderDetail as OrderDetailType, OrderAddress } from '../core';
-import { Screen, StatusChip, Money, Spinner, Icon, Button } from '../ui';
+import { Screen, StatusChip, Money, Spinner, Icon } from '../ui';
 import { fmtDate } from '../app/utils';
 
 // Standard HikaShop statuses offered as quick actions; the store validates the value.
@@ -39,11 +39,6 @@ export function OrderDetail() {
 	const [busy, setBusy] = useState('');
 	const [updateErr, setUpdateErr] = useState('');
 
-	const [note, setNote] = useState('');
-	const [noteNotify, setNoteNotify] = useState(false);
-	const [noteBusy, setNoteBusy] = useState(false);
-	const [noteErr, setNoteErr] = useState('');
-
 	async function persist(next: OrderDetailType) {
 		setOrder(next);
 		await cache.putOrderDetail(storeId, orderId, next);
@@ -66,22 +61,6 @@ export function OrderDetail() {
 			setUpdateErr(tError(t, codeOf(e)));
 		} finally {
 			setBusy('');
-		}
-	}
-
-	async function addNote() {
-		if (!client || !order || noteBusy || !note.trim()) return;
-		setNoteErr('');
-		setNoteBusy(true);
-		try {
-			const { note: entry } = await client.addOrderNote(orderId, note.trim(), { notify: noteNotify });
-			await persist({ ...order, history: [entry, ...order.history] });
-			setNote('');
-			setNoteNotify(false);
-		} catch (e) {
-			setNoteErr(tError(t, codeOf(e)));
-		} finally {
-			setNoteBusy(false);
 		}
 	}
 
@@ -171,31 +150,6 @@ export function OrderDetail() {
 							<span>{t('order.notifyCustomer')}</span>
 						</label>
 						{updateErr && <div className="hk-error-note" style={{ marginTop: 'var(--hk-s3)' }}>{updateErr}</div>}
-					</div>
-
-					<div className="hk-card hk-card--pad">
-						<span className="hk-muted">{t('order.addNote')}</span>
-						<textarea
-							className="hk-input"
-							style={{ marginTop: 'var(--hk-s2)', minHeight: 64, resize: 'vertical' }}
-							placeholder={t('order.notePlaceholder')}
-							value={note}
-							onChange={(e) => setNote(e.target.value)}
-							disabled={noteBusy}
-						/>
-						<label className="hk-check">
-							<input type="checkbox" checked={noteNotify} onChange={(e) => setNoteNotify(e.target.checked)} disabled={noteBusy} />
-							<span>{t('order.notifyCustomer')}</span>
-						</label>
-						<Button
-							variant="pri"
-							style={{ marginTop: 'var(--hk-s2)' }}
-							disabled={noteBusy || !note.trim()}
-							onClick={() => void addNote()}
-						>
-							{noteBusy ? t('order.updating') : t('order.saveNote')}
-						</Button>
-						{noteErr && <div className="hk-error-note" style={{ marginTop: 'var(--hk-s3)' }}>{noteErr}</div>}
 					</div>
 
 					<AddressCard label={t('order.billing')} address={order.billing_address} />

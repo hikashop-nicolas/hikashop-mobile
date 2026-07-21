@@ -275,7 +275,4 @@ export const fr: Messages = {
 	'order.invoice': 'Facture',
 	'order.shippingAddress': 'Adresse de livraison',
 	'order.reasonOptional': 'Motif (facultatif)',
-	'order.addNote': 'Ajouter une note',
-	'order.notePlaceholder': 'Écrire une note pour cette commande',
-	'order.saveNote': 'Enregistrer la note',
 };

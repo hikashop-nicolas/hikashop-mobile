@@ -277,7 +277,4 @@ export const en: Messages = {
 	'order.invoice': 'Invoice',
 	'order.shippingAddress': 'Shipping address',
 	'order.reasonOptional': 'Reason (optional)',
-	'order.addNote': 'Add a note',
-	'order.notePlaceholder': 'Write a note for this order',
-	'order.saveNote': 'Save note',
 };
