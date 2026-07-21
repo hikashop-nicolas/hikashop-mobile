@@ -4,7 +4,7 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile, RelatedProduct } from '../core';
-import { WRITABLE_FIELD_TYPES } from '../core';
+import { WRITABLE_FIELD_TYPES, tsToDate, dateToTs } from '../core';
 import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button, RichText, CustomFieldInput } from '../ui';
 import type { TreeNode } from '../ui';
 import { CategoryEditor } from './CategoryEditor';
@@ -22,7 +22,10 @@ function toForm(p: ProductDetail): Form {
 		dimension_unit: p.dimension_unit || 'cm',
 		min_per_order: String(p.min_per_order || ''), max_per_order: String(p.max_per_order || ''),
 		tax_id: String(p.tax_id || 0), manufacturer_id: String(p.manufacturer_id || 0),
+		access: p.access || 'all', contact: p.contact, warehouse_id: String(p.warehouse_id || 0),
+		sale_start: tsToDate(p.sale_start), sale_end: tsToDate(p.sale_end),
 		page_title: p.page_title, meta_description: p.meta_description, keywords: p.keywords,
+		canonical: p.canonical, alias: p.alias, url: p.url,
 	};
 }
 
@@ -61,6 +64,7 @@ export function ProductEdit() {
 	const [stockBusy, setStockBusy] = useState(false);
 	const [media, setMedia] = useState<{ images: ProductImage[]; files: ProductFile[] } | null>(null);
 	const [related, setRelated] = useState<{ bundle: RelatedProduct[]; options: RelatedProduct[]; related: RelatedProduct[] } | null>(null);
+	const [tags, setTags] = useState<number[]>([]);
 	useEffect(() => {
 		if (fetched && !form) {
 			setForm(toForm(fetched));
@@ -69,6 +73,7 @@ export function ProductEdit() {
 			setStockInput(fetched.quantity >= 0 ? String(fetched.quantity) : '');
 			setMedia({ images: fetched.images, files: fetched.files });
 			setRelated({ bundle: fetched.bundle ?? [], options: fetched.options ?? [], related: fetched.related ?? [] });
+			setTags(fetched.tags ?? []);
 			const cf: Record<string, string> = {};
 			for (const [k, v] of Object.entries(fetched.custom_fields ?? {})) cf[k] = v ?? '';
 			setCustom(cf);
@@ -142,7 +147,11 @@ export function ProductEdit() {
 				width: num(form.width), height: num(form.height), length: num(form.length), dimension_unit: form.dimension_unit,
 				min_per_order: int(form.min_per_order), max_per_order: int(form.max_per_order),
 				tax_id: int(form.tax_id), manufacturer_id: manufacturerId,
+				access: form.access, contact: form.contact, warehouse_id: int(form.warehouse_id),
+				sale_start: dateToTs(form.sale_start as string), sale_end: dateToTs(form.sale_end as string),
 				page_title: form.page_title, meta_description: form.meta_description, keywords: form.keywords,
+				canonical: form.canonical, alias: form.alias, url: form.url,
+				tags,
 				custom_fields: writableCustom(),
 				...(related ? {
 					bundle: related.bundle.map((r) => ({ id: r.id, quantity: r.quantity })),
@@ -202,6 +211,7 @@ export function ProductEdit() {
 						<Field label={t('product.name')}><input className="hk-input" value={s('name')} onChange={(e) => set('name', e.target.value)} /></Field>
 						<Field label={t('product.sku')}><input className="hk-input hk-input-mono" value={s('code')} onChange={(e) => set('code', e.target.value)} /></Field>
 						<label className="hk-check"><input type="checkbox" checked={!!form.published} onChange={(e) => set('published', e.target.checked)} /><span>{t('product.publishedLabel')}</span></label>
+						<label className="hk-check"><input type="checkbox" checked={!!form.contact} onChange={(e) => set('contact', e.target.checked)} /><span>{t('product.contact')}</span></label>
 						<Field label={t('product.description')}><RichText value={s('description')} onChange={(html) => set('description', html)} /></Field>
 						<div className="hk-form-row">
 							<Field label={t('product.msrp')}><input className="hk-input" type="number" inputMode="decimal" value={s('msrp')} onChange={(e) => set('msrp', e.target.value)} /></Field>
@@ -234,6 +244,18 @@ export function ProductEdit() {
 							<Field label={t('product.minPerOrder')}><input className="hk-input" type="number" inputMode="numeric" value={s('min_per_order')} onChange={(e) => set('min_per_order', e.target.value)} /></Field>
 							<Field label={t('product.maxPerOrder')}><input className="hk-input" type="number" inputMode="numeric" value={s('max_per_order')} onChange={(e) => set('max_per_order', e.target.value)} /></Field>
 						</div>
+						{(meta?.warehouses ?? []).length > 0 && (
+							<Field label={t('product.warehouse')}>
+								<select className="hk-select" value={s('warehouse_id')} onChange={(e) => set('warehouse_id', e.target.value)}>
+									<option value="0">{t('product.none')}</option>
+									{meta!.warehouses.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+								</select>
+							</Field>
+						)}
+						<div className="hk-form-row">
+							<Field label={t('product.saleStart')}><input className="hk-input" type="date" value={s('sale_start')} onChange={(e) => set('sale_start', e.target.value)} /></Field>
+							<Field label={t('product.saleEnd')}><input className="hk-input" type="date" value={s('sale_end')} onChange={(e) => set('sale_end', e.target.value)} /></Field>
+						</div>
 					</div>
 
 					<div className="hk-card hk-card--pad hk-form">
@@ -255,6 +277,18 @@ export function ProductEdit() {
 								{(meta?.tax_categories ?? []).map((tc) => <option key={tc.id} value={tc.id}>{tc.name}</option>)}
 							</select>
 						</Field>
+						<Field label={t('product.access')}>
+							<select className="hk-select" value={s('access')} onChange={(e) => set('access', e.target.value)}>
+								<option value="all">{t('product.allUsers')}</option>
+								{(meta?.access_levels ?? []).map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
+							</select>
+						</Field>
+						{(meta?.tags ?? []).length > 0 && (
+							<Field label={t('product.tags')}>
+								<TreeSelect nodes={meta!.tags} selected={tags} onChange={setTags}
+									searchPlaceholder={t('product.searchTags')} emptyLabel={t('product.noTags')} />
+							</Field>
+						)}
 					</div>
 
 					<div className="hk-card hk-card--pad">
@@ -304,6 +338,9 @@ export function ProductEdit() {
 						<Field label={t('product.pageTitle')}><input className="hk-input" value={s('page_title')} onChange={(e) => set('page_title', e.target.value)} /></Field>
 						<Field label={t('product.metaDescription')}><textarea className="hk-input hk-textarea" rows={2} value={s('meta_description')} onChange={(e) => set('meta_description', e.target.value)} /></Field>
 						<Field label={t('product.keywords')}><input className="hk-input" value={s('keywords')} onChange={(e) => set('keywords', e.target.value)} /></Field>
+						<Field label={t('product.alias')} hint={t('product.aliasHint')}><input className="hk-input hk-input-mono" value={s('alias')} onChange={(e) => set('alias', e.target.value)} /></Field>
+						<Field label={t('product.canonical')}><input className="hk-input" value={s('canonical')} onChange={(e) => set('canonical', e.target.value)} /></Field>
+						<Field label={t('product.urlRedirect')}><input className="hk-input" value={s('url')} onChange={(e) => set('url', e.target.value)} /></Field>
 					</div>
 
 					{fields.length > 0 && (

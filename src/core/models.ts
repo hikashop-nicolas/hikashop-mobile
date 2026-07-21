@@ -182,6 +182,10 @@ export interface ProductDetail {
 	keywords: string;
 	canonical: string;
 	url: string;
+	alias: string;
+	access: string;
+	contact: boolean;
+	warehouse_id: number;
 	type: string;
 	parent_id: number;
 	manufacturer_id: number;
@@ -197,6 +201,7 @@ export interface ProductDetail {
 	bundle: RelatedProduct[];
 	options: RelatedProduct[];
 	related: RelatedProduct[];
+	tags: number[];
 	custom_fields: Record<string, string | null>;
 	custom_field_files: Record<string, FieldFile[]>;
 	value_ids?: number[]; // characteristic value ids, present when this is a variant
@@ -315,6 +320,8 @@ export interface ProductMeta {
 	product_fields: ProductField[];
 	category_fields: ProductField[];
 	bundle_supported: boolean;
+	warehouses: { id: number; name: string }[];
+	tags: { id: number; name: string; parent_id: number }[];
 }
 
 // A store the app has been paired with (its token is kept separately, in secure storage).
