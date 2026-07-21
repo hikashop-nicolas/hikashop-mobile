@@ -3,12 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile } from '../core';
+import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile, RelatedProduct } from '../core';
 import { WRITABLE_FIELD_TYPES } from '../core';
 import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button, RichText, CustomFieldInput } from '../ui';
 import type { TreeNode } from '../ui';
 import { CategoryEditor } from './CategoryEditor';
 import { ProductMediaSection } from './ProductMediaSection';
+import { RelatedProducts } from './RelatedProducts';
 
 type Form = Record<string, string | boolean>;
 
@@ -59,6 +60,7 @@ export function ProductEdit() {
 	const [stockInput, setStockInput] = useState('');
 	const [stockBusy, setStockBusy] = useState(false);
 	const [media, setMedia] = useState<{ images: ProductImage[]; files: ProductFile[] } | null>(null);
+	const [related, setRelated] = useState<{ bundle: RelatedProduct[]; options: RelatedProduct[]; related: RelatedProduct[] } | null>(null);
 	useEffect(() => {
 		if (fetched && !form) {
 			setForm(toForm(fetched));
@@ -66,6 +68,7 @@ export function ProductEdit() {
 			setManufacturerId(fetched.manufacturer_id || 0);
 			setStockInput(fetched.quantity >= 0 ? String(fetched.quantity) : '');
 			setMedia({ images: fetched.images, files: fetched.files });
+			setRelated({ bundle: fetched.bundle ?? [], options: fetched.options ?? [], related: fetched.related ?? [] });
 			const cf: Record<string, string> = {};
 			for (const [k, v] of Object.entries(fetched.custom_fields ?? {})) cf[k] = v ?? '';
 			setCustom(cf);
@@ -141,6 +144,11 @@ export function ProductEdit() {
 				tax_id: int(form.tax_id), manufacturer_id: manufacturerId,
 				page_title: form.page_title, meta_description: form.meta_description, keywords: form.keywords,
 				custom_fields: writableCustom(),
+				...(related ? {
+					bundle: related.bundle.map((r) => ({ id: r.id, quantity: r.quantity })),
+					options: related.options.map((r) => ({ id: r.id })),
+					related: related.related.map((r) => ({ id: r.id })),
+				} : {}),
 			};
 			const updated = await client.updateProduct(productId, body);
 			const categories = await client.setProductCategories(productId, cats);
@@ -279,6 +287,12 @@ export function ProductEdit() {
 							<button className="hk-appbar-act" onClick={() => nav(`/products/${productId}/variants`)}>{t('product.edit')}</button></div>
 						<div className="hk-row-sub">{t('product.variantsSummary', { options: fetched?.characteristics.length ?? 0, count: fetched?.variants.length ?? 0 })}</div>
 					</div>
+
+					{related && (
+						<RelatedProducts productId={productId} bundle={related.bundle} options={related.options} related={related.related}
+							showBundle={meta?.bundle_supported ?? false}
+							onChange={(kind, items) => setRelated((r) => (r ? { ...r, [kind]: items } : r))} />
+					)}
 
 					<div className="hk-card hk-card--pad hk-form">
 						<span className="hk-muted">{t('product.seo')}</span>

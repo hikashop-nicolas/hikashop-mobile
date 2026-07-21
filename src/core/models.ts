@@ -194,9 +194,20 @@ export interface ProductDetail {
 	categories: { id: number; name: string }[];
 	characteristics: ProductCharacteristic[];
 	variants: ProductVariant[];
+	bundle: RelatedProduct[];
+	options: RelatedProduct[];
+	related: RelatedProduct[];
 	custom_fields: Record<string, string | null>;
 	custom_field_files: Record<string, FieldFile[]>;
 	value_ids?: number[]; // characteristic value ids, present when this is a variant
+}
+
+// A product linked to another as a bundle item, option or related product.
+export interface RelatedProduct {
+	id: number;
+	name: string;
+	code: string;
+	quantity: number; // meaningful for bundle only
 }
 
 // A shop-defined custom field on the product (from GET /products/meta).
@@ -303,6 +314,7 @@ export interface ProductMeta {
 	dimension_units: string[];
 	product_fields: ProductField[];
 	category_fields: ProductField[];
+	bundle_supported: boolean;
 }
 
 // A store the app has been paired with (its token is kept separately, in secure storage).
