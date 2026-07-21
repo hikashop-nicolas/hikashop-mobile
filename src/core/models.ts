@@ -55,6 +55,28 @@ export interface OrderHistoryEntry {
 	notified: boolean;
 }
 
+// A tax rate the operator can apply to an order fee.
+export interface TaxRate {
+	namekey: string;
+	rate: number; // fraction, e.g. 0.2 for 20%
+}
+
+// An editable order-level fee. amount is ex-tax; tax is the computed total; tax_namekeys
+// are the applied rates. method is present for shipping/payment; code for discount.
+export interface OrderFee {
+	amount: number;
+	tax: number;
+	tax_namekeys: string[];
+	method?: string;
+	code?: string;
+}
+
+export interface OrderFees {
+	discount: OrderFee;
+	shipping: OrderFee;
+	payment: OrderFee;
+}
+
 export interface OrderDetail {
 	id: number;
 	number: string;
@@ -77,6 +99,8 @@ export interface OrderDetail {
 	fields: ProductField[];
 	custom_fields: Record<string, string | null>;
 	custom_field_files: Record<string, FieldFile[]>;
+	fees: OrderFees;
+	tax_rates: TaxRate[];
 }
 
 export interface DashboardStats {

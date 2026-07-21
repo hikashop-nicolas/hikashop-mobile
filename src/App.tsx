@@ -13,6 +13,7 @@ import { OrderDetail } from './screens/OrderDetail';
 import { Products } from './screens/Products';
 import { ProductEdit } from './screens/ProductEdit';
 import { ProductPricesEdit } from './screens/ProductPricesEdit';
+import { OrderFeesEdit } from './screens/OrderFeesEdit';
 import { ProductVariantsEdit } from './screens/ProductVariantsEdit';
 import { VariantEdit } from './screens/VariantEdit';
 import { Categories } from './screens/Categories';
@@ -118,6 +119,7 @@ function Shell() {
 								<Route path="/dashboard" element={<Dashboard />} />
 								<Route path="/orders" element={<Orders />} />
 								<Route path="/orders/:id" element={<OrderDetail />} />
+								<Route path="/orders/:id/fees" element={<OrderFeesEdit />} />
 								<Route path="/products" element={<Products />} />
 								{/* Single product screen: the list links straight here (no read-only step). */}
 								<Route path="/products/:id" element={<ProductEdit />} />

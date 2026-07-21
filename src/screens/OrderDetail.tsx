@@ -127,7 +127,10 @@ export function OrderDetail() {
 					</div>
 
 					<div className="hk-card hk-card--pad">
-						<span className="hk-muted">{t('order.items')}</span>
+						<div className="hk-row" style={{ alignItems: 'center' }}>
+							<span className="hk-muted hk-row-grow">{t('order.items')}</span>
+							<button className="hk-appbar-act" style={{ padding: 0 }} onClick={() => nav(`/orders/${orderId}/fees`)}>{t('order.adjustFees')}</button>
+						</div>
 						{order.items.map((it, i) => (
 							<div key={i} className="hk-row">
 								<div className="hk-row-grow">

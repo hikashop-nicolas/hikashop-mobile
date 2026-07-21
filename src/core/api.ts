@@ -2,7 +2,7 @@
 // so native builds can swap in a CORS-free HTTP bridge and tests can mock responses.
 
 import type {
-	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
+	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderFees, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 } from './models';
@@ -160,6 +160,13 @@ export class ApiClient {
 		const { data } = await this.request<OrderStatusResult>('POST', `orders/${id}/status`, {
 			body: { status, notify: !!opts.notify, reason: opts.reason ?? '' },
 		});
+		return data;
+	}
+
+	// Set the order-level discount / shipping / payment fees (write scope). amount is ex-tax;
+	// tax is recomputed by the store from the chosen rate namekeys. Returns the new fees + totals.
+	async saveOrderFees(id: number, fees: Record<'discount' | 'shipping' | 'payment', { amount: number; tax_namekeys: string[]; code?: string }>): Promise<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }> {
+		const { data } = await this.request<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }>('PUT', `orders/${id}/fees`, { body: { fees } });
 		return data;
 	}
 
