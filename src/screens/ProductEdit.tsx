@@ -184,7 +184,12 @@ export function ProductEdit() {
 		<Screen
 			title={t('product.editTitle')}
 			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-			right={form ? <button className="hk-appbar-act" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</button> : undefined}
+			right={form ? (
+				<span className="hk-appbar-acts">
+					<button className="hk-iconbtn hk-danger" disabled={busy} onClick={() => void del()} aria-label={t('product.deleteProduct')}><Icon name="trash" size={22} /></button>
+					<button className="hk-appbar-act" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</button>
+				</span>
+			) : undefined}
 		>
 			{loading || !form ? (
 				<div className="hk-center-col"><Spinner /></div>
@@ -313,10 +318,6 @@ export function ProductEdit() {
 							))}
 						</div>
 					)}
-
-					<div className="hk-card hk-card--pad">
-						<button className="hk-btn hk-btn--danger hk-btn--block" disabled={busy} onClick={() => void del()}>{t('product.deleteProduct')}</button>
-					</div>
 
 					{saveErr && <div className="hk-error-note">{saveErr}</div>}
 				</div>
