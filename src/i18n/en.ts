@@ -277,4 +277,5 @@ export const en: Messages = {
 	'order.invoice': 'Invoice',
 	'order.shippingAddress': 'Shipping address',
 	'order.reasonOptional': 'Reason (optional)',
+	'order.fields': 'Order fields',
 };

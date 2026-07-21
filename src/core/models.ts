@@ -72,6 +72,11 @@ export interface OrderDetail {
 	billing_address: OrderAddress | null;
 	shipping_address: OrderAddress | null;
 	history: OrderHistoryEntry[];
+	// Shop-defined custom order fields: definitions (same shape as ProductField),
+	// their current values, and resolved files for ajax image/file fields.
+	fields: ProductField[];
+	custom_fields: Record<string, string | null>;
+	custom_field_files: Record<string, FieldFile[]>;
 }
 
 export interface DashboardStats {

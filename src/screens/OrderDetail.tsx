@@ -3,8 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useI18n, tError } from '../i18n';
-import type { OrderDetail as OrderDetailType, OrderAddress } from '../core';
-import { Screen, StatusChip, Money, Spinner, Icon } from '../ui';
+import type { OrderDetail as OrderDetailType, OrderAddress, ProductField, FieldFile } from '../core';
+import { WRITABLE_FIELD_TYPES } from '../core';
+import { Screen, StatusChip, Money, Spinner, Icon, Button, CustomFieldInput } from '../ui';
 import { fmtDate } from '../app/utils';
 
 // Standard HikaShop statuses offered as quick actions; the store validates the value.
@@ -30,18 +31,62 @@ export function OrderDetail() {
 		deps: [storeId, orderId],
 	});
 
-	// Local copy so a status change or a new note reflects instantly without a full reload.
+	// Local copy so a status change reflects instantly without a full reload.
 	const [order, setOrder] = useState<OrderDetailType | null>(null);
-	useEffect(() => { if (fetched) setOrder(fetched); }, [fetched]);
+	const [custom, setCustom] = useState<Record<string, string>>({});
+	const [customFiles, setCustomFiles] = useState<Record<string, FieldFile[]>>({});
+	useEffect(() => {
+		if (!fetched) return;
+		setOrder(fetched);
+		const cf: Record<string, string> = {};
+		for (const [k, v] of Object.entries(fetched.custom_fields ?? {})) cf[k] = v ?? '';
+		setCustom(cf);
+		setCustomFiles(fetched.custom_field_files ?? {});
+	}, [fetched]);
 
 	const [notify, setNotify] = useState(false);
 	const [reason, setReason] = useState('');
 	const [busy, setBusy] = useState('');
 	const [updateErr, setUpdateErr] = useState('');
 
+	const [fieldsBusy, setFieldsBusy] = useState(false);
+	const [fieldsErr, setFieldsErr] = useState('');
+	const [fieldsSaved, setFieldsSaved] = useState(false);
+
+	const fields: ProductField[] = order?.fields ?? [];
+	const isWritable = (f: ProductField) => WRITABLE_FIELD_TYPES.includes(f.type);
+
+	function setCustomField(namekey: string, value: string) {
+		setCustom((c) => ({ ...c, [namekey]: value }));
+		setFieldsSaved(false);
+	}
+	// An ajax field's column value is the pipe-joined path list of its files.
+	function setCustomFieldFiles(namekey: string, next: FieldFile[]) {
+		setCustomFiles((cf) => ({ ...cf, [namekey]: next }));
+		setCustom((c) => ({ ...c, [namekey]: next.map((f) => f.path).join('|') }));
+		setFieldsSaved(false);
+	}
+
 	async function persist(next: OrderDetailType) {
 		setOrder(next);
 		await cache.putOrderDetail(storeId, orderId, next);
+	}
+
+	async function saveFields() {
+		if (!client || !order || fieldsBusy) return;
+		setFieldsErr('');
+		setFieldsBusy(true);
+		try {
+			const out: Record<string, string> = {};
+			for (const f of fields) if (isWritable(f) && f.namekey in custom) out[f.namekey] = custom[f.namekey] ?? '';
+			const res = await client.saveOrderFields(orderId, out);
+			await persist({ ...order, custom_fields: res.custom_fields, custom_field_files: res.custom_field_files });
+			setFieldsSaved(true);
+		} catch (e) {
+			setFieldsErr(tError(t, codeOf(e)));
+		} finally {
+			setFieldsBusy(false);
+		}
 	}
 
 	async function changeStatus(status: string) {
@@ -151,6 +196,23 @@ export function OrderDetail() {
 						</label>
 						{updateErr && <div className="hk-error-note" style={{ marginTop: 'var(--hk-s3)' }}>{updateErr}</div>}
 					</div>
+
+					{fields.length > 0 && (
+						<div className="hk-card hk-card--pad hk-form">
+							<span className="hk-muted">{t('order.fields')}</span>
+							{fields.map((f) => (
+								<CustomFieldInput key={f.namekey} field={f} value={custom[f.namekey] ?? ''} files={customFiles[f.namekey] ?? []}
+									readOnlyLabel={t('product.fieldReadOnly')}
+									onChange={(v) => setCustomField(f.namekey, v)}
+									onUpload={() => Promise.reject(new Error('unsupported'))}
+									onFiles={(next) => setCustomFieldFiles(f.namekey, next)} />
+							))}
+							<Button variant="pri" style={{ marginTop: 'var(--hk-s2)' }} disabled={fieldsBusy} onClick={() => void saveFields()}>
+								{fieldsBusy ? t('product.saving') : fieldsSaved ? t('product.saved') : t('common.save')}
+							</Button>
+							{fieldsErr && <div className="hk-error-note" style={{ marginTop: 'var(--hk-s3)' }}>{fieldsErr}</div>}
+						</div>
+					)}
 
 					<AddressCard label={t('order.billing')} address={order.billing_address} />
 					<AddressCard label={t('order.shippingAddress')} address={order.shipping_address} />

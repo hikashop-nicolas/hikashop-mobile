@@ -163,6 +163,14 @@ export class ApiClient {
 		return data;
 	}
 
+	// Save custom order field values (write scope). Returns the persisted values + files.
+	async saveOrderFields(id: number, fields: Record<string, string>): Promise<{ id: number; custom_fields: Record<string, string | null>; custom_field_files: Record<string, FieldFile[]> }> {
+		const { data } = await this.request<{ id: number; custom_fields: Record<string, string | null>; custom_field_files: Record<string, FieldFile[]> }>('PUT', `orders/${id}/fields`, {
+			body: { fields },
+		});
+		return data;
+	}
+
 	async getDashboard(range = 'week'): Promise<DashboardStats> {
 		return (await this.request<DashboardStats>('GET', 'stats/dashboard', { query: { range } })).data;
 	}

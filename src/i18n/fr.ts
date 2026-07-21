@@ -275,4 +275,5 @@ export const fr: Messages = {
 	'order.invoice': 'Facture',
 	'order.shippingAddress': 'Adresse de livraison',
 	'order.reasonOptional': 'Motif (facultatif)',
+	'order.fields': 'Champs de commande',
 };
