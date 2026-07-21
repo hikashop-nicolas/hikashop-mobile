@@ -288,4 +288,5 @@ export const en: Messages = {
 	'order.inclTax': 'Incl. tax',
 	'order.decrease': 'Decrease quantity',
 	'order.increase': 'Increase quantity',
+	'order.addProduct': 'Add product',
 };

@@ -79,6 +79,17 @@ export interface OrderFees {
 	payment: OrderFee;
 }
 
+// A product priced in an order's context, ready to be added as a line (editable first).
+export interface OrderProductPrecompute {
+	product_id: number;
+	name: string;
+	code: string;
+	quantity: number;
+	price: number; // ex-tax
+	tax: number;
+	tax_namekeys: string[];
+}
+
 export interface OrderDetail {
 	id: number;
 	number: string;

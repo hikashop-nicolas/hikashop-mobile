@@ -7,6 +7,7 @@ import type { OrderDetail as OrderDetailType, OrderAddress, ProductField, FieldF
 import { WRITABLE_FIELD_TYPES } from '../core';
 import { Screen, StatusChip, Money, Spinner, Icon, Button, CustomFieldInput } from '../ui';
 import { fmtDate } from '../app/utils';
+import { AddProductModal } from './AddProductModal';
 
 // Standard HikaShop statuses offered as quick actions; the store validates the value.
 const STATUSES = ['created', 'confirmed', 'shipped', 'cancelled', 'refunded'];
@@ -49,6 +50,7 @@ export function OrderDetail() {
 	const [busy, setBusy] = useState('');
 	const [updateErr, setUpdateErr] = useState('');
 	const [qtyBusy, setQtyBusy] = useState(0);
+	const [addingProduct, setAddingProduct] = useState(false);
 
 	const [fieldsBusy, setFieldsBusy] = useState(false);
 	const [fieldsErr, setFieldsErr] = useState('');
@@ -111,7 +113,7 @@ export function OrderDetail() {
 	}
 
 	async function changeQty(lineId: number, quantity: number) {
-		if (!client || !order || qtyBusy || quantity < 1) return;
+		if (!client || !order || qtyBusy || quantity < 0) return;
 		setUpdateErr('');
 		setQtyBusy(lineId);
 		try {
@@ -144,6 +146,7 @@ export function OrderDetail() {
 					<div className="hk-card hk-card--pad">
 						<div className="hk-row" style={{ alignItems: 'center' }}>
 							<span className="hk-muted hk-row-grow">{t('order.items')}</span>
+							<button className="hk-appbar-act" style={{ padding: 0, marginRight: 'var(--hk-s3)' }} onClick={() => setAddingProduct(true)}>{t('order.addProduct')}</button>
 							<button className="hk-appbar-act" style={{ padding: 0 }} onClick={() => nav(`/orders/${orderId}/fees`)}>{t('order.adjustFees')}</button>
 						</div>
 						{order.items.map((it, i) => (
@@ -158,6 +161,7 @@ export function OrderDetail() {
 										<span style={{ minWidth: '1.5em', textAlign: 'center' }}>{qtyBusy === it.id ? '…' : it.quantity}</span>
 										<button className="hk-iconbtn" disabled={!!qtyBusy} aria-label={t('order.increase')} onClick={() => void changeQty(it.id, it.quantity + 1)}>+</button>
 										<Money value={it.price * it.quantity} currency={order.currency_id} />
+										<button className="hk-iconbtn" disabled={!!qtyBusy} aria-label={t('common.delete')} onClick={() => void changeQty(it.id, 0)}><Icon name="trash" size={18} /></button>
 									</div>
 								) : (
 									<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--hk-s2)' }}>
@@ -264,6 +268,15 @@ export function OrderDetail() {
 					</div>
 				</div>
 			) : null}
+			{addingProduct && order && (
+				<AddProductModal
+					orderId={orderId}
+					currencyId={order.currency_id}
+					taxRates={order.tax_rates}
+					onClose={() => setAddingProduct(false)}
+					onAdded={(items, totals) => { void persist({ ...order, items, totals }); setAddingProduct(false); }}
+				/>
+			)}
 		</Screen>
 	);
 }

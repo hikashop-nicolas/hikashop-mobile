@@ -286,4 +286,5 @@ export const fr: Messages = {
 	'order.inclTax': 'TTC',
 	'order.decrease': 'Diminuer la quantité',
 	'order.increase': 'Augmenter la quantité',
+	'order.addProduct': 'Ajouter un produit',
 };
