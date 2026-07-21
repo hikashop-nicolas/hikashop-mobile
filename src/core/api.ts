@@ -2,7 +2,7 @@
 // so native builds can swap in a CORS-free HTTP bridge and tests can mock responses.
 
 import type {
-	PairResult, SiteInfo, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
+	PairResult, SiteInfo, Settings, OrderSummary, OrderDetail, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 } from './models';
@@ -121,6 +121,11 @@ export class ApiClient {
 
 	async getSite(): Promise<SiteInfo> {
 		return (await this.request<SiteInfo>('GET', 'site')).data;
+	}
+
+	// Whitelisted shop config flags used to gate UI.
+	async getSettings(): Promise<Settings> {
+		return (await this.request<Settings>('GET', 'settings')).data;
 	}
 
 	async getOrders(filters: OrderFilters = {}): Promise<Paginated<OrderSummary>> {

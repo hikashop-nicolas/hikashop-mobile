@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile, RelatedProduct } from '../core';
+import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile, RelatedProduct, Settings } from '../core';
 import { WRITABLE_FIELD_TYPES, tsToDate, dateToTs } from '../core';
 import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button, RichText, CustomFieldInput } from '../ui';
 import type { TreeNode } from '../ui';
@@ -52,6 +52,13 @@ export function ProductEdit() {
 		read: () => cache.getProductMeta(storeId),
 		fetch: () => client!.getProductMeta(),
 		write: async (m) => { await cache.putProductMeta(storeId, m); },
+		deps: [storeId],
+	});
+	const { data: settings } = useCached<Settings>({
+		enabled: !!client && !!active,
+		read: () => cache.getSettings(storeId),
+		fetch: () => client!.getSettings(),
+		write: async (s) => { await cache.putSettings(storeId, s); },
 		deps: [storeId],
 	});
 
@@ -211,7 +218,9 @@ export function ProductEdit() {
 						<Field label={t('product.name')}><input className="hk-input" value={s('name')} onChange={(e) => set('name', e.target.value)} /></Field>
 						<Field label={t('product.sku')}><input className="hk-input hk-input-mono" value={s('code')} onChange={(e) => set('code', e.target.value)} /></Field>
 						<label className="hk-check"><input type="checkbox" checked={!!form.published} onChange={(e) => set('published', e.target.checked)} /><span>{t('product.publishedLabel')}</span></label>
-						<label className="hk-check"><input type="checkbox" checked={!!form.contact} onChange={(e) => set('contact', e.target.checked)} /><span>{t('product.contact')}</span></label>
+						{settings?.product_contact && (
+							<label className="hk-check"><input type="checkbox" checked={!!form.contact} onChange={(e) => set('contact', e.target.checked)} /><span>{t('product.contact')}</span></label>
+						)}
 						<Field label={t('product.description')}><RichText value={s('description')} onChange={(html) => set('description', html)} /></Field>
 						<div className="hk-form-row">
 							<Field label={t('product.msrp')}><input className="hk-input" type="number" inputMode="decimal" value={s('msrp')} onChange={(e) => set('msrp', e.target.value)} /></Field>

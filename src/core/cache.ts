@@ -4,7 +4,7 @@
 // shapes on a schema bump until a full migration runner lands (Phase 3 queue/ledger).
 
 import type { KeyValueStore } from './storage';
-import type { OrderSummary, OrderDetail, DashboardStats, Paginated, ProductSummary, ProductDetail, ProductMeta, CategoryListItem } from './models';
+import type { OrderSummary, OrderDetail, DashboardStats, Paginated, ProductSummary, ProductDetail, ProductMeta, CategoryListItem, Settings } from './models';
 
 export const CACHE_VERSION = 1;
 
@@ -89,6 +89,13 @@ export class CacheRepository {
 	}
 	putProductMeta(storeId: string, meta: ProductMeta): Promise<Cached<ProductMeta>> {
 		return this.write(this.key(storeId, 'productmeta'), meta);
+	}
+
+	getSettings(storeId: string): Promise<Cached<Settings> | null> {
+		return this.read(this.key(storeId, 'settings'));
+	}
+	putSettings(storeId: string, settings: Settings): Promise<Cached<Settings>> {
+		return this.write(this.key(storeId, 'settings'), settings);
 	}
 
 	getCategories(storeId: string, kind: string): Promise<Cached<CategoryListItem[]> | null> {

@@ -324,6 +324,14 @@ export interface ProductMeta {
 	tags: { id: number; name: string; parent_id: number }[];
 }
 
+// Whitelisted shop config flags (from GET /settings) the app uses to gate UI.
+export interface Settings {
+	product_contact: boolean;
+	product_waitlist: boolean;
+	price_with_tax: boolean;
+	show_original_price: boolean;
+}
+
 // A store the app has been paired with (its token is kept separately, in secure storage).
 export interface Store {
 	id: string;
