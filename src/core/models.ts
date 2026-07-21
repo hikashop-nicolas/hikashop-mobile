@@ -32,11 +32,13 @@ export interface OrderSummary {
 }
 
 export interface OrderItem {
+	id: number; // order_product_id
 	name: string;
 	code: string;
 	quantity: number;
 	price: number;
 	tax: number;
+	editable: boolean; // false for legacy "additional" fee lines
 }
 
 export interface OrderAddress {

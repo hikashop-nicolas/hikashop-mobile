@@ -2,7 +2,7 @@
 // so native builds can swap in a CORS-free HTTP bridge and tests can mock responses.
 
 import type {
-	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderFees, DashboardStats, Paginated, OrderStatusResult,
+	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderItem, OrderFees, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 } from './models';
@@ -160,6 +160,12 @@ export class ApiClient {
 		const { data } = await this.request<OrderStatusResult>('POST', `orders/${id}/status`, {
 			body: { status, notify: !!opts.notify, reason: opts.reason ?? '' },
 		});
+		return data;
+	}
+
+	// Change a product line's quantity (write scope). The store adjusts stock and re-totals.
+	async setOrderProductQuantity(id: number, lineId: number, quantity: number): Promise<{ id: number; items: OrderItem[]; totals: OrderDetail['totals'] }> {
+		const { data } = await this.request<{ id: number; items: OrderItem[]; totals: OrderDetail['totals'] }>('PUT', `orders/${id}/products/${lineId}`, { body: { quantity } });
 		return data;
 	}
 

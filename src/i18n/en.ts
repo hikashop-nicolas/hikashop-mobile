@@ -286,4 +286,6 @@ export const en: Messages = {
 	'order.noTax': 'No tax',
 	'order.discountCode': 'Discount code',
 	'order.inclTax': 'Incl. tax',
+	'order.decrease': 'Decrease quantity',
+	'order.increase': 'Increase quantity',
 };

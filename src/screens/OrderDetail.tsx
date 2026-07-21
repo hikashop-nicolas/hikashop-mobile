@@ -48,6 +48,7 @@ export function OrderDetail() {
 	const [reason, setReason] = useState('');
 	const [busy, setBusy] = useState('');
 	const [updateErr, setUpdateErr] = useState('');
+	const [qtyBusy, setQtyBusy] = useState(0);
 
 	const [fieldsBusy, setFieldsBusy] = useState(false);
 	const [fieldsErr, setFieldsErr] = useState('');
@@ -109,6 +110,20 @@ export function OrderDetail() {
 		}
 	}
 
+	async function changeQty(lineId: number, quantity: number) {
+		if (!client || !order || qtyBusy || quantity < 1) return;
+		setUpdateErr('');
+		setQtyBusy(lineId);
+		try {
+			const res = await client.setOrderProductQuantity(orderId, lineId, quantity);
+			await persist({ ...order, items: res.items, totals: res.totals });
+		} catch (e) {
+			setUpdateErr(tError(t, codeOf(e)));
+		} finally {
+			setQtyBusy(0);
+		}
+	}
+
 	return (
 		<Screen
 			title={order ? t('order.title', { number: order.number }) : t('order.titleFallback')}
@@ -135,9 +150,21 @@ export function OrderDetail() {
 							<div key={i} className="hk-row">
 								<div className="hk-row-grow">
 									<span className="hk-row-title">{it.name}</span>
-									<span className="hk-row-sub">{t('order.qty', { count: it.quantity })}{it.code ? ` · ${it.code}` : ''}</span>
+									<span className="hk-row-sub">{it.code || ' '}</span>
 								</div>
-								<Money value={it.price * it.quantity} currency={order.currency_id} />
+								{it.editable ? (
+									<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--hk-s2)' }}>
+										<button className="hk-iconbtn" disabled={!!qtyBusy || it.quantity <= 1} aria-label={t('order.decrease')} onClick={() => void changeQty(it.id, it.quantity - 1)}>−</button>
+										<span style={{ minWidth: '1.5em', textAlign: 'center' }}>{qtyBusy === it.id ? '…' : it.quantity}</span>
+										<button className="hk-iconbtn" disabled={!!qtyBusy} aria-label={t('order.increase')} onClick={() => void changeQty(it.id, it.quantity + 1)}>+</button>
+										<Money value={it.price * it.quantity} currency={order.currency_id} />
+									</div>
+								) : (
+									<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--hk-s2)' }}>
+										<span className="hk-row-sub">{t('order.qty', { count: it.quantity })}</span>
+										<Money value={it.price * it.quantity} currency={order.currency_id} />
+									</div>
+								)}
 							</div>
 						))}
 						{order.totals.discount > 0 && (
