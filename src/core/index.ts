@@ -8,3 +8,4 @@ export * from './files';
 export * from './dates';
 export * from './tree';
 export * from './datepicker';
+export * from './tax';

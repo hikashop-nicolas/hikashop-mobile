@@ -97,11 +97,12 @@ export interface ProductSummary {
 
 export interface ProductPrice {
 	id: number;
-	value: number;
+	value: number; // always tax-exclusive
 	currency_id: number;
 	min_quantity: number;
 	access: string;
-	users: string;
+	users: number[]; // restrict to specific users (preserved round-trip)
+	zone_ids: number[]; // restrict to zones (preserved round-trip)
 	start_date: number;
 	end_date: number;
 }
@@ -186,6 +187,7 @@ export interface ProductDetail {
 	access: string;
 	contact: boolean;
 	warehouse_id: number;
+	tax_rate: number; // the product's tax rate (e.g. 0.06) for excl/incl price entry
 	type: string;
 	parent_id: number;
 	manufacturer_id: number;
