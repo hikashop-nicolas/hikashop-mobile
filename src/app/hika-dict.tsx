@@ -5,8 +5,6 @@ import { useI18n } from '../i18n';
 
 // Map the app's short locale to the HikaShop language tag the store installs its packs under.
 const TAG: Record<string, string> = { en: 'en-GB', fr: 'fr-FR' };
-// The dictionary rarely changes; refresh at most once a day (it is ~250KB per locale).
-const MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 interface HikaDictValue {
 	// Resolve a HikaShop language key to the store's text (localized + merchant overrides),
@@ -28,18 +26,22 @@ export function HikaDictProvider({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		if (!client || !active) { setStrings({}); return; }
 		const storeId = active.id;
+		const name = `i18n.${tag}`;
 		let alive = true;
 		void (async () => {
 			const cached = await cache.getTranslations(storeId, tag);
 			if (cached && alive) setStrings(cached.data.strings);
-			if (!cached || Date.now() - cached.fetchedAt > MAX_AGE_MS) {
-				try {
-					const d = await client.getTranslations(tag);
-					if (!alive) return;
-					setStrings(d.strings);
-					await cache.putTranslations(storeId, tag, d);
-				} catch { /* keep whatever we have; HikaShop strings just fall back */ }
-			}
+			try {
+				// Only re-download the (large) dictionary when its change token differs.
+				const cur = await client.getVersion(tag);
+				const seen = await cache.getVersionTag(storeId, name);
+				if (cached && seen === cur.i18n) return;
+				const d = await client.getTranslations(tag);
+				if (!alive) return;
+				setStrings(d.strings);
+				await cache.putTranslations(storeId, tag, d);
+				await cache.putVersionTag(storeId, name, cur.i18n);
+			} catch { /* keep whatever we have; HikaShop strings just fall back */ }
 		})();
 		return () => { alive = false; };
 	}, [client, active, tag, cache]);

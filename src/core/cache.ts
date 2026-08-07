@@ -63,6 +63,16 @@ export class CacheRepository {
 		return this.write(this.key(storeId, 'order', String(orderId)), detail);
 	}
 
+	// A resource's last-seen change token (e.g. name = 'i18n.fr-FR' or 'statuses'), so a cached
+	// payload can be kept until its token changes.
+	async getVersionTag(storeId: string, name: string): Promise<string | null> {
+		const c = await this.read<string>(this.key(storeId, 'ver', name));
+		return c ? c.data : null;
+	}
+	putVersionTag(storeId: string, name: string, tag: string): Promise<Cached<string>> {
+		return this.write(this.key(storeId, 'ver', name), tag);
+	}
+
 	getStatuses(storeId: string): Promise<Cached<OrderStatusDef[]> | null> {
 		return this.read(this.key(storeId, 'statuses'));
 	}

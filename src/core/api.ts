@@ -198,6 +198,12 @@ export class ApiClient {
 		return data;
 	}
 
+	// Cheap change tokens for the app's cacheable resources (read scope), so big payloads are
+	// only re-downloaded when they actually change on the site.
+	async getVersion(lang: string): Promise<{ i18n: string; statuses: string }> {
+		return (await this.request<{ i18n: string; statuses: string }>('GET', 'version', { query: { lang } })).data;
+	}
+
 	// The shop's published order statuses in configured order (read scope).
 	async getStatuses(): Promise<OrderStatusDef[]> {
 		return (await this.request<OrderStatusDef[]>('GET', 'statuses')).data;

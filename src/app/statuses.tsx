@@ -23,9 +23,10 @@ function cap(s: string): string {
 // app's own catalog over the connector's raw name so a non-localized shop keeps its language.
 export function StatusesProvider({ children }: { children: ReactNode }) {
 	const { client, active, cache } = useStores();
-	const { t } = useI18n();
+	const { t, locale } = useI18n();
 	const hk = useHk();
 	const [statuses, setStatuses] = useState<OrderStatusDef[]>([]);
+	const tag = locale === 'fr' ? 'fr-FR' : 'en-GB';
 
 	useEffect(() => {
 		if (!client || !active) { setStatuses([]); return; }
@@ -35,14 +36,19 @@ export function StatusesProvider({ children }: { children: ReactNode }) {
 			const cached = await cache.getStatuses(storeId);
 			if (cached && alive) setStatuses(cached.data);
 			try {
+				// Only re-fetch the status list when its change token differs.
+				const cur = await client.getVersion(tag);
+				const seen = await cache.getVersionTag(storeId, 'statuses');
+				if (cached && seen === cur.statuses) return;
 				const s = await client.getStatuses();
 				if (!alive) return;
 				setStatuses(s);
 				await cache.putStatuses(storeId, s);
+				await cache.putVersionTag(storeId, 'statuses', cur.statuses);
 			} catch { /* keep cached / empty; callers fall back to their own labels */ }
 		})();
 		return () => { alive = false; };
-	}, [client, active, cache]);
+	}, [client, active, cache, tag]);
 
 	const byKey = useMemo(() => {
 		const m: Record<string, OrderStatusDef> = {};
