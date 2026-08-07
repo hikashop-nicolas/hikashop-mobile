@@ -3,6 +3,7 @@ import { useT, tError } from '../i18n';
 import { useStores } from '../app/store-context';
 import type { CustomerDetail, FieldFile } from '../core';
 import { Modal, Field, Button, CustomFieldInput } from '../ui';
+import { editableGroups, buildProfilePatch } from '../app/customers';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -43,15 +44,7 @@ export function CustomerEditModal({ customer, onClose, onSaved }: {
 		setErr('');
 		setBusy(true);
 		try {
-			const patch: Parameters<typeof client.updateCustomer>[1] = {};
-			if (name !== customer.name) patch.name = name;
-			if (email !== customer.email) patch.email = email;
-			if (registered && canEdit) {
-				if (username !== customer.username) patch.username = username;
-				if (password) patch.password = password;
-				if (customer.groups_editable) patch.groups = [...groups];
-			}
-			if (customer.fields.length > 0) patch.custom_fields = custom;
+			const patch = buildProfilePatch(customer, { name, email, username, password, groups, custom });
 			onSaved(await client.updateCustomer(customer.id, patch));
 		} catch (e) {
 			setErr(tError(t, codeOf(e)));
@@ -80,17 +73,12 @@ export function CustomerEditModal({ customer, onClose, onSaved }: {
 						{customer.groups_editable ? (
 						<Field label={t('customers.groups')}>
 							<div className="hk-checkbox-list">
-								{customer.available_groups.map((g) => {
-									const checked = groups.has(g.id);
-									// A non-assignable group is only shown when the customer already has it (kept, locked).
-									if (!g.assignable && !checked) return null;
-									return (
-										<label key={g.id} className="hk-checkbox-row">
-											<input type="checkbox" checked={checked} disabled={!g.assignable} onChange={() => toggleGroup(g.id)} />
-											<span>{g.title}</span>
-										</label>
-									);
-								})}
+								{editableGroups(customer.available_groups, groups).map((g) => (
+									<label key={g.id} className="hk-checkbox-row">
+										<input type="checkbox" checked={groups.has(g.id)} disabled={!g.assignable} onChange={() => toggleGroup(g.id)} />
+										<span>{g.title}</span>
+									</label>
+								))}
 							</div>
 						</Field>
 						) : null}

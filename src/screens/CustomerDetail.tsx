@@ -9,6 +9,7 @@ import { fmtDate } from '../app/utils';
 import { CustomerEditModal } from './CustomerEditModal';
 import { CustomerAccountModal } from './CustomerAccountModal';
 import { CustomerAddressModal } from './CustomerAddressModal';
+import { addressesOfType, defaultAddressId, canSetDefault as offerSetDefault } from '../app/customers';
 
 export function CustomerDetail() {
 	const { id } = useParams();
@@ -133,9 +134,8 @@ export function CustomerDetail() {
 					</div>
 
 					{(['billing', 'shipping'] as const).map((type) => {
-						const list = (customer.addresses ?? []).filter((a) => (a.types ?? []).length === 0 ? type === 'billing' : (a.types ?? []).includes(type));
-						// Exactly one default per type: a lone address is it; otherwise the first flagged one.
-						const defaultId = list.length === 1 ? list[0].id : (list.find((a) => a.default)?.id ?? 0);
+						const list = addressesOfType(customer.addresses, type);
+						const defaultId = defaultAddressId(list);
 						return (
 							<div key={type} className="hk-card hk-card--pad">
 								<div className="hk-card-head">
@@ -149,7 +149,7 @@ export function CustomerDetail() {
 										key={a.id}
 										address={a}
 										isDefault={a.id === defaultId}
-										canSetDefault={list.length > 1 && a.id !== defaultId}
+										canSetDefault={offerSetDefault(list, a.id)}
 										defaultLabel={t('customers.defaultAddress')}
 										setDefaultLabel={t('customers.setDefault')}
 										editLabel={t('product.edit')}

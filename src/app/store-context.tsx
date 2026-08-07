@@ -27,7 +27,8 @@ interface StoreContextValue {
 	remove: (id: string) => Promise<void>;
 }
 
-const StoreContext = createContext<StoreContextValue | null>(null);
+// Exported so tests can provide a mock store context (e.g. a fake ApiClient).
+export const StoreContext = createContext<StoreContextValue | null>(null);
 
 export function useStores(): StoreContextValue {
 	const ctx = useContext(StoreContext);
