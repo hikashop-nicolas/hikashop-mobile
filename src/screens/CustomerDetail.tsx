@@ -134,6 +134,8 @@ export function CustomerDetail() {
 
 					{(['billing', 'shipping'] as const).map((type) => {
 						const list = (customer.addresses ?? []).filter((a) => (a.types ?? []).length === 0 ? type === 'billing' : (a.types ?? []).includes(type));
+						// Exactly one default per type: a lone address is it; otherwise the first flagged one.
+						const defaultId = list.length === 1 ? list[0].id : (list.find((a) => a.default)?.id ?? 0);
 						return (
 							<div key={type} className="hk-card hk-card--pad">
 								<div className="hk-card-head">
@@ -146,6 +148,8 @@ export function CustomerDetail() {
 									<AddressBlock
 										key={a.id}
 										address={a}
+										isDefault={a.id === defaultId}
+										canSetDefault={list.length > 1 && a.id !== defaultId}
 										defaultLabel={t('customers.defaultAddress')}
 										setDefaultLabel={t('customers.setDefault')}
 										editLabel={t('product.edit')}
@@ -181,8 +185,10 @@ export function CustomerDetail() {
 	);
 }
 
-function AddressBlock({ address, defaultLabel, setDefaultLabel, editLabel, deleteLabel, busy, onEdit, onDelete, onSetDefault }: {
+function AddressBlock({ address, isDefault, canSetDefault, defaultLabel, setDefaultLabel, editLabel, deleteLabel, busy, onEdit, onDelete, onSetDefault }: {
 	address: CustomerAddress;
+	isDefault: boolean;
+	canSetDefault: boolean;
 	defaultLabel: string;
 	setDefaultLabel: string;
 	editLabel: string;
@@ -197,12 +203,12 @@ function AddressBlock({ address, defaultLabel, setDefaultLabel, editLabel, delet
 			<div className="hk-row-grow">
 				<span className="hk-row-title">
 					{address.name || address.company || '—'}
-					{address.default && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{defaultLabel}</span>}
+					{isDefault && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{defaultLabel}</span>}
 				</span>
 				{address.company && address.name && <span className="hk-row-sub">{address.company}</span>}
 				{address.street && <span className="hk-row-sub">{address.street}, {address.post_code} {address.city}</span>}
 				{address.telephone && <span className="hk-row-sub">{address.telephone}</span>}
-				{!address.default && (
+				{canSetDefault && (
 					<button type="button" className="hk-linkbtn" disabled={busy} onClick={onSetDefault} style={{ marginTop: 'var(--hk-s1)' }}>{setDefaultLabel}</button>
 				)}
 			</div>
