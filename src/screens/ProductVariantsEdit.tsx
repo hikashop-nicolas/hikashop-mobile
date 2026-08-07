@@ -4,7 +4,7 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductCharacteristic, ProductVariant } from '../core';
-import { Screen, Spinner, Icon, Money } from '../ui';
+import { Screen, Spinner, Icon, Money, Button } from '../ui';
 
 // Variants management: the option set (characteristics + values) plus a listing of
 // variants. Editing a variant opens its own edit screen; adding one creates a blank
@@ -112,7 +112,7 @@ export function ProductVariantsEdit() {
 		<Screen
 			title={t('product.editVariants')}
 			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-			right={<button className="hk-appbar-act" disabled={busy} onClick={() => void addVariant()}><span className="hk-btn-ic"><Icon name="plus" size={18} /> {t('product.addVariant')}</span></button>}
+			right={<Button variant="pri" size="sm" disabled={busy} onClick={() => void addVariant()}><Icon name="plus" size={16} /> {t('product.addVariant')}</Button>}
 		>
 			{loading || options === null ? (
 				<div className="hk-center-col"><Spinner /></div>
@@ -130,7 +130,7 @@ export function ProductVariantsEdit() {
 								</div>
 								<div style={{ display: 'flex', gap: 'var(--hk-s2)' }}>
 									<input className="hk-input" placeholder={t('product.addValue')} value={newValue[o.id] ?? ''} onChange={(e) => setNewValue((m) => ({ ...m, [o.id]: e.target.value }))} onKeyDown={(e) => { if (e.key === 'Enter') void addValue(o.id); }} />
-									<button className="hk-btn" disabled={busy} onClick={() => void addValue(o.id)}>{t('common.add')}</button>
+									<Button size="sm" disabled={busy} onClick={() => void addValue(o.id)}>{t('common.add')}</Button>
 								</div>
 							</div>
 						))}
@@ -140,12 +140,12 @@ export function ProductVariantsEdit() {
 									<option value="">{t('product.addExistingOption')}</option>
 									{availableOptions.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
 								</select>
-								<button className="hk-btn" disabled={busy || !pickOption} onClick={addExistingOption}>{t('common.add')}</button>
+								<Button size="sm" disabled={busy || !pickOption} onClick={addExistingOption}>{t('common.add')}</Button>
 							</div>
 						)}
 						<div style={{ display: 'flex', gap: 'var(--hk-s2)', marginTop: 'var(--hk-s2)' }}>
 							<input className="hk-input" placeholder={t('product.newOption')} value={newOption} onChange={(e) => setNewOption(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') void addOption(); }} />
-							<button className="hk-btn" disabled={busy} onClick={() => void addOption()}>{t('product.addOption')}</button>
+							<Button size="sm" disabled={busy} onClick={() => void addOption()}>{t('product.addOption')}</Button>
 						</div>
 					</div>
 

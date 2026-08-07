@@ -141,7 +141,7 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 			<Screen
 				title={title}
 				left={<button className="hk-iconbtn" onClick={onClose} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-				right={<button className="hk-appbar-act" disabled={busy} onClick={() => void submit()}>{saveLabel}</button>}
+				right={<Button variant="pri" size="sm" disabled={busy} onClick={() => void submit()}>{saveLabel}</Button>}
 			>
 				{body}
 			</Screen>

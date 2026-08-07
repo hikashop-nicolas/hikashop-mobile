@@ -3,7 +3,7 @@ import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl } from '../core';
 import type { ProductImage, ProductFile } from '../core';
-import { Icon, Spinner } from '../ui';
+import { Icon, Spinner, Button } from '../ui';
 import { FileOptionsModal } from './FileOptionsModal';
 import { MediaBrowser } from './MediaBrowser';
 
@@ -97,7 +97,7 @@ export function ProductMediaSection({ productId, images, files, accessLevels = [
 		<>
 			<div className="hk-card hk-card--pad">
 				<div className="hk-sect-head"><span className="hk-muted">{t('product.images')}</span>
-					<button className="hk-appbar-act" disabled={busy} onClick={() => setBrowsing('images')}>{t('media.browse')}</button></div>
+					<Button size="sm" disabled={busy} onClick={() => setBrowsing('images')}>{t('media.browse')}</Button></div>
 				<div className={`hk-media-grid hk-dropzone${dragOver === 'images' ? ' hk-dragover' : ''}`}
 					onDragOver={(e) => { e.preventDefault(); setDragOver('images'); }}
 					onDragLeave={() => setDragOver(null)}
@@ -123,7 +123,7 @@ export function ProductMediaSection({ productId, images, files, accessLevels = [
 
 			<div className="hk-card hk-card--pad">
 				<div className="hk-sect-head"><span className="hk-muted">{t('product.files')}</span>
-					<button className="hk-appbar-act" disabled={busy} onClick={() => setBrowsing('files')}>{t('media.browse')}</button></div>
+					<Button size="sm" disabled={busy} onClick={() => setBrowsing('files')}>{t('media.browse')}</Button></div>
 				<div className={`hk-dropzone hk-filedrop${dragOver === 'files' ? ' hk-dragover' : ''}`}
 					onDragOver={(e) => { e.preventDefault(); setDragOver('files'); }}
 					onDragLeave={() => setDragOver(null)}
@@ -134,9 +134,9 @@ export function ProductMediaSection({ productId, images, files, accessLevels = [
 							<button className="hk-iconbtn hk-danger" disabled={busy} aria-label={t('common.delete')} onClick={() => void del('files', f.id)}><Icon name="trash" size={18} /></button>
 						</div>
 					))}
-					<button className="hk-btn hk-btn--block" style={{ marginTop: 'var(--hk-s2)' }} disabled={busy} onClick={() => fileInput.current?.click()}>
-						<span className="hk-btn-ic"><Icon name="plus" size={18} /> {t('product.addFile')}</span>
-					</button>
+					<Button block style={{ marginTop: 'var(--hk-s2)' }} disabled={busy} onClick={() => fileInput.current?.click()}>
+						<Icon name="plus" size={18} /> {t('product.addFile')}
+					</Button>
 				</div>
 				{dragOver === 'files' && <div className="hk-muted" style={{ textAlign: 'center', marginTop: 'var(--hk-s2)' }}>{t('media.dropFileHint')}</div>}
 				<input ref={fileInput} type="file" multiple hidden onChange={(e) => void onPick('files', e.target.files)} />

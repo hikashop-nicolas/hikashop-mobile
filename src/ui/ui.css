@@ -78,7 +78,6 @@
 .hk-search .hk-search-ic { display: inline-flex; color: var(--hk-faint); flex: none; }
 .hk-search input { border: none; outline: none; background: none; color: var(--hk-ink); min-height: var(--hk-tap); flex: 1; font-size: .92rem; }
 
-.hk-btn-ic { display: inline-flex; align-items: center; gap: var(--hk-s2); }
 
 .hk-code { font-family: var(--hk-mono); font-size: 1.6rem; letter-spacing: .14em; font-weight: 700; text-align: center; }
 

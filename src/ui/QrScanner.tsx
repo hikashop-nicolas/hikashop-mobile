@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useT } from '../i18n';
+import { Button } from './atoms';
 
 // Pure-web QR scanner: BarcodeDetector over a getUserMedia stream. Works in the PWA and in the
 // Capacitor Android WebView (Chromium), so no native plugin is needed. Callers must only mount
@@ -93,7 +94,7 @@ export function QrScanner({ onResult, onClose }: { onResult: (text: string) => v
 			) : (
 				<p className="hk-muted hk-scan-hint">{t('scan.hint')}</p>
 			)}
-			<button className="hk-btn hk-btn--block" onClick={onClose}>{t('common.cancel')}</button>
+			<Button block onClick={onClose}>{t('common.cancel')}</Button>
 		</div>
 	);
 }

@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile } from '../core';
 import { WRITABLE_FIELD_TYPES } from '../core';
-import { Screen, Spinner, Icon, Field, CustomFieldInput } from '../ui';
+import { Screen, Spinner, Icon, Field, CustomFieldInput, Button } from '../ui';
 import { ProductMediaSection } from './ProductMediaSection';
 
 type Form = { code: string; quantity: string; price: string; currency_id: number; published: boolean };
@@ -108,7 +108,7 @@ export function VariantEdit() {
 		<Screen
 			title={t('product.editVariant')}
 			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-			right={form ? <button className="hk-appbar-act" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</button> : undefined}
+			right={form ? <Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button> : undefined}
 		>
 			{loading || !form || !parent ? (
 				<div className="hk-center-col"><Spinner /></div>

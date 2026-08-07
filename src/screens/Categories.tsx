@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { CategoryListItem } from '../core';
 import { flattenTree } from '../core';
-import { Screen, Spinner, Icon } from '../ui';
+import { Screen, Spinner, Icon, Button } from '../ui';
 
 type Kind = 'product' | 'manufacturer';
 
@@ -42,7 +42,7 @@ export function Categories() {
 	return (
 		<Screen
 			title={t('categories.title')}
-			right={<button className="hk-appbar-act" onClick={() => nav(`/categories/new?type=${kind}`)}><span className="hk-btn-ic"><Icon name="plus" size={18} /> {t('categories.new')}</span></button>}
+			right={<Button variant="pri" size="sm" onClick={() => nav(`/categories/new?type=${kind}`)}><Icon name="plus" size={16} /> {t('categories.new')}</Button>}
 		>
 			<div className="hk-filter-bar">
 				<button type="button" className={`hk-chip${kind === 'product' ? ' hk-on' : ''}`} onClick={() => setKind('product')}>{t('categories.categories')}</button>

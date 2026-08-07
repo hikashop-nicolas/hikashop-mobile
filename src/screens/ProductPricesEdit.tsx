@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductPrice, Settings } from '../core';
 import { tsToDate, dateToTs, inclFromExcl, exclFromIncl } from '../core';
-import { Screen, Spinner, Icon, Field } from '../ui';
+import { Screen, Spinner, Icon, Field, Button } from '../ui';
 import { SearchPicker } from './SearchPicker';
 import type { PickItem } from './SearchPicker';
 
@@ -143,7 +143,7 @@ export function ProductPricesEdit() {
 		<Screen
 			title={t('product.editPrices')}
 			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-			right={rows ? <button className="hk-appbar-act" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</button> : undefined}
+			right={rows ? <Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button> : undefined}
 		>
 			{loading || !rows ? (
 				<div className="hk-center-col"><Spinner /></div>
@@ -218,16 +218,16 @@ export function ProductPricesEdit() {
 								</div>
 								{confirmDel === i ? (
 									<div className="hk-form-row">
-										<button className="hk-btn" onClick={() => setConfirmDel(null)}>{t('common.cancel')}</button>
-										<button className="hk-btn hk-btn--danger" onClick={() => remove(i)}>{t('product.confirmDelete')}</button>
+										<Button size="sm" onClick={() => setConfirmDel(null)}>{t('common.cancel')}</Button>
+										<Button variant="danger" size="sm" onClick={() => remove(i)}>{t('product.confirmDelete')}</Button>
 									</div>
 								) : (
-									<button className="hk-btn hk-btn--danger" style={{ minHeight: '34px' }} onClick={() => setConfirmDel(i)}>{t('common.delete')}</button>
+									<Button variant="danger" size="sm" onClick={() => setConfirmDel(i)}>{t('common.delete')}</Button>
 								)}
 							</div>
 						);
 					})}
-					<button className="hk-btn hk-btn--block" onClick={add}><span className="hk-btn-ic"><Icon name="plus" size={18} /> {t('product.addPrice')}</span></button>
+					<Button block onClick={add}><Icon name="plus" size={18} /> {t('product.addPrice')}</Button>
 					{saveErr && <div className="hk-error-note">{saveErr}</div>}
 					{picking && picking.kind === 'users' && (
 						<SearchPicker title={t('product.restrictUsers')} placeholder={t('product.searchUsers')} minChars={2}

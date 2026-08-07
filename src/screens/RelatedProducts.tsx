@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useT } from '../i18n';
 import type { RelatedProduct, ProductSummary } from '../core';
-import { Icon } from '../ui';
+import { Icon, Button } from '../ui';
 import { ProductPicker } from './ProductPicker';
 
 type Kind = 'bundle' | 'options' | 'related';
@@ -41,7 +41,7 @@ export function RelatedProducts({ productId, bundle, options, related, showBundl
 			{groups.filter((g) => g.show).map((g) => (
 				<div key={g.kind}>
 					<div className="hk-sect-head"><span className="hk-row-sub">{g.label}</span>
-						<button type="button" className="hk-appbar-act" onClick={() => setPicking(g.kind)}><span className="hk-btn-ic"><Icon name="plus" size={16} /> {t('common.add')}</span></button></div>
+						<Button size="sm" onClick={() => setPicking(g.kind)}><Icon name="plus" size={16} /> {t('common.add')}</Button></div>
 					{sets[g.kind].length === 0 ? (
 						<div className="hk-row-sub" style={{ padding: 'var(--hk-s1) 0' }}>{t('related.none')}</div>
 					) : sets[g.kind].map((r) => (

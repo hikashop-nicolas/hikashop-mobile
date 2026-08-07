@@ -104,7 +104,7 @@ export function OrderFeesEdit() {
 		<Screen
 			title={t('order.adjustFees')}
 			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-			right={rows ? <button className="hk-appbar-act" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</button> : undefined}
+			right={rows ? <Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button> : undefined}
 		>
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>

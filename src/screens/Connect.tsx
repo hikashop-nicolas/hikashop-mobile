@@ -71,7 +71,7 @@ export function Connect() {
 					</p>
 					{scanSupported && (
 						<Button variant="pri" block disabled={busy} onClick={() => { setErr(''); setScanning(true); }}>
-							<span className="hk-btn-ic"><Icon name="scan" size={18} /> {t('connect.scan')}</span>
+							<Icon name="scan" size={18} /> {t('connect.scan')}
 						</Button>
 					)}
 					<Field label={t('connect.storeAddress')}>

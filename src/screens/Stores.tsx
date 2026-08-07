@@ -36,17 +36,17 @@ export function Stores() {
 					</div>
 					<div className="hk-row-rt">
 						{active?.id === s.id && <span className="hk-status hk-status--ok">{t('stores.active')}</span>}
-						<button
-							className="hk-btn hk-btn--danger"
-							style={{ minHeight: '32px', padding: '0 10px' }}
+						<Button
+							variant="danger"
+							size="sm"
 							onClick={() => { if (window.confirm(t('stores.removeConfirm', { name: s.name }))) void remove(s.id); }}
 						>
 							{t('stores.remove')}
-						</button>
+						</Button>
 					</div>
 				</div>
 			))}
-			<Button block onClick={() => nav('/connect')}><span className="hk-btn-ic"><Icon name="plus" size={18} /> {t('stores.add')}</span></Button>
+			<Button block onClick={() => nav('/connect')}><Icon name="plus" size={18} /> {t('stores.add')}</Button>
 
 			{notifySupported && (
 				<div className="hk-card hk-card--pad" style={{ marginTop: 'var(--hk-s4)' }}>

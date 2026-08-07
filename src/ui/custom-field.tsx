@@ -4,6 +4,7 @@ import { readAsDataUrl, hikaDateToIso, isoToHikaDate, isDateDisabled, isoRangeTo
 import { useT } from '../i18n';
 import { useHk } from '../app/hika-dict';
 import { Field } from './molecules';
+import { Button } from './atoms';
 import { RichText } from './rich-text';
 import { DateCalendar } from './date-calendar';
 import { Icon } from './icons';
@@ -169,9 +170,9 @@ function AjaxFiles({ field, files, onUpload, onFiles }: {
 						</div>
 					))}
 					{(field.multiple || files.length === 0) && (
-						<button type="button" className="hk-btn hk-btn--block" style={{ marginTop: 'var(--hk-s2)' }} disabled={busy} onClick={() => input.current?.click()}>
-							<span className="hk-btn-ic"><Icon name="plus" size={18} /> +</span>
-						</button>
+						<Button block style={{ marginTop: 'var(--hk-s2)' }} disabled={busy} onClick={() => input.current?.click()}>
+							<Icon name="plus" size={18} /> +
+						</Button>
 					)}
 				</div>
 			)}
