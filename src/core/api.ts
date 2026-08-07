@@ -70,7 +70,9 @@ export class ApiClient {
 		if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
 
 		const url = this.url(path, opts.query);
-		const init: RequestInit = { method, headers, body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined };
+		// The app has its own cache layer (cache-then-network), so bypass the browser's HTTP
+		// cache to avoid serving stale reads (e.g. an address form fetched before an edit).
+		const init: RequestInit = { method, headers, cache: 'no-store', body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined };
 
 		// Retry transient upstream failures (a busy server returns 502/503/504, and the request
 		// usually did not run) a couple of times with a short backoff before giving up.
