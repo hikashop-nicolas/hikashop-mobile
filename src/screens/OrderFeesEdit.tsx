@@ -5,6 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { OrderDetail, OrderFee, TaxRate } from '../core';
 import { Screen, Spinner, Icon, Field, Money, Button } from '../ui';
+import { ApplyCouponModal } from './ApplyCouponModal';
 
 // The three editable order-level fees, in display order.
 const FEE_TYPES = ['discount', 'shipping', 'payment'] as const;
@@ -47,6 +48,7 @@ export function OrderFeesEdit() {
 
 	const [busy, setBusy] = useState(false);
 	const [saveErr, setSaveErr] = useState('');
+	const [couponOpen, setCouponOpen] = useState(false);
 
 	const taxRates: TaxRate[] = order?.tax_rates ?? [];
 	const rateOf = (namekey: string): number => taxRates.find((r) => r.namekey === namekey)?.rate ?? 0;
@@ -117,7 +119,14 @@ export function OrderFeesEdit() {
 						const incl = amount * (1 + totalRate);
 						return (
 							<div key={type} className="hk-card hk-card--pad hk-form">
-								<span className="hk-muted">{t(FEE_LABEL[type])}</span>
+								{type === 'discount' ? (
+									<div className="hk-card-head">
+										<span className="hk-muted hk-row-grow">{t(FEE_LABEL[type])}</span>
+										<button type="button" className="hk-btn hk-btn--sm" onClick={() => setCouponOpen(true)}>{t('order.coupon')}</button>
+									</div>
+								) : (
+									<span className="hk-muted">{t(FEE_LABEL[type])}</span>
+								)}
 								<Field label={t('order.feeAmount')}>
 									<input className="hk-input" type="number" inputMode="decimal" value={row.amount}
 										onChange={(e) => update(type, { amount: e.target.value })} />
@@ -159,6 +168,20 @@ export function OrderFeesEdit() {
 					{saveErr && <div className="hk-error-note">{saveErr}</div>}
 				</div>
 			) : null}
+			{couponOpen && order && (
+				<ApplyCouponModal
+					orderId={orderId}
+					currentCode={rows?.discount.code ?? ''}
+					currencyId={order.currency_id}
+					onClose={() => setCouponOpen(false)}
+					onChanged={(fees, totals) => {
+						// A coupon sets the discount server-side; reflect it in the discount row and cache.
+						setRows((r) => (r ? { ...r, discount: toRow(fees.discount) } : r));
+						void cache.putOrderDetail(storeId, orderId, { ...order, fees, totals });
+						setCouponOpen(false);
+					}}
+				/>
+			)}
 		</Screen>
 	);
 }

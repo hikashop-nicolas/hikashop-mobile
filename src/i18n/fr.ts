@@ -304,4 +304,5 @@ export const fr: Messages = {
 	'order.couponApplied': 'Appliqué',
 	'order.availableCoupons': 'Codes promo disponibles',
 	'order.noCoupons': 'Aucun code promo',
+	'order.feesAndMethods': 'Frais et méthodes',
 };

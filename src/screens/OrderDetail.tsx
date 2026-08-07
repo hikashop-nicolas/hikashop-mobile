@@ -9,7 +9,6 @@ import { Screen, StatusChip, Money, Spinner, Icon, Button, CustomFieldInput } fr
 import { fmtDate } from '../app/utils';
 import { AddProductModal } from './AddProductModal';
 import { AddressEditModal } from './AddressEditModal';
-import { ApplyCouponModal } from './ApplyCouponModal';
 import { useStatuses } from '../app/statuses';
 
 // Standard HikaShop statuses offered as quick actions; the store validates the value.
@@ -54,7 +53,6 @@ export function OrderDetail() {
 	const [qtyBusy, setQtyBusy] = useState(0);
 	const [addingProduct, setAddingProduct] = useState(false);
 	const [editingAddress, setEditingAddress] = useState<null | 'billing' | 'shipping'>(null);
-	const [couponOpen, setCouponOpen] = useState(false);
 
 	const [fieldsBusy, setFieldsBusy] = useState(false);
 	const [fieldsErr, setFieldsErr] = useState('');
@@ -148,11 +146,9 @@ export function OrderDetail() {
 					</div>
 
 					<div className="hk-card hk-card--pad">
-						<div className="hk-row" style={{ alignItems: 'center' }}>
+						<div className="hk-card-head">
 							<span className="hk-muted hk-row-grow">{t('order.items')}</span>
-							<button className="hk-appbar-act" style={{ padding: 0, marginRight: 'var(--hk-s3)' }} onClick={() => setAddingProduct(true)}>{t('order.addProduct')}</button>
-							<button className="hk-appbar-act" style={{ padding: 0, marginRight: 'var(--hk-s3)' }} onClick={() => setCouponOpen(true)}>{t('order.coupon')}</button>
-							<button className="hk-appbar-act" style={{ padding: 0 }} onClick={() => nav(`/orders/${orderId}/fees`)}>{t('order.adjustFees')}</button>
+							<button className="hk-btn hk-btn--sm" onClick={() => setAddingProduct(true)}><Icon name="plus" size={16} />{t('order.addProduct')}</button>
 						</div>
 						{order.items.map((it, i) => (
 							<div key={i} className="hk-row">
@@ -194,33 +190,34 @@ export function OrderDetail() {
 						</div>
 					</div>
 
-					{(order.payment_method || order.shipping_method || order.invoice_number) && (
-						<div className="hk-card hk-card--pad">
-							{order.payment_method && <InfoRow label={t('order.payment')} value={order.payment_method} />}
-							{order.shipping_method && <InfoRow label={t('order.shippingMethod')} value={order.shipping_method} />}
-							{order.invoice_number && (
-								<InfoRow
-									label={t('order.invoice')}
-									value={order.invoice_number + (order.invoice_created ? ` · ${fmtDate(order.invoice_created, locale)}` : '')}
-								/>
-							)}
+					<div className="hk-card hk-card--pad">
+						<div className="hk-card-head">
+							<span className="hk-muted hk-row-grow">{t('order.feesAndMethods')}</span>
+							<button className="hk-btn hk-btn--sm" onClick={() => nav(`/orders/${orderId}/fees`)}>{t('order.adjustFees')}</button>
 						</div>
-					)}
+						{order.payment_method && <InfoRow label={t('order.payment')} value={order.payment_method} />}
+						{order.shipping_method && <InfoRow label={t('order.shippingMethod')} value={order.shipping_method} />}
+						{order.invoice_number && (
+							<InfoRow
+								label={t('order.invoice')}
+								value={order.invoice_number + (order.invoice_created ? ` · ${fmtDate(order.invoice_created, locale)}` : '')}
+							/>
+						)}
+					</div>
 
 					<div className="hk-card hk-card--pad">
 						<span className="hk-muted">{t('order.changeStatus')}</span>
-						<div style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap', marginTop: 'var(--hk-s2)' }}>
+						<select
+							className="hk-select"
+							style={{ width: '100%', marginTop: 'var(--hk-s2)' }}
+							value={order.status}
+							disabled={!!busy}
+							onChange={(e) => void changeStatus(e.target.value)}
+						>
 							{statuses.map((s) => (
-								<button
-									key={s.namekey}
-									className={`hk-chip${s.namekey === order.status ? ' hk-on' : ''}`}
-									disabled={!!busy}
-									onClick={() => void changeStatus(s.namekey)}
-								>
-									{busy === s.namekey ? t('order.updating') : statusLabel(s.namekey)}
-								</button>
+								<option key={s.namekey} value={s.namekey}>{statusLabel(s.namekey)}</option>
 							))}
-						</div>
+						</select>
 						<input
 							className="hk-input"
 							style={{ marginTop: 'var(--hk-s3)' }}
@@ -293,15 +290,6 @@ export function OrderDetail() {
 					}}
 				/>
 			)}
-			{couponOpen && order && (
-				<ApplyCouponModal
-					orderId={orderId}
-					currentCode={order.fees.discount.code ?? ''}
-					currencyId={order.currency_id}
-					onClose={() => setCouponOpen(false)}
-					onChanged={(fees, totals) => { void persist({ ...order, fees, totals }); setCouponOpen(false); }}
-				/>
-			)}
 		</Screen>
 	);
 }
@@ -327,9 +315,9 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 function AddressCard({ label, address, editLabel, onEdit }: { label: string; address: OrderAddress | null; editLabel: string; onEdit: () => void }) {
 	return (
 		<div className="hk-card hk-card--pad">
-			<div className="hk-row" style={{ alignItems: 'center' }}>
+			<div className="hk-card-head">
 				<span className="hk-muted hk-row-grow">{label}</span>
-				<button className="hk-appbar-act" style={{ padding: 0 }} onClick={onEdit}>{editLabel}</button>
+				<button className="hk-btn hk-btn--sm" onClick={onEdit}>{editLabel}</button>
 			</div>
 			{address && (
 				<>

@@ -306,4 +306,5 @@ export const en: Messages = {
 	'order.couponApplied': 'Applied',
 	'order.availableCoupons': 'Available coupons',
 	'order.noCoupons': 'No coupons',
+	'order.feesAndMethods': 'Fees & methods',
 };
