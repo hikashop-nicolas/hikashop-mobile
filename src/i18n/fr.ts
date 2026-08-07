@@ -293,4 +293,9 @@ export const fr: Messages = {
 	'orders.createOrder': 'Créer la commande',
 	'order.customerName': 'Nom du client',
 	'order.customerEmail': 'E-mail du client',
+	'address.country': 'Pays',
+	'address.state': 'Région',
+	'address.searchCountry': 'Rechercher un pays',
+	'address.searchState': 'Rechercher une région',
+	'address.choose': 'Choisir',
 };

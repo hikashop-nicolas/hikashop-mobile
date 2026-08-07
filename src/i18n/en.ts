@@ -295,4 +295,9 @@ export const en: Messages = {
 	'orders.createOrder': 'Create order',
 	'order.customerName': 'Customer name',
 	'order.customerEmail': 'Customer email',
+	'address.country': 'Country',
+	'address.state': 'State',
+	'address.searchCountry': 'Search a country',
+	'address.searchState': 'Search a state',
+	'address.choose': 'Choose',
 };

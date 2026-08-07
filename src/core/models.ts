@@ -383,8 +383,20 @@ export interface ProductMeta {
 // A zone (country / state / tax) for restricting a price to regions.
 export interface ZoneItem {
 	id: number;
+	namekey: string; // what addresses store (e.g. country_France_73)
 	name: string;
-	type: string;
+	type: string; // country | state | tax
+}
+
+// A billing/shipping address form for an order: the shop's published address fields,
+// current values, and the resolved country/state display names (stored as namekeys).
+export interface OrderAddressForm {
+	type: 'billing' | 'shipping';
+	address_id: number;
+	fields: ProductField[];
+	values: Record<string, string>;
+	country_name: string;
+	state_name: string;
 }
 
 // A HikaShop user for restricting a price to specific customers.

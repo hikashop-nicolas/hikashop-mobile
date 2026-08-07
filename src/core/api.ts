@@ -2,7 +2,7 @@
 // so native builds can swap in a CORS-free HTTP bridge and tests can mock responses.
 
 import type {
-	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderItem, OrderFees, OrderProductPrecompute, DashboardStats, Paginated, OrderStatusResult,
+	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 } from './models';
@@ -129,9 +129,19 @@ export class ApiClient {
 	}
 
 	// Search zones by name, or resolve a specific id list (for the price zone picker).
-	async getZones(params: { search?: string; ids?: number[] } = {}): Promise<ZoneItem[]> {
-		const query: Query = { search: params.search, ids: params.ids?.join(',') };
+	async getZones(params: { search?: string; ids?: number[]; namekeys?: string[]; type?: string; parent?: string } = {}): Promise<ZoneItem[]> {
+		const query: Query = { search: params.search, ids: params.ids?.join(','), namekeys: params.namekeys?.join(','), type: params.type, parent: params.parent };
 		return (await this.request<ZoneItem[]>('GET', 'zones', { query })).data;
+	}
+
+	// Read an order's billing/shipping address form (fields + values + zone display names).
+	async getOrderAddress(id: number, type: 'billing' | 'shipping'): Promise<OrderAddressForm> {
+		return (await this.request<OrderAddressForm>('GET', `orders/${id}/address/${type}`)).data;
+	}
+
+	// Save an order's billing/shipping address (write scope). Returns the new values + summary.
+	async saveOrderAddress(id: number, type: 'billing' | 'shipping', fields: Record<string, string>): Promise<{ address_id: number; values: Record<string, string>; country_name: string; state_name: string; summary: OrderAddress }> {
+		return (await this.request<{ address_id: number; values: Record<string, string>; country_name: string; state_name: string; summary: OrderAddress }>('PUT', `orders/${id}/address/${type}`, { body: { fields } })).data;
 	}
 
 	// Search users, or resolve a specific id list (for the price user picker).

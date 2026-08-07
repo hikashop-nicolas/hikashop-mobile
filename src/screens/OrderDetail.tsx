@@ -8,6 +8,7 @@ import { WRITABLE_FIELD_TYPES } from '../core';
 import { Screen, StatusChip, Money, Spinner, Icon, Button, CustomFieldInput } from '../ui';
 import { fmtDate } from '../app/utils';
 import { AddProductModal } from './AddProductModal';
+import { AddressEditModal } from './AddressEditModal';
 
 // Standard HikaShop statuses offered as quick actions; the store validates the value.
 const STATUSES = ['created', 'confirmed', 'shipped', 'cancelled', 'refunded'];
@@ -51,6 +52,7 @@ export function OrderDetail() {
 	const [updateErr, setUpdateErr] = useState('');
 	const [qtyBusy, setQtyBusy] = useState(0);
 	const [addingProduct, setAddingProduct] = useState(false);
+	const [editingAddress, setEditingAddress] = useState<null | 'billing' | 'shipping'>(null);
 
 	const [fieldsBusy, setFieldsBusy] = useState(false);
 	const [fieldsErr, setFieldsErr] = useState('');
@@ -248,8 +250,8 @@ export function OrderDetail() {
 						</div>
 					)}
 
-					<AddressCard label={t('order.billing')} address={order.billing_address} />
-					<AddressCard label={t('order.shippingAddress')} address={order.shipping_address} />
+					<AddressCard label={t('order.billing')} address={order.billing_address} editLabel={t('product.edit')} onEdit={() => setEditingAddress('billing')} />
+					<AddressCard label={t('order.shippingAddress')} address={order.shipping_address} editLabel={t('product.edit')} onEdit={() => setEditingAddress('shipping')} />
 
 					<div className="hk-card hk-card--pad">
 						<span className="hk-muted">{t('order.history')}</span>
@@ -277,6 +279,17 @@ export function OrderDetail() {
 					onAdded={(items, totals) => { void persist({ ...order, items, totals }); setAddingProduct(false); }}
 				/>
 			)}
+			{editingAddress && order && (
+				<AddressEditModal
+					orderId={orderId}
+					type={editingAddress}
+					onClose={() => setEditingAddress(null)}
+					onSaved={(summary) => {
+						void persist(editingAddress === 'billing' ? { ...order, billing_address: summary } : { ...order, shipping_address: summary });
+						setEditingAddress(null);
+					}}
+				/>
+			)}
 		</Screen>
 	);
 }
@@ -299,14 +312,20 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 	);
 }
 
-function AddressCard({ label, address }: { label: string; address: OrderAddress | null }) {
-	if (!address) return null;
+function AddressCard({ label, address, editLabel, onEdit }: { label: string; address: OrderAddress | null; editLabel: string; onEdit: () => void }) {
 	return (
 		<div className="hk-card hk-card--pad">
-			<span className="hk-muted">{label}</span>
-			<div>{address.name}</div>
-			{address.company && <div className="hk-row-sub">{address.company}</div>}
-			<div className="hk-row-sub">{address.street}, {address.post_code} {address.city}</div>
+			<div className="hk-row" style={{ alignItems: 'center' }}>
+				<span className="hk-muted hk-row-grow">{label}</span>
+				<button className="hk-appbar-act" style={{ padding: 0 }} onClick={onEdit}>{editLabel}</button>
+			</div>
+			{address && (
+				<>
+					<div>{address.name}</div>
+					{address.company && <div className="hk-row-sub">{address.company}</div>}
+					<div className="hk-row-sub">{address.street}, {address.post_code} {address.city}</div>
+				</>
+			)}
 		</div>
 	);
 }
