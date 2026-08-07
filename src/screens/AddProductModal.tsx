@@ -106,7 +106,7 @@ export function AddProductModal({ orderId, currencyId, taxRates, onClose, onAdde
 						);
 					})}
 					{rates.length < taxRates.length && (
-						<Button variant="ghost" style={{ marginTop: 'var(--hk-s2)' }} onClick={() => setRates((r) => {
+						<Button size="sm" style={{ marginTop: 'var(--hk-s2)', alignSelf: 'flex-start' }} onClick={() => setRates((r) => {
 							const used = new Set(r);
 							const next = taxRates.find((tr) => !used.has(tr.namekey));
 							return [...r, next ? next.namekey : ''];

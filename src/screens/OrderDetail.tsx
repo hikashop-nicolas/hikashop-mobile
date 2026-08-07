@@ -148,7 +148,7 @@ export function OrderDetail() {
 					<div className="hk-card hk-card--pad">
 						<div className="hk-card-head">
 							<span className="hk-muted hk-row-grow">{t('order.items')}</span>
-							<button className="hk-btn hk-btn--sm" onClick={() => setAddingProduct(true)}><Icon name="plus" size={16} />{t('order.addProduct')}</button>
+							<Button size="sm" onClick={() => setAddingProduct(true)}><Icon name="plus" size={16} />{t('order.addProduct')}</Button>
 						</div>
 						{order.items.map((it, i) => (
 							<div key={i} className="hk-row">
@@ -193,7 +193,7 @@ export function OrderDetail() {
 					<div className="hk-card hk-card--pad">
 						<div className="hk-card-head">
 							<span className="hk-muted hk-row-grow">{t('order.feesAndMethods')}</span>
-							<button className="hk-btn hk-btn--sm" onClick={() => nav(`/orders/${orderId}/fees`)}>{t('order.adjustFees')}</button>
+							<Button size="sm" onClick={() => nav(`/orders/${orderId}/fees`)}>{t('order.adjustFees')}</Button>
 						</div>
 						{order.payment_method && <InfoRow label={t('order.payment')} value={order.payment_method} />}
 						{order.shipping_method && <InfoRow label={t('order.shippingMethod')} value={order.shipping_method} />}
@@ -317,7 +317,7 @@ function AddressCard({ label, address, editLabel, onEdit }: { label: string; add
 		<div className="hk-card hk-card--pad">
 			<div className="hk-card-head">
 				<span className="hk-muted hk-row-grow">{label}</span>
-				<button className="hk-btn hk-btn--sm" onClick={onEdit}>{editLabel}</button>
+				<Button size="sm" onClick={onEdit}>{editLabel}</Button>
 			</div>
 			{address && (
 				<>

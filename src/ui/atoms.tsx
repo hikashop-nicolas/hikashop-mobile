@@ -4,13 +4,15 @@ import { useStatuses } from '../app/statuses';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 	variant?: 'default' | 'pri' | 'ghost' | 'danger';
+	size?: 'default' | 'sm';
 	block?: boolean;
 };
 
-export function Button({ variant = 'default', block, className = '', children, ...rest }: ButtonProps) {
+export function Button({ variant = 'default', size = 'default', block, className = '', children, ...rest }: ButtonProps) {
 	const cls = [
 		'hk-btn',
 		variant !== 'default' ? `hk-btn--${variant}` : '',
+		size === 'sm' ? 'hk-btn--sm' : '',
 		block ? 'hk-btn--block' : '',
 		className,
 	].filter(Boolean).join(' ');
