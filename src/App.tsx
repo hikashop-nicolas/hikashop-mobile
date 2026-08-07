@@ -54,12 +54,21 @@ function SideNav() {
 	const nav = useNavigate();
 	const loc = useLocation();
 	const t = useT();
-	const active = activeKey(loc.pathname);
+	const { active: store } = useStores();
+	const tab = activeKey(loc.pathname);
 	return (
 		<nav className="hk-sidenav">
-			<div className="hk-brand">HikaShop</div>
+			{/* The active store, tappable to switch: everything you view and create targets it. */}
+			<button className="hk-store-switch" onClick={() => nav('/stores')} title={t('stores.title')}>
+				<Icon name="store" size={20} />
+				<span className="hk-store-switch-text">
+					<span className="hk-store-switch-eyebrow">HikaShop</span>
+					<span className="hk-store-switch-name">{store?.name || '…'}</span>
+				</span>
+				<Icon name="chevron" size={16} className="hk-store-switch-chevron" />
+			</button>
 			{TAB_DEFS.map((d) => (
-				<button key={d.key} className={`hk-navitem${active === d.key ? ' hk-on' : ''}`} onClick={() => nav(`/${d.key}`)}>
+				<button key={d.key} className={`hk-navitem${tab === d.key ? ' hk-on' : ''}`} onClick={() => nav(`/${d.key}`)}>
 					<Icon name={d.icon} size={20} /><span>{t(d.labelKey)}</span>
 				</button>
 			))}

@@ -113,6 +113,12 @@
 	.hk-tabbar { display: none; }
 	.hk-sidenav { display: flex; flex-direction: column; gap: 3px; width: 244px; flex: none; padding: var(--hk-s3); border-right: 1px solid var(--hk-line); background: var(--hk-surface); overflow-y: auto; }
 	.hk-brand { font-weight: 700; font-size: 1.1rem; letter-spacing: -.01em; padding: var(--hk-s3) var(--hk-s3) var(--hk-s4); color: var(--hk-ink); }
+	.hk-store-switch { display: flex; align-items: center; gap: var(--hk-s3); width: 100%; padding: 10px 12px; margin-bottom: var(--hk-s3); border: none; background: none; border-radius: var(--hk-r2); color: var(--hk-ink); cursor: pointer; text-align: left; }
+	.hk-store-switch:hover { background: var(--hk-surface-2); }
+	.hk-store-switch-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+	.hk-store-switch-eyebrow { font-size: .66rem; text-transform: uppercase; letter-spacing: .07em; color: var(--hk-faint); }
+	.hk-store-switch-name { font-weight: 700; font-size: 1.02rem; letter-spacing: -.01em; color: var(--hk-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.hk-store-switch-chevron { color: var(--hk-faint); flex: none; }
 	.hk-navitem { display: flex; align-items: center; gap: var(--hk-s3); padding: 10px 12px; border-radius: var(--hk-r2); border: none; background: none; color: var(--hk-muted); font: inherit; font-weight: 600; cursor: pointer; text-align: left; width: 100%; }
 	.hk-navitem:hover { background: var(--hk-surface-2); color: var(--hk-ink); }
 	.hk-navitem.hk-on { background: var(--hk-accent-soft); color: var(--hk-accent); }
