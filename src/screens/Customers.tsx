@@ -1,17 +1,20 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useI18n, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { CustomerSummary, Paginated } from '../core';
-import { Screen, Search, Spinner } from '../ui';
+import { Screen, Search, Spinner, NewButton } from '../ui';
 import { fmtDate } from '../app/utils';
+import { NewCustomerModal } from './NewCustomerModal';
 
 export function Customers() {
 	const { client, active, cache } = useStores();
 	const { t, locale } = useI18n();
+	const nav = useNavigate();
 	const [search, setSearch] = useState('');
+	const [creating, setCreating] = useState(false);
 	const storeId = active?.id ?? '';
 	const filterKey = ordersFilterKey('', search);
 
@@ -28,7 +31,7 @@ export function Customers() {
 	const total = data?.total ?? 0;
 
 	return (
-		<Screen title={t('customers.title')}>
+		<Screen title={t('customers.title')} right={<NewButton onClick={() => setCreating(true)} />}>
 			<Search value={search} onChange={setSearch} placeholder={t('customers.search')} />
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>
@@ -55,6 +58,12 @@ export function Customers() {
 					))}
 					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('customers.countOf', { shown: items.length, total })}</div>
 				</div>
+			)}
+			{creating && (
+				<NewCustomerModal
+					onClose={() => setCreating(false)}
+					onCreated={(id) => { setCreating(false); nav(`/customers/${id}`); }}
+				/>
 			)}
 		</Screen>
 	);

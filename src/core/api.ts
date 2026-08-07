@@ -170,6 +170,12 @@ export class ApiClient {
 		return (await this.request<CustomerDetail>('GET', `customers/${id}`)).data;
 	}
 
+	// Create a new (guest) customer from an email and optional name (write scope). A login can be
+	// added afterwards from the customer's detail. Returns the new customer id.
+	async createCustomer(customer: { email: string; name?: string }): Promise<{ id: number }> {
+		return (await this.request<{ id: number }>('POST', 'customers', { body: customer })).data;
+	}
+
 	// Edit a customer's profile (write scope). Any omitted field is left unchanged; username,
 	// password and groups apply to registered customers only. Returns the refreshed detail.
 	async updateCustomer(id: number, patch: { name?: string; email?: string; username?: string; password?: string; groups?: number[]; custom_fields?: Record<string, string> }): Promise<CustomerDetail> {

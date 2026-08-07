@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useI18n, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { OrderSummary, Paginated } from '../core';
-import { Screen, Search, StatusChip, Money, Spinner, Icon } from '../ui';
+import { Screen, Search, StatusChip, Money, Spinner, NewButton } from '../ui';
 import { fmtDate } from '../app/utils';
 import { NewOrderModal } from './NewOrderModal';
 import { useStatuses } from '../app/statuses';
@@ -36,7 +36,7 @@ export function Orders() {
 	return (
 		<Screen
 			title={t('orders.title')}
-			right={<button className="hk-iconbtn" aria-label={t('orders.newOrder')} onClick={() => setCreating(true)}><Icon name="plus" size={24} /></button>}
+			right={<NewButton onClick={() => setCreating(true)} />}
 		>
 			<Search value={search} onChange={setSearch} placeholder={t('orders.search')} />
 			<div style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap' }}>

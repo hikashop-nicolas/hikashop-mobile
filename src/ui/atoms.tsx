@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, CSSProperties } from 'react';
 import { useT } from '../i18n';
 import { useStatuses } from '../app/statuses';
+import { Icon } from './icons';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 	variant?: 'default' | 'pri' | 'ghost' | 'danger';
@@ -20,6 +21,16 @@ export function Button({ variant = 'default', size = 'default', block, className
 		<button className={cls} {...rest}>
 			{children}
 		</button>
+	);
+}
+
+// The uniform "+ New" action used in every list screen's header (Screen `right` slot).
+export function NewButton({ onClick, disabled, label }: { onClick: () => void; disabled?: boolean; label?: string }) {
+	const t = useT();
+	return (
+		<Button variant="pri" size="sm" disabled={disabled} onClick={onClick}>
+			<Icon name="plus" size={16} /> {label ?? t('common.new')}
+		</Button>
 	);
 }
 

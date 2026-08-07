@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { ProductSummary, Paginated, ProductMeta } from '../core';
-import { Screen, Search, Money, Spinner, Icon, TreeSelect, Button } from '../ui';
+import { Screen, Search, Money, Spinner, Icon, TreeSelect, Button, NewButton } from '../ui';
 
 export function Products() {
 	const { client, active, cache } = useStores();
@@ -60,7 +60,7 @@ export function Products() {
 	return (
 		<Screen
 			title={t('products.title')}
-			right={<Button variant="pri" size="sm" disabled={creating} onClick={() => void create()}><Icon name="plus" size={16} /> {t('product.newProduct')}</Button>}
+			right={<NewButton disabled={creating} onClick={() => void create()} />}
 		>
 			<Search value={search} onChange={setSearch} placeholder={t('products.search')} />
 			<div className="hk-filter-bar">

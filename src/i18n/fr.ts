@@ -176,6 +176,7 @@ export const fr: Messages = {
 	'product.newProduct': 'Nouveau produit',
 	'product.createTitle': 'Nouveau produit',
 	'common.add': 'Ajouter',
+	'common.new': 'Nouveau',
 	'common.delete': 'Supprimer',
 	'common.create': 'Créer',
 	'common.done': 'Terminé',
@@ -338,4 +339,6 @@ export const fr: Messages = {
 	'customers.addAddress': 'Ajouter {type}',
 	'customers.addAddressShort': 'Ajouter',
 	'customers.setDefault': 'Définir par défaut',
+	'customers.newCustomer': 'Nouveau client',
+	'customers.emailRequired': 'Une adresse email est requise.',
 };

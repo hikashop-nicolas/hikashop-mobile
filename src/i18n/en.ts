@@ -178,6 +178,7 @@ export const en: Messages = {
 	'product.newProduct': 'New product',
 	'product.createTitle': 'New product',
 	'common.add': 'Add',
+	'common.new': 'New',
 	'common.delete': 'Delete',
 	'common.create': 'Create',
 	'common.done': 'Done',
@@ -340,4 +341,6 @@ export const en: Messages = {
 	'customers.addAddress': 'Add {type}',
 	'customers.addAddressShort': 'Add',
 	'customers.setDefault': 'Set as default',
+	'customers.newCustomer': 'New customer',
+	'customers.emailRequired': 'An email address is required.',
 };
