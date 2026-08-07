@@ -4,6 +4,7 @@ import { StoreProvider, useStores } from './app/store-context';
 import { VersionsProvider } from './app/versions';
 import { HikaDictProvider } from './app/hika-dict';
 import { StatusesProvider } from './app/statuses';
+import { composeProviders } from './app/compose-providers';
 import { useOrderPoll } from './app/use-order-poll';
 import { I18nProvider, useT } from './i18n';
 import { TabBar, Spinner, Icon, CurrencyProvider } from './ui';
@@ -147,20 +148,21 @@ function Shell() {
 	);
 }
 
+// Outermost first: each provider may use the context of those listed before it.
+const AppProviders = composeProviders([
+	I18nProvider,
+	StoreProvider,
+	VersionsProvider,
+	HikaDictProvider,
+	StatusesProvider,
+]);
+
 export default function App() {
 	return (
-		<I18nProvider>
-			<StoreProvider>
-				<VersionsProvider>
-					<HikaDictProvider>
-						<StatusesProvider>
-							<HashRouter>
-								<Shell />
-							</HashRouter>
-						</StatusesProvider>
-					</HikaDictProvider>
-				</VersionsProvider>
-			</StoreProvider>
-		</I18nProvider>
+		<AppProviders>
+			<HashRouter>
+				<Shell />
+			</HashRouter>
+		</AppProviders>
 	);
 }
