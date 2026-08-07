@@ -2,7 +2,7 @@
 // so native builds can swap in a CORS-free HTTP bridge and tests can mock responses.
 
 import type {
-	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, Coupon, DashboardStats, Paginated, OrderStatusResult,
+	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, Coupon, OrderStatusDef, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 } from './models';
@@ -196,6 +196,11 @@ export class ApiClient {
 	async addOrderProduct(id: number, line: { product_id: number; quantity: number; price: number; tax_namekeys: string[] }): Promise<{ id: number; items: OrderItem[]; totals: OrderDetail['totals'] }> {
 		const { data } = await this.request<{ id: number; items: OrderItem[]; totals: OrderDetail['totals'] }>('POST', `orders/${id}/products`, { body: line });
 		return data;
+	}
+
+	// The shop's published order statuses in configured order (read scope).
+	async getStatuses(): Promise<OrderStatusDef[]> {
+		return (await this.request<OrderStatusDef[]>('GET', 'statuses')).data;
 	}
 
 	// HikaShop's full translation dictionary for a locale (read scope), so the app can render

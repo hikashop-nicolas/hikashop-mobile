@@ -79,6 +79,14 @@ export interface OrderFees {
 	payment: OrderFee;
 }
 
+// A shop order status (from GET /statuses), in the shop's configured order.
+export interface OrderStatusDef {
+	namekey: string; // what the status endpoint expects
+	name: string; // translated name (site locale)
+	label_key: string; // ORDER_STATUS_* key, for dictionary resolution
+	color: string; // merchant-set hex, or ''
+}
+
 // A shop coupon (from GET /coupons), for the operator to browse and apply to an order.
 export interface Coupon {
 	id: number;

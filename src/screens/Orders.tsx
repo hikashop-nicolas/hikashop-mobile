@@ -8,18 +8,12 @@ import type { OrderSummary, Paginated } from '../core';
 import { Screen, Search, StatusChip, Money, Spinner, Icon } from '../ui';
 import { fmtDate } from '../app/utils';
 import { NewOrderModal } from './NewOrderModal';
-
-const FILTERS: [string, string][] = [
-	['', 'orders.filter.all'],
-	['confirmed', 'orders.filter.confirmed'],
-	['created', 'orders.filter.created'],
-	['shipped', 'orders.filter.shipped'],
-	['cancelled', 'orders.filter.cancelled'],
-];
+import { useStatuses } from '../app/statuses';
 
 export function Orders() {
 	const { client, active, cache } = useStores();
 	const { t, locale } = useI18n();
+	const { statuses, statusLabel } = useStatuses();
 	const nav = useNavigate();
 	const [status, setStatus] = useState('');
 	const [search, setSearch] = useState('');
@@ -46,9 +40,12 @@ export function Orders() {
 		>
 			<Search value={search} onChange={setSearch} placeholder={t('orders.search')} />
 			<div style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap' }}>
-				{FILTERS.map(([f, labelKey]) => (
-					<button key={f || 'all'} className={`hk-chip${status === f ? ' hk-on' : ''}`} onClick={() => setStatus(f)}>
-						{t(labelKey)}
+				<button key="all" className={`hk-chip${status === '' ? ' hk-on' : ''}`} onClick={() => setStatus('')}>
+					{t('orders.filter.all')}
+				</button>
+				{statuses.map((s) => (
+					<button key={s.namekey} className={`hk-chip${status === s.namekey ? ' hk-on' : ''}`} onClick={() => setStatus(s.namekey)}>
+						{statusLabel(s.namekey)}
 					</button>
 				))}
 			</div>

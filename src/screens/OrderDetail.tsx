@@ -10,10 +10,9 @@ import { fmtDate } from '../app/utils';
 import { AddProductModal } from './AddProductModal';
 import { AddressEditModal } from './AddressEditModal';
 import { ApplyCouponModal } from './ApplyCouponModal';
+import { useStatuses } from '../app/statuses';
 
 // Standard HikaShop statuses offered as quick actions; the store validates the value.
-const STATUSES = ['created', 'confirmed', 'shipped', 'cancelled', 'refunded'];
-
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
 }
@@ -23,6 +22,7 @@ export function OrderDetail() {
 	const nav = useNavigate();
 	const { client, active, cache } = useStores();
 	const { t, locale } = useI18n();
+	const { statuses, statusLabel } = useStatuses();
 	const storeId = active?.id ?? '';
 	const orderId = Number(id);
 
@@ -210,14 +210,14 @@ export function OrderDetail() {
 					<div className="hk-card hk-card--pad">
 						<span className="hk-muted">{t('order.changeStatus')}</span>
 						<div style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap', marginTop: 'var(--hk-s2)' }}>
-							{STATUSES.map((s) => (
+							{statuses.map((s) => (
 								<button
-									key={s}
-									className={`hk-chip${s === order.status ? ' hk-on' : ''}`}
+									key={s.namekey}
+									className={`hk-chip${s.namekey === order.status ? ' hk-on' : ''}`}
 									disabled={!!busy}
-									onClick={() => void changeStatus(s)}
+									onClick={() => void changeStatus(s.namekey)}
 								>
-									{busy === s ? t('order.updating') : t(`status.${s}`)}
+									{busy === s.namekey ? t('order.updating') : statusLabel(s.namekey)}
 								</button>
 							))}
 						</div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { StoreProvider, useStores } from './app/store-context';
 import { HikaDictProvider } from './app/hika-dict';
+import { StatusesProvider } from './app/statuses';
 import { useOrderPoll } from './app/use-order-poll';
 import { I18nProvider, useT } from './i18n';
 import { TabBar, Spinner, Icon, CurrencyProvider } from './ui';
@@ -150,9 +151,11 @@ export default function App() {
 		<I18nProvider>
 			<StoreProvider>
 				<HikaDictProvider>
-					<HashRouter>
-						<Shell />
-					</HashRouter>
+					<StatusesProvider>
+						<HashRouter>
+							<Shell />
+						</HashRouter>
+					</StatusesProvider>
 				</HikaDictProvider>
 			</StoreProvider>
 		</I18nProvider>

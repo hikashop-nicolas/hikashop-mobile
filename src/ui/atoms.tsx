@@ -1,5 +1,6 @@
-import type { ButtonHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, CSSProperties } from 'react';
 import { useT } from '../i18n';
+import { useStatuses } from '../app/statuses';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 	variant?: 'default' | 'pri' | 'ghost' | 'danger';
@@ -37,13 +38,13 @@ const STATUS_KIND: Record<string, 'ok' | 'warn' | 'crit' | 'neutral'> = {
 };
 
 export function StatusChip({ status }: { status: string }) {
-	const t = useT();
+	const { statusLabel, statusColor } = useStatuses();
 	const norm = (status || '').toLowerCase();
 	const kind = STATUS_KIND[norm] ?? 'neutral';
-	// Use a translated status label when we have one; otherwise fall back to the raw value.
-	const key = `status.${norm}`;
-	const translated = t(key);
-	const label = translated !== key ? translated : (status ? status.charAt(0).toUpperCase() + status.slice(1) : '');
-	return <span className={`hk-status hk-status--${kind}`}>{label}</span>;
+	const label = statusLabel(status);
+	// A merchant-set status color, when present, overrides the semantic kind color.
+	const color = statusColor(status);
+	const style: CSSProperties | undefined = color ? { background: color, color: '#fff', borderColor: color } : undefined;
+	return <span className={`hk-status hk-status--${kind}`} style={style}>{label}</span>;
 }
 
