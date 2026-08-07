@@ -300,4 +300,10 @@ export const en: Messages = {
 	'address.searchCountry': 'Search a country',
 	'address.searchState': 'Search a state',
 	'address.choose': 'Choose',
+	'order.coupon': 'Coupon',
+	'order.couponCode': 'Coupon code',
+	'order.applyCoupon': 'Apply',
+	'order.couponApplied': 'Applied',
+	'order.availableCoupons': 'Available coupons',
+	'order.noCoupons': 'No coupons',
 };

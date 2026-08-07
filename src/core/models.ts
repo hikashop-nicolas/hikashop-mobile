@@ -79,6 +79,20 @@ export interface OrderFees {
 	payment: OrderFee;
 }
 
+// A shop coupon (from GET /coupons), for the operator to browse and apply to an order.
+export interface Coupon {
+	id: number;
+	code: string;
+	flat_amount: number;
+	percent_amount: number;
+	currency_id: number;
+	start: number;
+	end: number;
+	quota: number;
+	used_times: number;
+	minimum_order: number;
+}
+
 // A product priced in an order's context, ready to be added as a line (editable first).
 export interface OrderProductPrecompute {
 	product_id: number;

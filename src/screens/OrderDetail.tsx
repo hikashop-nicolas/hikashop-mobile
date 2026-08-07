@@ -9,6 +9,7 @@ import { Screen, StatusChip, Money, Spinner, Icon, Button, CustomFieldInput } fr
 import { fmtDate } from '../app/utils';
 import { AddProductModal } from './AddProductModal';
 import { AddressEditModal } from './AddressEditModal';
+import { ApplyCouponModal } from './ApplyCouponModal';
 
 // Standard HikaShop statuses offered as quick actions; the store validates the value.
 const STATUSES = ['created', 'confirmed', 'shipped', 'cancelled', 'refunded'];
@@ -53,6 +54,7 @@ export function OrderDetail() {
 	const [qtyBusy, setQtyBusy] = useState(0);
 	const [addingProduct, setAddingProduct] = useState(false);
 	const [editingAddress, setEditingAddress] = useState<null | 'billing' | 'shipping'>(null);
+	const [couponOpen, setCouponOpen] = useState(false);
 
 	const [fieldsBusy, setFieldsBusy] = useState(false);
 	const [fieldsErr, setFieldsErr] = useState('');
@@ -149,6 +151,7 @@ export function OrderDetail() {
 						<div className="hk-row" style={{ alignItems: 'center' }}>
 							<span className="hk-muted hk-row-grow">{t('order.items')}</span>
 							<button className="hk-appbar-act" style={{ padding: 0, marginRight: 'var(--hk-s3)' }} onClick={() => setAddingProduct(true)}>{t('order.addProduct')}</button>
+							<button className="hk-appbar-act" style={{ padding: 0, marginRight: 'var(--hk-s3)' }} onClick={() => setCouponOpen(true)}>{t('order.coupon')}</button>
 							<button className="hk-appbar-act" style={{ padding: 0 }} onClick={() => nav(`/orders/${orderId}/fees`)}>{t('order.adjustFees')}</button>
 						</div>
 						{order.items.map((it, i) => (
@@ -288,6 +291,15 @@ export function OrderDetail() {
 						void persist(editingAddress === 'billing' ? { ...order, billing_address: summary } : { ...order, shipping_address: summary });
 						setEditingAddress(null);
 					}}
+				/>
+			)}
+			{couponOpen && order && (
+				<ApplyCouponModal
+					orderId={orderId}
+					currentCode={order.fees.discount.code ?? ''}
+					currencyId={order.currency_id}
+					onClose={() => setCouponOpen(false)}
+					onChanged={(fees, totals) => { void persist({ ...order, fees, totals }); setCouponOpen(false); }}
 				/>
 			)}
 		</Screen>

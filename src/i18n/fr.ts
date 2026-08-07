@@ -298,4 +298,10 @@ export const fr: Messages = {
 	'address.searchCountry': 'Rechercher un pays',
 	'address.searchState': 'Rechercher une région',
 	'address.choose': 'Choisir',
+	'order.coupon': 'Code promo',
+	'order.couponCode': 'Code promo',
+	'order.applyCoupon': 'Appliquer',
+	'order.couponApplied': 'Appliqué',
+	'order.availableCoupons': 'Codes promo disponibles',
+	'order.noCoupons': 'Aucun code promo',
 };

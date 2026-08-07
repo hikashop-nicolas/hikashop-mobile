@@ -2,7 +2,7 @@
 // so native builds can swap in a CORS-free HTTP bridge and tests can mock responses.
 
 import type {
-	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, DashboardStats, Paginated, OrderStatusResult,
+	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, Coupon, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 } from './models';
@@ -193,6 +193,23 @@ export class ApiClient {
 	// Add a product line to the order (write scope). price is ex-tax; tax is recomputed from the rates.
 	async addOrderProduct(id: number, line: { product_id: number; quantity: number; price: number; tax_namekeys: string[] }): Promise<{ id: number; items: OrderItem[]; totals: OrderDetail['totals'] }> {
 		const { data } = await this.request<{ id: number; items: OrderItem[]; totals: OrderDetail['totals'] }>('POST', `orders/${id}/products`, { body: line });
+		return data;
+	}
+
+	// List the shop's published coupons (read scope).
+	async getCoupons(search?: string): Promise<Coupon[]> {
+		return (await this.request<Coupon[]>('GET', 'coupons', { query: { search } })).data;
+	}
+
+	// Apply a coupon code to an order (write scope); the store validates and computes it.
+	async applyOrderCoupon(id: number, code: string): Promise<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }> {
+		const { data } = await this.request<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }>('POST', `orders/${id}/coupon`, { body: { code } });
+		return data;
+	}
+
+	// Remove the discount/coupon from an order (write scope).
+	async removeOrderCoupon(id: number): Promise<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }> {
+		const { data } = await this.request<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }>('DELETE', `orders/${id}/coupon`);
 		return data;
 	}
 
