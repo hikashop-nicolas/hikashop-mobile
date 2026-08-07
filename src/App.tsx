@@ -54,18 +54,19 @@ function SideNav() {
 	const nav = useNavigate();
 	const loc = useLocation();
 	const t = useT();
-	const { active: store } = useStores();
+	const { active: store, stores } = useStores();
 	const tab = activeKey(loc.pathname);
 	return (
 		<nav className="hk-sidenav">
-			{/* The active store, tappable to switch: everything you view and create targets it. */}
+			{/* The active store, tappable to switch: everything you view and create targets it.
+			    The chevron only appears when there is more than one store to switch between. */}
 			<button className="hk-store-switch" onClick={() => nav('/stores')} title={t('stores.title')}>
 				<Icon name="store" size={20} />
 				<span className="hk-store-switch-text">
 					<span className="hk-store-switch-eyebrow">HikaShop</span>
 					<span className="hk-store-switch-name">{store?.name || '…'}</span>
 				</span>
-				<Icon name="chevron" size={16} className="hk-store-switch-chevron" />
+				{stores.length > 1 && <Icon name="chevron" size={16} className="hk-store-switch-chevron" />}
 			</button>
 			{TAB_DEFS.map((d) => (
 				<button key={d.key} className={`hk-navitem${tab === d.key ? ' hk-on' : ''}`} onClick={() => nav(`/${d.key}`)}>
