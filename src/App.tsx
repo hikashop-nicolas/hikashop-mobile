@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { StoreProvider, useStores } from './app/store-context';
+import { VersionsProvider } from './app/versions';
 import { HikaDictProvider } from './app/hika-dict';
 import { StatusesProvider } from './app/statuses';
 import { useOrderPoll } from './app/use-order-poll';
@@ -150,13 +151,15 @@ export default function App() {
 	return (
 		<I18nProvider>
 			<StoreProvider>
-				<HikaDictProvider>
-					<StatusesProvider>
-						<HashRouter>
-							<Shell />
-						</HashRouter>
-					</StatusesProvider>
-				</HikaDictProvider>
+				<VersionsProvider>
+					<HikaDictProvider>
+						<StatusesProvider>
+							<HashRouter>
+								<Shell />
+							</HashRouter>
+						</StatusesProvider>
+					</HikaDictProvider>
+				</VersionsProvider>
 			</StoreProvider>
 		</I18nProvider>
 	);
