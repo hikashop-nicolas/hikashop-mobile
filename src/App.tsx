@@ -39,6 +39,7 @@ function activeKey(pathname: string): string {
 	if (pathname.startsWith('/orders')) return 'orders';
 	if (pathname.startsWith('/products')) return 'products';
 	if (pathname.startsWith('/categories')) return 'categories';
+	if (pathname.startsWith('/customers')) return 'customers';
 	if (pathname.startsWith('/stores')) return 'stores';
 	return 'dashboard';
 }

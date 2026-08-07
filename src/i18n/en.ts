@@ -318,7 +318,11 @@ export const en: Messages = {
 	'customers.since': 'Customer since {date}',
 	'customers.orders': 'Orders',
 	'customers.noOrders': 'No orders yet.',
-	'customers.addresses': 'Addresses',
+	'customers.billing': 'Billing address',
+	'customers.shipping': 'Shipping address',
 	'customers.noAddresses': 'No saved addresses.',
 	'customers.defaultAddress': 'Default',
+	'customers.registered': 'Registered',
+	'customers.blocked': 'Blocked',
+	'customers.username': 'Username',
 };

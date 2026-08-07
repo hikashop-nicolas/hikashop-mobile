@@ -441,6 +441,7 @@ export interface CustomerSummary {
 // A single customer address, as shown on the customer detail screen.
 export interface CustomerAddress {
 	id: number;
+	types: string[]; // billing and/or shipping
 	name: string;
 	company: string;
 	street: string;
@@ -448,6 +449,12 @@ export interface CustomerAddress {
 	post_code: string;
 	telephone: string;
 	default: boolean;
+}
+
+// A Joomla user group the customer belongs to.
+export interface UserGroup {
+	id: number;
+	title: string;
 }
 
 // A customer's order, as shown on the customer detail screen.
@@ -463,10 +470,13 @@ export interface CustomerOrder {
 // Full customer profile with their addresses and orders.
 export interface CustomerDetail {
 	id: number;
+	cms_id: number; // 0 for guests (no Joomla account)
 	name: string;
 	email: string;
 	username: string;
-	type: string;
+	type: string; // registered | guest
+	blocked: boolean;
+	groups: UserGroup[];
 	created: number;
 	addresses: CustomerAddress[];
 	orders: CustomerOrder[];

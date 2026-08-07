@@ -38,10 +38,19 @@ export function CustomerDetail() {
 					<div className="hk-card hk-card--pad">
 						<div className="hk-row-title">
 							{customer.name || t('common.guest')}
-							{customer.type === 'guest' && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('customers.guest')}</span>}
+							<span className={`hk-status ${customer.type === 'guest' ? 'hk-status--neutral' : 'hk-status--ok'}`} style={{ marginLeft: 'var(--hk-s2)' }}>
+								{customer.type === 'guest' ? t('customers.guest') : t('customers.registered')}
+							</span>
+							{customer.blocked && <span className="hk-status hk-status--warn" style={{ marginLeft: 'var(--hk-s2)' }}>{t('customers.blocked')}</span>}
 						</div>
 						<div className="hk-row-sub">{customer.email}</div>
+						{customer.type !== 'guest' && customer.username && <div className="hk-row-sub">{t('customers.username')}: {customer.username}</div>}
 						<div className="hk-row-sub">{t('customers.since', { date: fmtDate(customer.created, locale) })}</div>
+						{(customer.groups ?? []).length > 0 && (
+							<div style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap', marginTop: 'var(--hk-s2)' }}>
+								{(customer.groups ?? []).map((g) => <span key={g.id} className="hk-status hk-status--neutral">{g.title}</span>)}
+							</div>
+						)}
 					</div>
 
 					<div className="hk-card hk-card--pad">
@@ -61,14 +70,19 @@ export function CustomerDetail() {
 						))}
 					</div>
 
-					<div className="hk-card hk-card--pad">
-						<div className="hk-card-head">
-							<span className="hk-muted hk-row-grow">{t('customers.addresses')}</span>
-						</div>
-						{customer.addresses.length === 0 ? (
-							<div className="hk-row-sub">{t('customers.noAddresses')}</div>
-						) : customer.addresses.map((a) => <AddressBlock key={a.id} address={a} defaultLabel={t('customers.defaultAddress')} />)}
-					</div>
+					{(['billing', 'shipping'] as const).map((type) => {
+						const list = (customer.addresses ?? []).filter((a) => (a.types ?? []).length === 0 ? type === 'billing' : (a.types ?? []).includes(type));
+						return (
+							<div key={type} className="hk-card hk-card--pad">
+								<div className="hk-card-head">
+									<span className="hk-muted hk-row-grow">{t(type === 'billing' ? 'customers.billing' : 'customers.shipping')}</span>
+								</div>
+								{list.length === 0 ? (
+									<div className="hk-row-sub">{t('customers.noAddresses')}</div>
+								) : list.map((a) => <AddressBlock key={a.id} address={a} defaultLabel={t('customers.defaultAddress')} />)}
+							</div>
+						);
+					})}
 				</>
 			)}
 		</Screen>
