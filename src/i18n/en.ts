@@ -159,6 +159,7 @@ export const en: Messages = {
 	'related.related': 'Related',
 	'related.none': 'None',
 	'related.pickProduct': 'Choose a product',
+	'field.addFile': 'Add a file',
 	'field.dateUnavailable': 'This date is not available.',
 	'field.pickDate': 'Pick a date',
 	'field.pickRange': 'Pick a start date',

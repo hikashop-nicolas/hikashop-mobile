@@ -378,7 +378,7 @@ export class ApiClient {
 	}
 
 	// Upload a file for an ajax image/file custom field; returns its stored path + url.
-	async uploadFieldFile(table: 'product' | 'category', namekey: string, file: { data: string; name: string }): Promise<FieldFile> {
+	async uploadFieldFile(table: 'product' | 'category' | 'order', namekey: string, file: { data: string; name: string }): Promise<FieldFile> {
 		return (await this.request<FieldFile>('POST', `fields/${table}/${namekey}/file`, { body: file })).data;
 	}
 

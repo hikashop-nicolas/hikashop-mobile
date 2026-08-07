@@ -157,6 +157,7 @@ export const fr: Messages = {
 	'related.related': 'Produits associés',
 	'related.none': 'Aucun',
 	'related.pickProduct': 'Choisir un produit',
+	'field.addFile': 'Ajouter un fichier',
 	'field.dateUnavailable': 'Cette date n\'est pas disponible.',
 	'field.pickDate': 'Choisir une date',
 	'field.pickRange': 'Choisir une date de début',

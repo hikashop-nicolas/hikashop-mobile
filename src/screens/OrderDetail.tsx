@@ -148,7 +148,7 @@ export function OrderDetail() {
 					<div className="hk-card hk-card--pad">
 						<div className="hk-card-head">
 							<span className="hk-muted hk-row-grow">{t('order.items')}</span>
-							<Button size="sm" onClick={() => setAddingProduct(true)}><Icon name="plus" size={16} />{t('order.addProduct')}</Button>
+							<Button variant="pri" size="sm" onClick={() => setAddingProduct(true)}><Icon name="plus" size={16} /> {t('order.addProduct')}</Button>
 						</div>
 						{order.items.map((it, i) => (
 							<div key={i} className="hk-row">
@@ -193,7 +193,7 @@ export function OrderDetail() {
 					<div className="hk-card hk-card--pad">
 						<div className="hk-card-head">
 							<span className="hk-muted hk-row-grow">{t('order.feesAndMethods')}</span>
-							<Button size="sm" onClick={() => nav(`/orders/${orderId}/fees`)}>{t('order.adjustFees')}</Button>
+							<Button variant="pri" size="sm" onClick={() => nav(`/orders/${orderId}/fees`)}><Icon name="edit" size={15} /> {t('order.adjustFees')}</Button>
 						</div>
 						{order.payment_method && <InfoRow label={t('order.payment')} value={order.payment_method} />}
 						{order.shipping_method && <InfoRow label={t('order.shippingMethod')} value={order.shipping_method} />}
@@ -240,7 +240,7 @@ export function OrderDetail() {
 								<CustomFieldInput key={f.namekey} field={f} value={custom[f.namekey] ?? ''} files={customFiles[f.namekey] ?? []}
 									readOnlyLabel={t('product.fieldReadOnly')}
 									onChange={(v) => setCustomField(f.namekey, v)}
-									onUpload={() => Promise.reject(new Error('unsupported'))}
+									onUpload={(data, name) => client!.uploadFieldFile('order', f.namekey, { data, name })}
 									onFiles={(next) => setCustomFieldFiles(f.namekey, next)} />
 							))}
 							<Button variant="pri" style={{ marginTop: 'var(--hk-s2)' }} disabled={fieldsBusy} onClick={() => void saveFields()}>

@@ -128,6 +128,7 @@ function AjaxFiles({ field, files, onUpload, onFiles }: {
 	onUpload: (data: string, name: string) => Promise<FieldFile>;
 	onFiles: (files: FieldFile[]) => void;
 }) {
+	const t = useT();
 	const input = useRef<HTMLInputElement>(null);
 	const [busy, setBusy] = useState(false);
 	const isImage = field.type === 'ajaximage';
@@ -171,7 +172,7 @@ function AjaxFiles({ field, files, onUpload, onFiles }: {
 					))}
 					{(field.multiple || files.length === 0) && (
 						<Button block style={{ marginTop: 'var(--hk-s2)' }} disabled={busy} onClick={() => input.current?.click()}>
-							<Icon name="plus" size={18} /> +
+							<Icon name="plus" size={18} /> {t('field.addFile')}
 						</Button>
 					)}
 				</div>
