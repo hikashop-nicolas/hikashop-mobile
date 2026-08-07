@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { CategoryListItem } from '../core';
 import { flattenTree } from '../core';
-import { Screen, Spinner, Icon, Button, NewButton } from '../ui';
+import { Screen, Spinner, Icon, NewButton } from '../ui';
 
 type Kind = 'product' | 'manufacturer';
 

@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { ProductSummary, Paginated, ProductMeta } from '../core';
-import { Screen, Search, Money, Spinner, Icon, TreeSelect, Button, NewButton } from '../ui';
+import { Screen, Search, Money, Spinner, Icon, TreeSelect, NewButton } from '../ui';
 
 export function Products() {
 	const { client, active, cache } = useStores();
