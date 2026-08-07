@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { ProductField, FieldFile } from '../core';
 import { readAsDataUrl, hikaDateToIso, isoToHikaDate, isDateDisabled, isoRangeToHika, hikaToIsoRange, nightsBetween } from '../core';
 import { useT } from '../i18n';
+import { useHk } from '../app/hika-dict';
 import { Field } from './molecules';
 import { RichText } from './rich-text';
 import { DateCalendar } from './date-calendar';
@@ -20,6 +21,7 @@ export function CustomFieldInput({ field, value, files, readOnlyLabel, onChange,
 	onFiles?: (files: FieldFile[]) => void;
 }) {
 	const t = field.type;
+	const hk = useHk();
 
 	if (t === 'ajaximage' || t === 'ajaxfile') {
 		if (!onUpload || !onFiles) {
@@ -45,7 +47,7 @@ export function CustomFieldInput({ field, value, files, readOnlyLabel, onChange,
 			<Field label={field.label}>
 				<select className="hk-select" value={value} onChange={(e) => onChange(e.target.value)}>
 					<option value="">-</option>
-					{field.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+					{field.options.map((o) => <option key={o.value} value={o.value}>{o.label_key ? hk(o.label_key, o.label) : o.label}</option>)}
 				</select>
 			</Field>
 		);

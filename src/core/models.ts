@@ -293,7 +293,7 @@ export interface ProductField {
 	label: string;
 	default: string;
 	required: boolean;
-	options: { value: string; label: string }[];
+	options: { value: string; label: string; label_key?: string }[];
 	multiple: boolean;
 	upload_dir: string;
 	allowed_extensions: string;

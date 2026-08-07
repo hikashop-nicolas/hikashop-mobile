@@ -3,6 +3,7 @@ import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import type { OrderAddressForm, OrderAddress, ProductField, ZoneItem } from '../core';
 import { Modal, Field, Button, Spinner } from '../ui';
+import { useHk } from '../app/hika-dict';
 import { SearchPicker } from './SearchPicker';
 
 function codeOf(e: unknown): string {
@@ -19,6 +20,7 @@ export function AddressEditModal({ orderId, type, onClose, onSaved }: {
 }) {
 	const { client } = useStores();
 	const t = useT();
+	const hk = useHk();
 	const [form, setForm] = useState<OrderAddressForm | null>(null);
 	const [values, setValues] = useState<Record<string, string>>({});
 	const [countryName, setCountryName] = useState('');
@@ -110,7 +112,7 @@ export function AddressEditModal({ orderId, type, onClose, onSaved }: {
 								<Field key={f.namekey} label={f.label}>
 									<select className="hk-select" value={values[f.namekey] ?? ''} onChange={(e) => set(f.namekey, e.target.value)}>
 										<option value="">{t('address.choose')}</option>
-										{f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+										{f.options.map((o) => <option key={o.value} value={o.value}>{o.label_key ? hk(o.label_key, o.label) : o.label}</option>)}
 									</select>
 								</Field>
 							);

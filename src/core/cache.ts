@@ -63,6 +63,13 @@ export class CacheRepository {
 		return this.write(this.key(storeId, 'order', String(orderId)), detail);
 	}
 
+	getTranslations(storeId: string, locale: string): Promise<Cached<{ locale: string; strings: Record<string, string> }> | null> {
+		return this.read(this.key(storeId, 'i18n', locale));
+	}
+	putTranslations(storeId: string, locale: string, dict: { locale: string; strings: Record<string, string> }): Promise<Cached<{ locale: string; strings: Record<string, string> }>> {
+		return this.write(this.key(storeId, 'i18n', locale), dict);
+	}
+
 	getDashboard(storeId: string, range: string): Promise<Cached<DashboardStats> | null> {
 		return this.read(this.key(storeId, 'dashboard', range));
 	}

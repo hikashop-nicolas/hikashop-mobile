@@ -198,6 +198,12 @@ export class ApiClient {
 		return data;
 	}
 
+	// HikaShop's full translation dictionary for a locale (read scope), so the app can render
+	// HikaShop-sourced strings in the operator's language and reflect the merchant's overrides.
+	async getTranslations(lang: string): Promise<{ locale: string; strings: Record<string, string> }> {
+		return (await this.request<{ locale: string; strings: Record<string, string> }>('GET', 'i18n', { query: { lang } })).data;
+	}
+
 	// List the shop's published coupons (read scope).
 	async getCoupons(search?: string): Promise<Coupon[]> {
 		return (await this.request<Coupon[]>('GET', 'coupons', { query: { search } })).data;
