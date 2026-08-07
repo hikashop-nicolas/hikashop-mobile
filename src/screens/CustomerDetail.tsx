@@ -50,6 +50,16 @@ export function CustomerDetail() {
 		}
 	}
 
+	async function makeDefault(addressId: number) {
+		if (!client || addrBusy) return;
+		setAddrBusy(addressId);
+		try {
+			await applyUpdate(await client.setDefaultCustomerAddress(customerId, addressId));
+		} finally {
+			setAddrBusy(0);
+		}
+	}
+
 	return (
 		<Screen
 			title={customer ? (customer.name || customer.email || t('common.guest')) : t('customers.detailTitle')}
@@ -137,11 +147,13 @@ export function CustomerDetail() {
 										key={a.id}
 										address={a}
 										defaultLabel={t('customers.defaultAddress')}
+										setDefaultLabel={t('customers.setDefault')}
 										editLabel={t('product.edit')}
 										deleteLabel={t('common.delete')}
 										busy={addrBusy === a.id}
 										onEdit={() => setEditingAddress({ addressId: a.id, types: a.types.length ? a.types : [type] })}
 										onDelete={() => void removeAddress(a.id)}
+										onSetDefault={() => void makeDefault(a.id)}
 									/>
 								))}
 							</div>
@@ -169,14 +181,16 @@ export function CustomerDetail() {
 	);
 }
 
-function AddressBlock({ address, defaultLabel, editLabel, deleteLabel, busy, onEdit, onDelete }: {
+function AddressBlock({ address, defaultLabel, setDefaultLabel, editLabel, deleteLabel, busy, onEdit, onDelete, onSetDefault }: {
 	address: CustomerAddress;
 	defaultLabel: string;
+	setDefaultLabel: string;
 	editLabel: string;
 	deleteLabel: string;
 	busy: boolean;
 	onEdit: () => void;
 	onDelete: () => void;
+	onSetDefault: () => void;
 }) {
 	return (
 		<div className="hk-row">
@@ -188,6 +202,9 @@ function AddressBlock({ address, defaultLabel, editLabel, deleteLabel, busy, onE
 				{address.company && address.name && <span className="hk-row-sub">{address.company}</span>}
 				{address.street && <span className="hk-row-sub">{address.street}, {address.post_code} {address.city}</span>}
 				{address.telephone && <span className="hk-row-sub">{address.telephone}</span>}
+				{!address.default && (
+					<button type="button" className="hk-linkbtn" disabled={busy} onClick={onSetDefault} style={{ marginTop: 'var(--hk-s1)' }}>{setDefaultLabel}</button>
+				)}
 			</div>
 			<div className="hk-row-rt" style={{ flexDirection: 'row', gap: 'var(--hk-s2)' }}>
 				<Button variant="default" size="sm" disabled={busy} onClick={onEdit}>{editLabel}</Button>

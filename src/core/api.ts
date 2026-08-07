@@ -5,7 +5,7 @@ import type {
 	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, Coupon, OrderStatusDef, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
-	CustomerSummary, CustomerDetail, CustomerAddressForm,
+	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup,
 } from './models';
 
 export class ApiError extends Error {
@@ -195,6 +195,16 @@ export class ApiClient {
 	// Unpublish a customer address (write scope). Returns the refreshed customer detail.
 	async deleteCustomerAddress(id: number, addressId: number): Promise<CustomerDetail> {
 		return (await this.request<CustomerDetail>('DELETE', `customers/${id}/addresses/${addressId}`)).data;
+	}
+
+	// Make a customer address the default for its type (write scope). Returns the refreshed detail.
+	async setDefaultCustomerAddress(id: number, addressId: number): Promise<CustomerDetail> {
+		return (await this.request<CustomerDetail>('PUT', `customers/${id}/addresses/${addressId}/default`)).data;
+	}
+
+	// The CMS user groups the operator can assign, from HikaShop's portable acl source (read scope).
+	async getGroups(): Promise<UserGroup[]> {
+		return (await this.request<UserGroup[]>('GET', 'groups')).data;
 	}
 
 	async getOrders(filters: OrderFilters = {}): Promise<Paginated<OrderSummary>> {

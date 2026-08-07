@@ -339,4 +339,5 @@ export const en: Messages = {
 	'customers.missingCredentials': 'A username and password are required.',
 	'customers.addAddress': 'Add {type}',
 	'customers.addAddressShort': 'Add',
+	'customers.setDefault': 'Set as default',
 };

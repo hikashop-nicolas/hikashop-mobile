@@ -49,7 +49,7 @@ export function CustomerEditModal({ customer, onClose, onSaved }: {
 			if (registered && canEdit) {
 				if (username !== customer.username) patch.username = username;
 				if (password) patch.password = password;
-				patch.groups = [...groups];
+				if (customer.groups_editable) patch.groups = [...groups];
 			}
 			if (customer.fields.length > 0) patch.custom_fields = custom;
 			onSaved(await client.updateCustomer(customer.id, patch));
@@ -77,6 +77,7 @@ export function CustomerEditModal({ customer, onClose, onSaved }: {
 						<Field label={t('customers.newPassword')} hint={t('customers.passwordHint')}>
 							<input className="hk-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
 						</Field>
+						{customer.groups_editable ? (
 						<Field label={t('customers.groups')}>
 							<div className="hk-checkbox-list">
 								{customer.available_groups.map((g) => {
@@ -92,6 +93,7 @@ export function CustomerEditModal({ customer, onClose, onSaved }: {
 								})}
 							</div>
 						</Field>
+						) : null}
 					</>
 				)}
 				{registered && !canEdit && <div className="hk-muted">{t('customers.cannotEditAccount')}</div>}

@@ -337,4 +337,5 @@ export const fr: Messages = {
 	'customers.missingCredentials': 'Un identifiant et un mot de passe sont requis.',
 	'customers.addAddress': 'Ajouter {type}',
 	'customers.addAddressShort': 'Ajouter',
+	'customers.setDefault': 'Définir par défaut',
 };

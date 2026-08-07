@@ -482,6 +482,7 @@ export interface CustomerDetail {
 	type: string; // registered | guest
 	blocked: boolean;
 	can_edit_account: boolean; // false when the operator lacks the ACL to edit this account
+	groups_editable: boolean; // false where the platform can't persist group changes (e.g. WordPress)
 	groups: UserGroup[];
 	available_groups: AssignableGroup[];
 	created: number;

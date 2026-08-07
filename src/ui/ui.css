@@ -37,6 +37,8 @@
 .hk-checkbox-row { display: flex; align-items: center; gap: var(--hk-s2); font-size: .9rem; }
 .hk-checkbox-row input { width: 18px; height: 18px; }
 .hk-checkbox-row input:disabled + span { color: var(--hk-muted); }
+.hk-linkbtn { background: none; border: none; padding: 0; color: var(--hk-accent); font-size: .82rem; cursor: pointer; text-align: left; }
+.hk-linkbtn:disabled { color: var(--hk-muted); cursor: default; }
 
 .hk-input { border: 1px solid var(--hk-line); border-radius: var(--hk-r2); padding: 0 var(--hk-s3); min-height: var(--hk-tap); font-size: .95rem; background: var(--hk-surface); color: var(--hk-ink); width: 100%; }
 .hk-input::placeholder { color: var(--hk-faint); }
