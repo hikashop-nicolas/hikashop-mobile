@@ -287,4 +287,10 @@ export const fr: Messages = {
 	'order.decrease': 'Diminuer la quantité',
 	'order.increase': 'Augmenter la quantité',
 	'order.addProduct': 'Ajouter un produit',
+	'orders.newOrder': 'Nouvelle commande',
+	'orders.existingCustomer': 'Client existant',
+	'orders.guestCustomer': 'Invité',
+	'orders.createOrder': 'Créer la commande',
+	'order.customerName': 'Nom du client',
+	'order.customerEmail': 'E-mail du client',
 };

@@ -155,6 +155,12 @@ export class ApiClient {
 		return (await this.request<OrderDetail>('GET', `orders/${id}`)).data;
 	}
 
+	// Create a blank order for a customer (write scope): either an existing user_id, or a guest
+	// (name optional, email required). Returns the new order id to open its detail.
+	async createOrder(customer: { user_id: number } | { guest: { name?: string; email: string } }): Promise<{ id: number }> {
+		return (await this.request<{ id: number }>('POST', 'orders', { body: customer })).data;
+	}
+
 	// Change an order's status (write scope). notify asks the store to email the customer.
 	async setOrderStatus(id: number, status: string, opts: { notify?: boolean; reason?: string } = {}): Promise<OrderStatusResult> {
 		const { data } = await this.request<OrderStatusResult>('POST', `orders/${id}/status`, {

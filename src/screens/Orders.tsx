@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useI18n, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { OrderSummary, Paginated } from '../core';
-import { Screen, Search, StatusChip, Money, Spinner } from '../ui';
+import { Screen, Search, StatusChip, Money, Spinner, Icon } from '../ui';
 import { fmtDate } from '../app/utils';
+import { NewOrderModal } from './NewOrderModal';
 
 const FILTERS: [string, string][] = [
 	['', 'orders.filter.all'],
@@ -19,8 +20,10 @@ const FILTERS: [string, string][] = [
 export function Orders() {
 	const { client, active, cache } = useStores();
 	const { t, locale } = useI18n();
+	const nav = useNavigate();
 	const [status, setStatus] = useState('');
 	const [search, setSearch] = useState('');
+	const [creating, setCreating] = useState(false);
 	const storeId = active?.id ?? '';
 	const filterKey = ordersFilterKey(status, search);
 
@@ -37,7 +40,10 @@ export function Orders() {
 	const total = data?.total ?? 0;
 
 	return (
-		<Screen title={t('orders.title')}>
+		<Screen
+			title={t('orders.title')}
+			right={<button className="hk-iconbtn" aria-label={t('orders.newOrder')} onClick={() => setCreating(true)}><Icon name="plus" size={24} /></button>}
+		>
 			<Search value={search} onChange={setSearch} placeholder={t('orders.search')} />
 			<div style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap' }}>
 				{FILTERS.map(([f, labelKey]) => (
@@ -66,6 +72,12 @@ export function Orders() {
 					))}
 					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('orders.countOf', { shown: items.length, total })}</div>
 				</div>
+			)}
+			{creating && (
+				<NewOrderModal
+					onClose={() => setCreating(false)}
+					onCreated={(orderId) => { setCreating(false); nav(`/orders/${orderId}`); }}
+				/>
 			)}
 		</Screen>
 	);

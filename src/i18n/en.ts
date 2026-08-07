@@ -289,4 +289,10 @@ export const en: Messages = {
 	'order.decrease': 'Decrease quantity',
 	'order.increase': 'Increase quantity',
 	'order.addProduct': 'Add product',
+	'orders.newOrder': 'New order',
+	'orders.existingCustomer': 'Existing customer',
+	'orders.guestCustomer': 'Guest',
+	'orders.createOrder': 'Create order',
+	'order.customerName': 'Customer name',
+	'order.customerEmail': 'Customer email',
 };
