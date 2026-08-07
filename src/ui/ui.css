@@ -33,6 +33,10 @@
 .hk-btn--block { display: flex; width: 100%; }
 .hk-btn--sm { min-height: 32px; padding: 0 var(--hk-s3); font-size: .82rem; }
 .hk-card-head { display: flex; align-items: center; gap: var(--hk-s2); margin-bottom: var(--hk-s3); }
+.hk-checkbox-list { display: flex; flex-direction: column; gap: var(--hk-s2); }
+.hk-checkbox-row { display: flex; align-items: center; gap: var(--hk-s2); font-size: .9rem; }
+.hk-checkbox-row input { width: 18px; height: 18px; }
+.hk-checkbox-row input:disabled + span { color: var(--hk-muted); }
 
 .hk-input { border: 1px solid var(--hk-line); border-radius: var(--hk-r2); padding: 0 var(--hk-s3); min-height: var(--hk-tap); font-size: .95rem; background: var(--hk-surface); color: var(--hk-ink); width: 100%; }
 .hk-input::placeholder { color: var(--hk-faint); }

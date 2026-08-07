@@ -5,7 +5,7 @@ import type {
 	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, Coupon, OrderStatusDef, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
-	CustomerSummary, CustomerDetail,
+	CustomerSummary, CustomerDetail, CustomerAddressForm,
 } from './models';
 
 export class ApiError extends Error {
@@ -168,6 +168,33 @@ export class ApiClient {
 	// A single customer's profile with their addresses and orders (read scope).
 	async getCustomer(id: number): Promise<CustomerDetail> {
 		return (await this.request<CustomerDetail>('GET', `customers/${id}`)).data;
+	}
+
+	// Edit a customer's profile (write scope). Any omitted field is left unchanged; username,
+	// password and groups apply to registered customers only. Returns the refreshed detail.
+	async updateCustomer(id: number, patch: { name?: string; email?: string; username?: string; password?: string; groups?: number[]; custom_fields?: Record<string, string> }): Promise<CustomerDetail> {
+		return (await this.request<CustomerDetail>('PUT', `customers/${id}`, { body: patch })).data;
+	}
+
+	// Give a guest a real account, promoting them to a registered customer (write scope).
+	async createCustomerAccount(id: number, account: { username: string; password: string; groups?: number[] }): Promise<CustomerDetail> {
+		return (await this.request<CustomerDetail>('POST', `customers/${id}/account`, { body: account })).data;
+	}
+
+	// Load a customer address-book entry's edit form (aid = 0 for a new address; read scope).
+	async getCustomerAddress(id: number, addressId: number): Promise<CustomerAddressForm> {
+		return (await this.request<CustomerAddressForm>('GET', `customers/${id}/addresses/${addressId}`)).data;
+	}
+
+	// Create or update a customer address (write scope). Returns the refreshed customer detail.
+	async saveCustomerAddress(id: number, addressId: number, body: { fields: Record<string, string>; types?: string[]; default?: boolean }): Promise<CustomerDetail> {
+		const path = addressId > 0 ? `customers/${id}/addresses/${addressId}` : `customers/${id}/addresses`;
+		return (await this.request<CustomerDetail>(addressId > 0 ? 'PUT' : 'POST', path, { body })).data;
+	}
+
+	// Unpublish a customer address (write scope). Returns the refreshed customer detail.
+	async deleteCustomerAddress(id: number, addressId: number): Promise<CustomerDetail> {
+		return (await this.request<CustomerDetail>('DELETE', `customers/${id}/addresses/${addressId}`)).data;
 	}
 
 	async getOrders(filters: OrderFilters = {}): Promise<Paginated<OrderSummary>> {

@@ -467,7 +467,12 @@ export interface CustomerOrder {
 	currency_id: number;
 }
 
-// Full customer profile with their addresses and orders.
+// A user group the operator may assign (an admin group is only assignable by a super admin).
+export interface AssignableGroup extends UserGroup {
+	assignable: boolean;
+}
+
+// Full customer profile with their addresses, orders, groups and custom fields.
 export interface CustomerDetail {
 	id: number;
 	cms_id: number; // 0 for guests (no Joomla account)
@@ -476,10 +481,26 @@ export interface CustomerDetail {
 	username: string;
 	type: string; // registered | guest
 	blocked: boolean;
+	can_edit_account: boolean; // false when the operator lacks the ACL to edit this account
 	groups: UserGroup[];
+	available_groups: AssignableGroup[];
 	created: number;
 	addresses: CustomerAddress[];
 	orders: CustomerOrder[];
+	fields: ProductField[]; // custom user field definitions
+	custom_fields: Record<string, string | null>;
+	custom_field_files: Record<string, FieldFile[]>;
+}
+
+// A customer address-book entry's edit form (shape shared with the reusable address editor).
+export interface CustomerAddressForm {
+	address_id: number;
+	types: string[];
+	default: boolean;
+	fields: ProductField[];
+	values: Record<string, string>;
+	country_name: string;
+	state_name: string;
 }
 
 // Whitelisted shop config flags (from GET /settings) the app uses to gate UI.
