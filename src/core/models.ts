@@ -428,6 +428,50 @@ export interface UserItem {
 	email: string;
 }
 
+// A customer row in the customers list.
+export interface CustomerSummary {
+	id: number;
+	name: string;
+	email: string;
+	type: string; // registered | guest
+	created: number;
+	order_count: number;
+}
+
+// A single customer address, as shown on the customer detail screen.
+export interface CustomerAddress {
+	id: number;
+	name: string;
+	company: string;
+	street: string;
+	city: string;
+	post_code: string;
+	telephone: string;
+	default: boolean;
+}
+
+// A customer's order, as shown on the customer detail screen.
+export interface CustomerOrder {
+	id: number;
+	number: string;
+	status: string;
+	created: number;
+	total: number;
+	currency_id: number;
+}
+
+// Full customer profile with their addresses and orders.
+export interface CustomerDetail {
+	id: number;
+	name: string;
+	email: string;
+	username: string;
+	type: string;
+	created: number;
+	addresses: CustomerAddress[];
+	orders: CustomerOrder[];
+}
+
 // Whitelisted shop config flags (from GET /settings) the app uses to gate UI.
 export interface Settings {
 	product_contact: boolean;

@@ -5,6 +5,7 @@ import type {
 	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, Coupon, OrderStatusDef, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
+	CustomerSummary, CustomerDetail,
 } from './models';
 
 export class ApiError extends Error {
@@ -150,6 +151,23 @@ export class ApiClient {
 	async getUsers(params: { search?: string; ids?: number[] } = {}): Promise<UserItem[]> {
 		const query: Query = { search: params.search, ids: params.ids?.join(',') };
 		return (await this.request<UserItem[]>('GET', 'users', { query })).data;
+	}
+
+	// The shop's customers (read scope), searchable and paginated, each with an order count.
+	async getCustomers(params: { start?: number; limit?: number; search?: string } = {}): Promise<Paginated<CustomerSummary>> {
+		const query: Query = { start: params.start, limit: params.limit, search: params.search };
+		const { data, meta } = await this.request<CustomerSummary[]>('GET', 'customers', { query });
+		return {
+			items: data || [],
+			total: Number(meta?.total ?? 0),
+			start: Number(meta?.start ?? 0),
+			limit: Number(meta?.limit ?? 0),
+		};
+	}
+
+	// A single customer's profile with their addresses and orders (read scope).
+	async getCustomer(id: number): Promise<CustomerDetail> {
+		return (await this.request<CustomerDetail>('GET', `customers/${id}`)).data;
 	}
 
 	async getOrders(filters: OrderFilters = {}): Promise<Paginated<OrderSummary>> {

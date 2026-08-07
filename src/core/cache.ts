@@ -4,7 +4,7 @@
 // shapes on a schema bump until a full migration runner lands (Phase 3 queue/ledger).
 
 import type { KeyValueStore } from './storage';
-import type { OrderSummary, OrderDetail, DashboardStats, Paginated, ProductSummary, ProductDetail, ProductMeta, CategoryListItem, Settings, OrderStatusDef } from './models';
+import type { OrderSummary, OrderDetail, DashboardStats, Paginated, ProductSummary, ProductDetail, ProductMeta, CategoryListItem, Settings, OrderStatusDef, CustomerSummary, CustomerDetail } from './models';
 
 export const CACHE_VERSION = 1;
 
@@ -106,6 +106,20 @@ export class CacheRepository {
 	}
 	putProduct(storeId: string, productId: number, detail: ProductDetail): Promise<Cached<ProductDetail>> {
 		return this.write(this.key(storeId, 'product', String(productId)), detail);
+	}
+
+	getCustomers(storeId: string, filterKey: string): Promise<Cached<Paginated<CustomerSummary>> | null> {
+		return this.read(this.key(storeId, 'customers', filterKey));
+	}
+	putCustomers(storeId: string, filterKey: string, page: Paginated<CustomerSummary>): Promise<Cached<Paginated<CustomerSummary>>> {
+		return this.write(this.key(storeId, 'customers', filterKey), page);
+	}
+
+	getCustomer(storeId: string, customerId: number): Promise<Cached<CustomerDetail> | null> {
+		return this.read(this.key(storeId, 'customer', String(customerId)));
+	}
+	putCustomer(storeId: string, customerId: number, detail: CustomerDetail): Promise<Cached<CustomerDetail>> {
+		return this.write(this.key(storeId, 'customer', String(customerId)), detail);
 	}
 
 	getProductMeta(storeId: string): Promise<Cached<ProductMeta> | null> {

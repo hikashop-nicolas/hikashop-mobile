@@ -22,6 +22,8 @@ import { ProductVariantsEdit } from './screens/ProductVariantsEdit';
 import { VariantEdit } from './screens/VariantEdit';
 import { Categories } from './screens/Categories';
 import { CategoryEdit } from './screens/CategoryEdit';
+import { Customers } from './screens/Customers';
+import { CustomerDetail } from './screens/CustomerDetail';
 import { Stores } from './screens/Stores';
 
 const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
@@ -29,6 +31,7 @@ const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
 	{ key: 'orders', icon: 'orders', labelKey: 'tabs.orders' },
 	{ key: 'products', icon: 'products', labelKey: 'tabs.products' },
 	{ key: 'categories', icon: 'categories', labelKey: 'tabs.categories' },
+	{ key: 'customers', icon: 'customers', labelKey: 'tabs.customers' },
 	{ key: 'stores', icon: 'store', labelKey: 'tabs.stores' },
 ];
 
@@ -144,6 +147,8 @@ function Shell() {
 								<Route path="/categories" element={<Categories />} />
 							<Route path="/categories/new" element={<CategoryEdit />} />
 							<Route path="/categories/:id/edit" element={<CategoryEdit />} />
+								<Route path="/customers" element={<Customers />} />
+								<Route path="/customers/:id" element={<CustomerDetail />} />
 								<Route path="/stores" element={<Stores />} />
 								<Route path="/connect" element={<Connect />} />
 								<Route path="*" element={<Navigate to="/dashboard" replace />} />
