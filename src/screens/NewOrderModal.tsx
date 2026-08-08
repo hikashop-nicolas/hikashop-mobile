@@ -69,7 +69,7 @@ export function NewOrderModal({ onClose, onCreated }: { onClose: () => void; onC
 					) : (
 						<div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
 							{results.map((u) => (
-								<button key={u.id} type="button" className="hk-row hk-row-btn" disabled={busy} onClick={() => void create({ user_id: u.id })}>
+								<button key={u.id} type="button" className="hk-row hk-row--btn" disabled={busy} onClick={() => void create({ user_id: u.id })}>
 									<div className="hk-row-grow"><span className="hk-row-title">{u.name || u.email}</span>{u.name && <span className="hk-row-sub">{u.email}</span>}</div>
 								</button>
 							))}

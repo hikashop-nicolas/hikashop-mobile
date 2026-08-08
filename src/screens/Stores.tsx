@@ -3,10 +3,13 @@ import { useStores } from '../app/store-context';
 import { useI18n, LOCALES } from '../i18n';
 import { Screen, Button, Icon, DeleteButton } from '../ui';
 import { hostOf } from '../app/utils';
+import { useTheme } from '../app/theme';
+import type { ThemeChoice } from '../app/theme';
 
 export function Stores() {
 	const { stores, active, setActive, remove, notifyEnabled, notifySupported } = useStores();
 	const { t, locale, setLocale } = useI18n();
+	const { theme, setTheme } = useTheme();
 	const nav = useNavigate();
 
 	return (
@@ -34,7 +37,7 @@ export function Stores() {
 
 			{notifySupported && (
 				<div className="hk-card hk-card--pad" style={{ marginTop: 'var(--hk-s4)' }}>
-					<button type="button" className="hk-row hk-row-btn" style={{ borderBottom: 'none', padding: 0, width: '100%' }} onClick={() => nav('/notifications')}>
+					<button type="button" className="hk-row hk-row--btn" style={{ borderBottom: 'none', padding: 0, width: '100%' }} onClick={() => nav('/notifications')}>
 						<span className="hk-lead-ic"><Icon name="bell" size={20} /></span>
 						<div className="hk-row-grow">
 							<span className="hk-row-title">{t('notifications.title')}</span>
@@ -55,6 +58,18 @@ export function Stores() {
 						{Object.entries(LOCALES).map(([code, def]) => (
 							<option key={code} value={code}>{def.name}</option>
 						))}
+					</select>
+				</div>
+
+				<div className="hk-row" style={{ borderBottom: 'none', padding: 'var(--hk-s3) 0 0' }}>
+					<span className="hk-lead-ic"><Icon name="dashboard" size={20} /></span>
+					<div className="hk-row-grow">
+						<span className="hk-row-title">{t('stores.appearance')}</span>
+					</div>
+					<select className="hk-select" value={theme} onChange={(e) => setTheme(e.target.value as ThemeChoice)}>
+						<option value="auto">{t('stores.themeAuto')}</option>
+						<option value="light">{t('stores.themeLight')}</option>
+						<option value="dark">{t('stores.themeDark')}</option>
 					</select>
 				</div>
 			</div>

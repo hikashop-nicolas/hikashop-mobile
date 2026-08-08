@@ -194,6 +194,9 @@
 .hk-cat-imgadd { width: 96px; height: 96px; aspect-ratio: unset; }
 
 .hk-row-btn { border: none; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 0; display: flex; flex-direction: column; }
+/* The same reset for a button that *is* a row: hk-row already lays it out horizontally,
+   so this must not impose a direction of its own. */
+.hk-row--btn { border: none; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; width: 100%; }
 .hk-iconbtn.hk-danger { color: var(--hk-crit); }
 .hk-iconbtn.hk-danger:disabled { opacity: .4; }
 

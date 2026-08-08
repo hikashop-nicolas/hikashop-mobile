@@ -4,6 +4,7 @@ import { StoreProvider, useStores } from './app/store-context';
 import { VersionsProvider } from './app/versions';
 import { HikaDictProvider } from './app/hika-dict';
 import { StatusesProvider } from './app/statuses';
+import { ThemeProvider } from './app/theme';
 import { composeProviders } from './app/compose-providers';
 import { useOrderPoll } from './app/use-order-poll';
 import { I18nProvider, useT } from './i18n';
@@ -176,6 +177,8 @@ function Shell() {
 
 // Outermost first: each provider may use the context of those listed before it.
 const AppProviders = composeProviders([
+	// Outermost: it only touches the document element, and everything below renders in its theme.
+	ThemeProvider,
 	I18nProvider,
 	StoreProvider,
 	VersionsProvider,

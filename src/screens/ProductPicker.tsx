@@ -52,7 +52,7 @@ export function ProductPicker({ excludeIds = [], onClose, onPick }: {
 			) : (
 				<div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
 					{shown.map((p) => (
-						<button key={p.id} type="button" className="hk-row hk-row-btn" onClick={() => onPick(p)}>
+						<button key={p.id} type="button" className="hk-row hk-row--btn" onClick={() => onPick(p)}>
 							{p.image ? <img className="hk-avatar-img" src={p.image} alt="" loading="lazy" /> : <div className="hk-avatar">{(p.name || '?').charAt(0).toUpperCase()}</div>}
 							<div className="hk-row-grow">
 								<span className="hk-row-title">{p.name}</span>

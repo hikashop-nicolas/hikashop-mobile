@@ -419,4 +419,8 @@ export const fr: Messages = {
 	'scan.openProduct': 'Ouvrir le produit',
 	'scan.scanAnother': 'Scanner un autre',
 	'scan.noMatch': 'Aucun produit ne correspond à {code}.',
+	'stores.appearance': 'Apparence',
+	'stores.themeAuto': 'Selon l\'appareil',
+	'stores.themeLight': 'Clair',
+	'stores.themeDark': 'Sombre',
 };

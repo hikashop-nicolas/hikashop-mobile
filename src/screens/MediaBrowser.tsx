@@ -83,7 +83,7 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 					) : isFiles ? (
 						<div>
 							{items.map((f) => (
-								<button key={f.path} type="button" className={`hk-row hk-row-btn hk-mb-file${selected?.path === f.path ? ' hk-on' : ''}`} onClick={() => setSelected({ path: f.path, name: f.name })}>
+								<button key={f.path} type="button" className={`hk-row hk-row--btn hk-mb-file${selected?.path === f.path ? ' hk-on' : ''}`} onClick={() => setSelected({ path: f.path, name: f.name })}>
 									<span className="hk-row-title">{f.name}</span>
 								</button>
 							))}

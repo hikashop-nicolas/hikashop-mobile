@@ -9,9 +9,11 @@
 	--hk-muted: #626b73;
 	--hk-faint: #aab0b6;
 	--hk-line: #e1e6ea;
-	--hk-accent: #0c6d77;
+	/* The brand blue, deepened: the mark's #297EBA only reaches 4.39:1 against white,
+	   short of the 4.5 minimum for the text sitting on our buttons. */
+	--hk-accent: #1F6494;
 	--hk-accent-ink: #ffffff;
-	--hk-accent-soft: #dcedef;
+	--hk-accent-soft: #dbe9f5;
 	--hk-ok: #2c7c52;
 	--hk-ok-soft: #e0f1e8;
 	--hk-warn: #a56718;
@@ -47,9 +49,10 @@
 		--hk-muted: #98a1a8;
 		--hk-faint: #5b636a;
 		--hk-line: #293037;
-		--hk-accent: #43b6c0;
-		--hk-accent-ink: #071e21;
-		--hk-accent-soft: #102f33;
+		/* Lightened for a dark surface, as the teal was. */
+		--hk-accent: #6FB6E8;
+		--hk-accent-ink: #08202e;
+		--hk-accent-soft: #12293a;
 		--hk-ok: #5ec085;
 		--hk-ok-soft: #16281f;
 		--hk-warn: #d59f52;
@@ -68,9 +71,11 @@
 	--hk-muted: #626b73;
 	--hk-faint: #aab0b6;
 	--hk-line: #e1e6ea;
-	--hk-accent: #0c6d77;
+	/* The brand blue, deepened: the mark's #297EBA only reaches 4.39:1 against white,
+	   short of the 4.5 minimum for the text sitting on our buttons. */
+	--hk-accent: #1F6494;
 	--hk-accent-ink: #ffffff;
-	--hk-accent-soft: #dcedef;
+	--hk-accent-soft: #dbe9f5;
 	--hk-ok: #2c7c52;
 	--hk-ok-soft: #e0f1e8;
 	--hk-warn: #a56718;
@@ -88,9 +93,9 @@
 	--hk-muted: #98a1a8;
 	--hk-faint: #5b636a;
 	--hk-line: #293037;
-	--hk-accent: #43b6c0;
-	--hk-accent-ink: #071e21;
-	--hk-accent-soft: #102f33;
+	--hk-accent: #6FB6E8;
+	--hk-accent-ink: #08202e;
+	--hk-accent-soft: #12293a;
 	--hk-ok: #5ec085;
 	--hk-ok-soft: #16281f;
 	--hk-warn: #d59f52;

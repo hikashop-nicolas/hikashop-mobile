@@ -52,7 +52,7 @@ export function SearchPicker({ title, placeholder, minChars = 0, search, exclude
 			) : (
 				<div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
 					{shown.map((it) => (
-						<button key={it.id} type="button" className="hk-row hk-row-btn" onClick={() => onPick(it)}>
+						<button key={it.id} type="button" className="hk-row hk-row--btn" onClick={() => onPick(it)}>
 							<div className="hk-row-grow"><span className="hk-row-title">{it.label}</span>{it.sub && <span className="hk-row-sub">{it.sub}</span>}</div>
 						</button>
 					))}
