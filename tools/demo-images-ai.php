@@ -107,10 +107,11 @@ final class DemoImagesAi
 			return file_get_contents($cacheFile);
 		}
 
-		// The two dialects differ only in how they take the dimensions: OpenAI and LocalAI want
-		// "size", Together and fal want width and height, and each rejects the other's field. So
-		// try one, fall back to the other, and remember which answered.
-		$order = $this->dialect !== null ? [$this->dialect] : ['size', 'wh'];
+		// Endpoints disagree on two fields. Dimensions: OpenAI and LocalAI want "size", Together and
+		// fal want width and height. And gpt-image rejects "response_format" outright, because it
+		// only ever answers with base64. Each rejects the other's shape, so try them in turn and
+		// remember which one answered.
+		$order = $this->dialect !== null ? [$this->dialect] : ['size', 'wh', 'size-nofmt'];
 		$raw = false;
 		$code = 0;
 		foreach ($order as $dialect) {
@@ -154,8 +155,9 @@ final class DemoImagesAi
 	{
 		$body = ['prompt' => $prompt, 'n' => 1];
 		if ($this->model !== '') $body['model'] = $this->model;
-		// Ask for the bytes directly. Some endpoints answer with a URL anyway, handled above.
-		$body['response_format'] = 'b64_json';
+		// Ask for the bytes directly where that is allowed. Some endpoints answer with a URL
+		// anyway, which is handled above.
+		if ($dialect !== 'size-nofmt') $body['response_format'] = 'b64_json';
 		if ($dialect === 'wh') {
 			$body['width'] = $this->size;
 			$body['height'] = $this->size;
