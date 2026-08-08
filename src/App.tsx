@@ -34,15 +34,27 @@ import { UnsavedProvider } from './app/unsaved';
 import { DataChangedProvider } from './app/data-changed';
 import { UnsavedPrompt } from './ui/unsaved-prompt';
 
-const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
-	{ key: 'dashboard', icon: 'dashboard', labelKey: 'tabs.dashboard' },
-	{ key: 'orders', icon: 'orders', labelKey: 'tabs.orders' },
-	{ key: 'products', icon: 'products', labelKey: 'tabs.products' },
-	{ key: 'categories', icon: 'categories', labelKey: 'tabs.categories' },
-	{ key: 'customers', icon: 'customers', labelKey: 'tabs.customers' },
-	{ key: 'discounts', icon: 'discount', labelKey: 'tabs.discounts' },
+// `acl` is the kind of record in the vocabulary of HikaShop's access levels; a tab whose kind the
+// operator may not view is not offered. Stores has none: it is where you go to switch or leave a
+// shop, which no shop setting should be able to take away.
+const TAB_DEFS: { key: string; icon: IconName; labelKey: string; acl?: string }[] = [
+	{ key: 'dashboard', icon: 'dashboard', labelKey: 'tabs.dashboard', acl: 'dashboard' },
+	{ key: 'orders', icon: 'orders', labelKey: 'tabs.orders', acl: 'order' },
+	{ key: 'products', icon: 'products', labelKey: 'tabs.products', acl: 'product' },
+	{ key: 'categories', icon: 'categories', labelKey: 'tabs.categories', acl: 'category' },
+	{ key: 'customers', icon: 'customers', labelKey: 'tabs.customers', acl: 'user' },
+	{ key: 'discounts', icon: 'discount', labelKey: 'tabs.discounts', acl: 'discount' },
 	{ key: 'stores', icon: 'store', labelKey: 'tabs.stores' },
 ];
+
+// The shop enforces this; the app only avoids offering what it would be refused. An older
+// connector reports nothing, which is read as allowed.
+function useVisibleTabs(): typeof TAB_DEFS {
+	const { active } = useStores();
+	const perms = active?.permissions;
+	if (!perms) return TAB_DEFS;
+	return TAB_DEFS.filter((d) => !d.acl || perms[d.acl]?.view !== false);
+}
 
 function activeKey(pathname: string): string {
 	if (pathname.startsWith('/orders')) return 'orders';
@@ -59,7 +71,7 @@ function BottomTabs() {
 	const nav = useNavigate();
 	const loc = useLocation();
 	const t = useT();
-	const tabs: TabDef[] = TAB_DEFS.map((d) => ({ key: d.key, icon: d.icon, label: t(d.labelKey) }));
+	const tabs: TabDef[] = useVisibleTabs().map((d) => ({ key: d.key, icon: d.icon, label: t(d.labelKey) }));
 	return <TabBar tabs={tabs} active={activeKey(loc.pathname)} onSelect={(k) => nav(`/${k}`)} />;
 }
 
@@ -69,6 +81,7 @@ function SideNav() {
 	const loc = useLocation();
 	const t = useT();
 	const { active: store, stores } = useStores();
+	const visible = useVisibleTabs();
 	const tab = activeKey(loc.pathname);
 	return (
 		<nav className="hk-sidenav">
@@ -83,7 +96,7 @@ function SideNav() {
 				</span>
 				{stores.length > 1 && <Icon name="chevron" size={16} className="hk-store-switch-chevron" />}
 			</button>
-			{TAB_DEFS.map((d) => (
+			{visible.map((d) => (
 				<button key={d.key} className={`hk-navitem${tab === d.key ? ' hk-on' : ''}`} onClick={() => nav(`/${d.key}`)}>
 					<Icon name={d.icon} size={20} /><span>{t(d.labelKey)}</span>
 				</button>

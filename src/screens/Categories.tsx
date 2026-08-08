@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useMatch } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { usePaged } from '../app/use-paged';
 import { useSticky } from '../app/use-sticky';
@@ -72,6 +72,11 @@ export function Categories() {
 		debounceMs: searching ? 300 : 0,
 	});
 
+	// Which row's detail is open, so it can be marked in the list like every other listing does.
+	// Read from the route rather than from a click: opening one from a link or a reload counts.
+	const editing = useMatch('/categories/:id/edit');
+	const editingId = Number(editing?.params.id ?? 0);
+
 	// Opening a branch loads its children; closing keeps them, so reopening is instant.
 	const [open, setOpen] = useState<Set<number>>(new Set());
 
@@ -121,7 +126,9 @@ export function Categories() {
 		const branch = branches[c.id];
 		return (
 			<div key={c.id}>
-				<div className="hk-row" style={{ paddingLeft: `calc(${depth} * 1.25rem)` }}>
+				{/* The depth is a margin rather than padding, so the highlight on the row being
+				    edited starts at its content instead of out in the indent. */}
+				<div className={`hk-row${editingId === c.id ? ' hk-row--on' : ''}`} style={{ marginLeft: `calc(${depth} * 1.25rem)` }}>
 					{canOpen ? (
 						<button
 							type="button"

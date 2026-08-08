@@ -133,11 +133,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 				logo: site.logo ?? '',
 				role: site.operator?.role ?? store.role,
 				capabilities: site.capabilities,
+				permissions: site.permissions,
 			};
 			const same = patch.name === store.name
 				&& patch.logo === (store.logo ?? '')
 				&& patch.role === store.role
-				&& JSON.stringify(patch.capabilities) === JSON.stringify(store.capabilities);
+				&& JSON.stringify(patch.capabilities) === JSON.stringify(store.capabilities)
+				&& JSON.stringify(patch.permissions) === JSON.stringify(store.permissions);
 			if (same) return;
 			await registry.update(store.id, patch);
 			await refresh();

@@ -25,6 +25,11 @@ export interface SiteInfo {
 	operator: { id: number; name: string; role: string };
 	scopes: Scope[];
 	capabilities: { pos: boolean; push: boolean; multivendor: boolean };
+	// What HikaShop's access levels allow this operator, by kind of record ('product', 'order',
+	// 'category', 'discount', 'user', 'dashboard', ...). Absent on an older connector, which is
+	// read as "allowed": the shop is the one that enforces this, the app only avoids offering
+	// what it would be refused.
+	permissions?: Record<string, { view: boolean; manage: boolean; delete: boolean }>;
 }
 
 export interface OrderSummary {
@@ -691,5 +696,6 @@ export interface Store {
 	// The shop's logo, re-read from the site once per app start (see StoreProvider).
 	logo?: string;
 	capabilities?: SiteInfo['capabilities'];
+	permissions?: SiteInfo['permissions'];
 	createdAt: number;
 }

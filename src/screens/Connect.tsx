@@ -30,7 +30,7 @@ export function Connect() {
 			await registry.add(
 				// The shop's own name where it has one; its address is the fallback and stays on
 				// show in the store list either way.
-				{ name: site.site_name?.trim() || hostOf(base), baseUrl: base, role: site.operator?.role ?? 'staff', logo: site.logo ?? '', capabilities: site.capabilities },
+				{ name: site.site_name?.trim() || hostOf(base), baseUrl: base, role: site.operator?.role ?? 'staff', logo: site.logo ?? '', capabilities: site.capabilities, permissions: site.permissions },
 				res.token,
 			);
 			await refresh();

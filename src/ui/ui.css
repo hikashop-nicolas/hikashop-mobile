@@ -334,7 +334,9 @@
 /* The row whose detail is open. Only meaningful beside a detail pane, so it is scoped to the
    split breakpoint: on a phone the list is never on screen at the same time as its detail. */
 @media (min-width: 1100px) {
-	.hk-split-list .hk-row--on { background: var(--hk-accent-soft); border-radius: var(--hk-r2); }
+	/* The highlight needs room around the text to read as a block rather than as a stripe behind
+	   it, and the pull-back keeps the row's content aligned with every other row. */
+	.hk-split-list .hk-row--on { background: var(--hk-accent-soft); border-radius: var(--hk-r2); padding-inline: var(--hk-s3); margin-inline: calc(var(--hk-s3) * -1); }
 	.hk-split-list .hk-row--on .hk-row-title { color: var(--hk-accent); }
 }
 
