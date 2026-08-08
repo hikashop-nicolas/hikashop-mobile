@@ -1,6 +1,12 @@
 <?php
 /**
- * Product photographs from a local image model, through LocalAI's OpenAI-compatible endpoint.
+ * Product photographs from an image model, through any OpenAI-compatible images endpoint.
+ *
+ * Written against LocalAI first, but the same three fields are what Together, fal and OpenAI
+ * itself expect, so the endpoint is a URL and a key rather than a product. On this machine the
+ * local route is not viable -- an Intel Mac gets no GPU acceleration, and a CPU image takes twelve
+ * minutes -- so a hosted endpoint is the realistic one. The cache means it makes no difference
+ * afterwards: images generated anywhere land in the same directory.
  *
  * This is the optional half of the seeder's imagery. The drawn tiles in demo-images.php cost
  * nothing and always work; these look like actual product shots, which is what you want when the
@@ -27,10 +33,14 @@ final class DemoImagesAi
 	private int $timeout;
 	private int $size;
 	private string $style;
+	private string $apiKey;
+
+	/** Which way this endpoint wants the dimensions: 'size', or 'wh'. Learned on the first call. */
+	private ?string $dialect = null;
 
 	public array $stats = ['generated' => 0, 'cached' => 0, 'failed' => 0];
 
-	public function __construct(string $baseUrl, string $model = '', string $cacheDir = '', int $timeout = 180, int $size = 768, string $style = '')
+	public function __construct(string $baseUrl, string $model = '', string $cacheDir = '', int $timeout = 180, int $size = 768, string $style = '', string $apiKey = '')
 	{
 		$this->style = $style !== '' ? $style : 'plain light background, soft studio lighting, centred, sharp focus, e-commerce catalogue photo';
 		$this->endpoint = rtrim($baseUrl, '/').'/v1/images/generations';
@@ -38,6 +48,7 @@ final class DemoImagesAi
 		$this->cacheDir = $cacheDir !== '' ? rtrim($cacheDir, '/') : __DIR__.'/cache/images';
 		$this->timeout = $timeout;
 		$this->size = $size;
+		$this->apiKey = $apiKey;
 		if (!is_dir($this->cacheDir)) @mkdir($this->cacheDir, 0775, true);
 	}
 
@@ -46,10 +57,23 @@ final class DemoImagesAi
 	{
 		$base = preg_replace('#/v1/images/generations$#', '', $this->endpoint);
 		$ch = curl_init($base.'/v1/models');
-		curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 5, CURLOPT_FAILONERROR => false]);
+		curl_setopt_array($ch, [
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_TIMEOUT => 10,
+			CURLOPT_FAILONERROR => false,
+			CURLOPT_HTTPHEADER => $this->headers(),
+		]);
 		curl_exec($ch);
 		$code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		return $code >= 200 && $code < 500 && $code !== 404;
+	}
+
+	/** The key never reaches a command line or this file; it comes from the environment. */
+	private function headers(): array
+	{
+		$h = ['Content-Type: application/json'];
+		if ($this->apiKey !== '') $h[] = 'Authorization: Bearer '.$this->apiKey;
+		return $h;
 	}
 
 	/**
@@ -83,21 +107,19 @@ final class DemoImagesAi
 			return file_get_contents($cacheFile);
 		}
 
-		$body = ['prompt' => $prompt, 'size' => $this->size.'x'.$this->size, 'n' => 1];
-		if ($this->model !== '') $body['model'] = $this->model;
-		// Ask for the bytes directly. LocalAI may answer with a URL instead, which is handled below.
-		$body['response_format'] = 'b64_json';
-
-		$ch = curl_init($this->endpoint);
-		curl_setopt_array($ch, [
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_POST => true,
-			CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-			CURLOPT_POSTFIELDS => json_encode($body),
-			CURLOPT_TIMEOUT => $this->timeout,
-		]);
-		$raw = curl_exec($ch);
-		$code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		// The two dialects differ only in how they take the dimensions: OpenAI and LocalAI want
+		// "size", Together and fal want width and height, and each rejects the other's field. So
+		// try one, fall back to the other, and remember which answered.
+		$order = $this->dialect !== null ? [$this->dialect] : ['size', 'wh'];
+		$raw = false;
+		$code = 0;
+		foreach ($order as $dialect) {
+			[$raw, $code] = $this->post($this->body($prompt, $dialect));
+			if ($raw !== false && $code >= 200 && $code < 300) {
+				$this->dialect = $dialect;
+				break;
+			}
+		}
 
 		if ($raw === false || $code < 200 || $code >= 300) {
 			$this->stats['failed']++;
@@ -126,6 +148,36 @@ final class DemoImagesAi
 		@file_put_contents($cacheFile, $bytes);
 		$this->stats['generated']++;
 		return $bytes;
+	}
+
+	private function body(string $prompt, string $dialect): array
+	{
+		$body = ['prompt' => $prompt, 'n' => 1];
+		if ($this->model !== '') $body['model'] = $this->model;
+		// Ask for the bytes directly. Some endpoints answer with a URL anyway, handled above.
+		$body['response_format'] = 'b64_json';
+		if ($dialect === 'wh') {
+			$body['width'] = $this->size;
+			$body['height'] = $this->size;
+		} else {
+			$body['size'] = $this->size.'x'.$this->size;
+		}
+		return $body;
+	}
+
+	/** @return array{0: string|false, 1: int} */
+	private function post(array $body): array
+	{
+		$ch = curl_init($this->endpoint);
+		curl_setopt_array($ch, [
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_POST => true,
+			CURLOPT_HTTPHEADER => $this->headers(),
+			CURLOPT_POSTFIELDS => json_encode($body),
+			CURLOPT_TIMEOUT => $this->timeout,
+		]);
+		$raw = curl_exec($ch);
+		return [$raw, (int)curl_getinfo($ch, CURLINFO_HTTP_CODE)];
 	}
 
 	/** LocalAI answers with a path under its own host, so make it absolute against the endpoint. */

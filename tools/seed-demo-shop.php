@@ -155,7 +155,10 @@ $ai = null;
 if ($wantImages && isset($opts['ai-images'])) {
 	require __DIR__.'/demo-images-ai.php';
 	$aiUrl = is_string($opts['ai-images']) && $opts['ai-images'] !== '' ? $opts['ai-images'] : 'http://localhost:8080';
-	$ai = new DemoImagesAi($aiUrl, is_string($opts['ai-model'] ?? null) ? $opts['ai-model'] : '', '', 180, 768, $catalogue['imagery']['style'] ?? '');
+	// A hosted endpoint needs a key. It is read from the environment rather than taken as a flag,
+	// so it stays out of the shell history and out of anything that logs the command line.
+	$aiKey = (string)(getenv('DEMO_IMAGE_API_KEY') ?: '');
+	$ai = new DemoImagesAi($aiUrl, is_string($opts['ai-model'] ?? null) ? $opts['ai-model'] : '', '', 180, 768, $catalogue['imagery']['style'] ?? '', $aiKey);
 	if (!$ai->reachable()) {
 		fwrite(STDERR, "no image model answering at $aiUrl; drawing the tiles instead\n");
 		$ai = null;

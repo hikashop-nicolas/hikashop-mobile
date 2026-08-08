@@ -79,13 +79,29 @@ added to the repo. It is honestly a placeholder, which is better than a stock ph
 against a cast iron skillet.
 
 For screenshots that go somewhere people will see them, `--ai-images` fetches real product
-photographs from a local image model through LocalAI's OpenAI-compatible endpoint:
+photographs from any OpenAI-compatible images endpoint. A hosted one is the practical choice — see
+below for why the local one is not, on this machine:
+
+```sh
+export DEMO_IMAGE_API_KEY=...                    # never passed as a flag; see "The key" below
+php tools/seed-demo-shop.php --site=... \
+    --ai-images=https://api.together.xyz \
+    --ai-model=black-forest-labs/FLUX.1-schnell
+```
+
+Or against a local LocalAI, which needs no key:
 
 ```sh
 local-ai run flux.1-dev-ggml                     # or any image model in its gallery
 php tools/seed-demo-shop.php --site=... --ai-images=http://localhost:8081
-php tools/seed-demo-shop.php --site=... --ai-images=http://localhost:8081 --ai-model=flux.1-dev-ggml
 ```
+
+The two families of endpoint disagree on one field: OpenAI and LocalAI take `size`, Together and
+fal take `width`/`height`. The client tries one, falls back to the other, and remembers which
+answered, so the URL is the only thing that has to be right.
+
+**The key** is read from `DEMO_IMAGE_API_KEY` rather than taken as an option, so it stays out of
+the shell history and out of anything that logs a command line. Export it in your own shell.
 
 Two things make that practical rather than an overnight job:
 
@@ -111,12 +127,36 @@ Tried against LocalAI's all-in-one CPU image, which ships Stable Diffusion 1.5 q
 - **Colour names are approximate.** "Tan" came back orange. Good enough for a variant to look
   different from its siblings, not good enough to match a swatch.
 - **On a CPU it is 10-13 minutes per image.** One per kind of product is a long evening; one per
-  product and variant is not worth attempting. Generate on a machine with a GPU, or against a
-  hosted endpoint, and copy `tools/cache/images` over: the cache is keyed by prompt, so images
-  made anywhere are picked up.
+  product and variant is not worth attempting.
 
 Note LocalAI defaults to port 8080, which is where the local Joomla stack already listens — run it
 elsewhere and pass the URL.
+
+### Why not locally, on this machine
+
+The Radeon Pro 5500M is unreachable from a container: Docker on macOS has no GPU passthrough, and
+LocalAI publishes a `darwin-arm64` build only. Native Mac tools that do use Metal (Draw Things has
+an HTTP server on port 7860) are written for Apple Silicon, and the consistent advice is that
+Intel Macs get little acceleration. Even a good outcome there is minutes per image, against
+roughly a second on a hosted endpoint, and a build to maintain.
+
+The cache is keyed by prompt, so this is not a lock-in: images generated anywhere drop into
+`tools/cache/images` and are picked up.
+
+### Choosing a hosted endpoint
+
+Costs for the ~1,200 images a full run wants (one per kind of product, per colour variant, per
+category, plus second views):
+
+| Endpoint | Model | Per image | ~1,200 images |
+|---|---|---|---|
+| Together | FLUX.1-schnell | ~$0.003 | ~$4 |
+| fal | FLUX.1-schnell | ~$0.025 | ~$30 |
+| Replicate | FLUX.1-schnell | ~$0.03-0.05 | ~$36-60 |
+
+FLUX.1-schnell is worth preferring over Stable Diffusion beyond the price: it is Apache 2.0, so
+its output carries no use restriction. That matters if this ever becomes HikaShop's sample data
+and the photographs ship to customers — SD 1.5's OpenRAIL-M licence does attach conditions.
 
 ### No faker dependency
 
