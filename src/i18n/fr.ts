@@ -484,4 +484,5 @@ export const fr: Messages = {
 	'dashboard.revenueOverTime': 'Chiffre d\'affaires',
 	'dashboard.peak': 'Maximum',
 	'dashboard.noRevenue': 'Aucun chiffre d\'affaires sur cette période.',
+	'dashboard.deltaNew': 'nouveau',
 };

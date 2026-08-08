@@ -486,4 +486,5 @@ export const en: Messages = {
 	'dashboard.revenueOverTime': 'Revenue',
 	'dashboard.peak': 'Peak',
 	'dashboard.noRevenue': 'No revenue in this period.',
+	'dashboard.deltaNew': 'new',
 };

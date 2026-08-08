@@ -345,3 +345,9 @@
 .hk-bar-value { font-size: .8rem; color: var(--hk-muted); font-variant-numeric: tabular-nums; flex: none; }
 .hk-bar-track { height: 6px; border-radius: 999px; background: var(--hk-surface-2); overflow: hidden; }
 .hk-bar-fill { height: 100%; border-radius: 999px; background: var(--hk-accent); }
+
+/* Movement against the period before. The sign is in the text too: colour alone must not be
+   what tells you which way a figure went. */
+.hk-delta { display: inline-flex; align-items: center; gap: 3px; font-size: .74rem; font-weight: 650; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.hk-delta--up { color: var(--hk-ok); }
+.hk-delta--down { color: var(--hk-crit); }

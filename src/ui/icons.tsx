@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 // A small, consistent line-icon set. All icons are drawn on a 24x24 grid, stroked with
 // currentColor so they inherit text colour, and share one stroke weight and round joins.
 
-export type IconName = 'dashboard' | 'orders' | 'store' | 'search' | 'plus' | 'back' | 'scan' | 'bell' | 'products' | 'chevron' | 'check' | 'close' | 'categories' | 'trash' | 'edit' | 'customers' | 'discount';
+export type IconName = 'dashboard' | 'orders' | 'store' | 'search' | 'plus' | 'back' | 'scan' | 'bell' | 'products' | 'chevron' | 'check' | 'close' | 'categories' | 'trash' | 'edit' | 'customers' | 'discount' | 'trendUp' | 'trendDown';
 
 const PATHS: Record<IconName, ReactNode> = {
 	discount: (
@@ -99,6 +99,9 @@ const PATHS: Record<IconName, ReactNode> = {
 		</>
 	),
 	chevron: <path d="M9 6l6 6-6 6" />,
+	// Diagonal arrows for a trend: up to the right for a rise, down to the right for a fall.
+	trendUp: <><path d="M5 18L18 5" /><path d="M9 5h9v9" /></>,
+	trendDown: <><path d="M5 5l13 13" /><path d="M18 9v9H9" /></>,
 	check: <path d="M5 12.5l4.5 4.5L19 7" />,
 	close: (
 		<>

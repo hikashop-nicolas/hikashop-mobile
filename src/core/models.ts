@@ -153,6 +153,8 @@ export interface DashboardStats {
 	// The shop's currency, so the totals can be shown as money.
 	currency_id?: number;
 	totals: { revenue: number; orders: number; average_order: number; customers: number };
+	// The same figures for the period immediately before, of the same length.
+	previous?: { revenue: number; orders: number; average_order: number; customers: number };
 	revenue_series: { date: string; revenue: number }[];
 	top_products: { name: string; quantity: number }[];
 }

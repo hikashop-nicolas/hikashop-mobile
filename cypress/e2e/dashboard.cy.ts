@@ -27,12 +27,30 @@ describe('Dashboard', () => {
 		});
 	});
 
+	// Stubbed rather than relying on a quiet period in the shop: whether today happens to have
+	// orders is a property of the fixture, and this is about what an empty range looks like.
 	it('says so plainly when a range has nothing in it', () => {
+		cy.intercept({ method: 'GET', url: /stats\/dashboard/ }, {
+			statusCode: 200,
+			body: {
+				data: {
+					range: 'today',
+					currency_id: 1,
+					totals: { revenue: 0, orders: 0, average_order: 0, customers: 0 },
+					previous: { revenue: 0, orders: 0, average_order: 0, customers: 0 },
+					revenue_series: [],
+					top_products: [],
+				},
+				meta: null,
+			},
+		}).as('stats');
 		cy.visitApp('/dashboard');
-		cy.contains('.hk-chip', 'Today').click();
-		// No chart drawn for an empty series, and a sentence instead.
+		cy.wait('@stats');
+
+		// No chart drawn for an empty series, a sentence instead, and nothing claiming movement.
 		cy.get('.hk-chart-svg').should('not.exist');
-		cy.get('.hk-empty').should('have.length.greaterThan', 0);
+		cy.get('.hk-empty').should('have.length', 2);
+		cy.get('.hk-delta').should('not.exist');
 	});
 
 	it('redraws when the range changes', () => {
@@ -41,6 +59,42 @@ describe('Dashboard', () => {
 			cy.contains('.hk-chip', 'Year').click();
 			cy.get('.hk-chart-x span', { timeout: 15000 }).first()
 				.should(($el) => expect($el.text()).to.not.equal(weekStart));
+		});
+	});
+
+	it('shows each figure against the period before it', () => {
+		cy.visitApp('/dashboard');
+		cy.get('.hk-delta').should('have.length.greaterThan', 0);
+
+		// Every indicator carries its direction in the text as well as the colour, so the meaning
+		// does not depend on telling green from red.
+		cy.get('.hk-delta').each(($d) => {
+			const text = $d.text().trim();
+			const cls = $d.attr('class') ?? '';
+			if (cls.includes('hk-delta--up')) {
+				expect(text, 'a rise reads as + or as new').to.match(/^(\+\d+%|new)$/);
+			} else {
+				expect(cls, 'the only other direction').to.contain('hk-delta--down');
+				expect(text, 'a fall reads as -').to.match(/^-\d+%$/);
+			}
+		});
+	});
+
+	it('says a figure is new when there is nothing to compare it with', () => {
+		cy.visitApp('/dashboard');
+		// The shop's data starts a year ago, so the year before it holds nothing.
+		cy.contains('.hk-chip', 'Year').click();
+		cy.get('.hk-delta', { timeout: 15000 }).first().should('contain', 'new');
+	});
+
+	it('groups a year by week so the line reads as a trend', () => {
+		cy.visitApp('/dashboard');
+		cy.contains('.hk-chip', 'Year').click();
+		// 52 weekly points rather than 365 daily ones: the path has to stay legible.
+		cy.get('.hk-chart-line', { timeout: 15000 }).invoke('attr', 'd').then((d) => {
+			const points = String(d).split(/[ML]/).length - 1;
+			expect(points, 'weekly buckets, not daily').to.be.lessThan(80);
+			expect(points, 'still a real series').to.be.greaterThan(10);
 		});
 	});
 });

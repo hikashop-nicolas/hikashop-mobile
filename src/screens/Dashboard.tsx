@@ -12,6 +12,12 @@ function shortDate(iso: string, locale: string): string {
 	return d.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short' });
 }
 
+// A figure and its counterpart from the period before, when the shop sent one.
+function compareOf(data: DashboardStats, key: 'revenue' | 'orders' | 'average_order' | 'customers') {
+	if (!data.previous) return undefined;
+	return { current: data.totals[key], previous: data.previous[key] };
+}
+
 const RANGES: [string, string][] = [
 	['today', 'dashboard.range.today'],
 	['week', 'dashboard.range.week'],
@@ -47,11 +53,28 @@ export function Dashboard() {
 				<div className="hk-error-note">{tError(t, error)}</div>
 			) : data ? (
 				<>
+					{/* Each figure is shown against the same length of time immediately before it. */}
 					<div className="hk-stats">
-						<StatCard label={t('dashboard.revenue')} value={<Money value={data.totals.revenue} currency={data.currency_id} />} />
-						<StatCard label={t('dashboard.orders')} value={data.totals.orders} />
-						<StatCard label={t('dashboard.avgOrder')} value={<Money value={data.totals.average_order} currency={data.currency_id} />} />
-						<StatCard label={t('dashboard.customers')} value={data.totals.customers} />
+						<StatCard
+							label={t('dashboard.revenue')}
+							value={<Money value={data.totals.revenue} currency={data.currency_id} />}
+							compare={compareOf(data, 'revenue')}
+							newLabel={t('dashboard.deltaNew')} />
+						<StatCard
+							label={t('dashboard.orders')}
+							value={data.totals.orders}
+							compare={compareOf(data, 'orders')}
+							newLabel={t('dashboard.deltaNew')} />
+						<StatCard
+							label={t('dashboard.avgOrder')}
+							value={<Money value={data.totals.average_order} currency={data.currency_id} />}
+							compare={compareOf(data, 'average_order')}
+							newLabel={t('dashboard.deltaNew')} />
+						<StatCard
+							label={t('dashboard.customers')}
+							value={data.totals.customers}
+							compare={compareOf(data, 'customers')}
+							newLabel={t('dashboard.deltaNew')} />
 					</div>
 					<div className="hk-card hk-card--pad">
 						<span className="hk-muted">{t('dashboard.revenueOverTime')}</span>

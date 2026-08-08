@@ -43,11 +43,17 @@ describe('Split layout', () => {
 		// The narrow list pane only exists beside an open detail, which is where the squeeze is.
 		cy.get('.hk-row').first().click();
 		cy.get('.hk-split-list .hk-row').should('have.length.greaterThan', 0);
-		// The title truncates rather than overflowing its column, whatever it contains.
-		cy.get('.hk-split-list .hk-row-title').first().then(($el) => {
-			const el = $el[0];
-			expect(getComputedStyle(el).textOverflow).to.equal('ellipsis');
-			expect(el.scrollWidth).to.be.at.most(el.clientWidth + 1);
+		// The title truncates rather than overflowing its column. Its content being wider than the
+		// box is what truncation IS, so the thing to check is that what is drawn stays inside the
+		// row -- not that the text happens to be short enough to fit.
+		cy.get('.hk-split-list .hk-row').first().then(($row) => {
+			const title = $row[0].querySelector('.hk-row-title') as HTMLElement;
+			const style = getComputedStyle(title);
+			expect(style.textOverflow, 'truncates').to.equal('ellipsis');
+			expect(style.overflow, 'clips').to.not.equal('visible');
+			expect(style.whiteSpace, 'stays on one line').to.equal('nowrap');
+			expect(title.getBoundingClientRect().right, 'stays inside the row')
+				.to.be.at.most($row[0].getBoundingClientRect().right + 1);
 		});
 	});
 
