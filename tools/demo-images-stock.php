@@ -70,7 +70,7 @@ final class DemoImagesStock
 	 * picks a different photo from the same search, which is what the thumbnail slider wants: a
 	 * second angle on the same kind of thing rather than the same picture twice.
 	 */
-	public function imageFor(string $department, string $thing, ?string $colour = null, string $view = 'front', ?string $query = null): ?string
+	public function imageFor(string $department, string $thing, ?string $colour = null, string $view = 'front', $query = null): ?string
 	{
 		// A colour needs the same product recoloured, which a search cannot do. Say so and let the
 		// caller try the model instead of returning a different boot and calling it a variant.
@@ -79,13 +79,17 @@ final class DemoImagesStock
 			return null;
 		}
 
-		$search = $query !== null && $query !== '' ? $query : $thing;
+		$search = is_string($query) && $query !== '' ? $query : $thing;
 		$index = $this->indexFor($view);
 
 		$cacheFile = $this->cacheDir.'/'.sha1(strtolower($search)).'-'.$index.'.jpg';
 		if (is_file($cacheFile) && filesize($cacheFile) > 0) {
 			$this->stats['cached']++;
-			$this->note($search, $index, $department, $thing, $cacheFile);
+			// Recover who took it from the stored search. Without this a cached run credits nobody,
+			// and since almost every run is mostly cached, the credits file would name a handful of
+			// photographers out of two hundred -- which is worse than having no file at all, because
+			// it looks complete.
+			$this->note($search, $index, $department, $thing, $cacheFile, $this->stored($search)[$index] ?? null);
 			return file_get_contents($cacheFile);
 		}
 
@@ -165,6 +169,23 @@ final class DemoImagesStock
 		// no photographs. A quota failure is not: that is not an answer about the word.
 		if (!$this->limited) @file_put_contents($file, json_encode($photos));
 		return $this->results[$key] = $photos;
+	}
+
+	/**
+	 * The stored result for a query, reading disk only.
+	 *
+	 * Deliberately not search(): that would go to the API when nothing is stored, and the callers
+	 * of this only want the description and the photographer for a picture they already have.
+	 * Spending a request to caption a cached image would be a poor trade.
+	 */
+	private function stored(string $query): array
+	{
+		$key = strtolower($query);
+		if (isset($this->results[$key])) return $this->results[$key];
+		$file = $this->cacheDir.'/search-'.sha1($key).'.json';
+		if (!is_file($file)) return [];
+		$json = json_decode((string)file_get_contents($file), true);
+		return is_array($json) ? $this->results[$key] = $json : [];
 	}
 
 	private function fetchPhotos(array $params): array

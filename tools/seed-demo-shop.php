@@ -136,13 +136,27 @@ if (isset($opts['clean'])) {
  */
 function writeImage(string $path, array $product, ?string $colour, string $view, DemoImages $drawn, array $sources, array $swatches = []): bool
 {
-	// Something offered in colours is generated end to end, so its images match each other.
-	$hasColours = in_array('Colour', $product['characteristics'] ?? [], true);
+	// Something offered in colours is generated end to end, so its base picture and its variants
+	// match each other -- but only when there is a generator to do the whole job. With stock alone,
+	// holding out for consistency would mean a gradient tile in every listing, so take the real
+	// photograph for the base and let the per-colour variants be tiles. The listing is what gets
+	// looked at; the variant pictures only matter once someone is on the product page.
+	$canGenerate = false;
+	foreach ($sources as $source) {
+		if (!$source instanceof DemoImagesStock) $canGenerate = true;
+	}
+	$hasColours = $canGenerate && in_array('Colour', $product['characteristics'] ?? [], true);
+
+	// A theme can also rule stock out for a thing outright, with 'stock' => false. Some products
+	// simply are not photographed on their own: search a stock library for a skillet and you get
+	// the food cooked in one, for a jumper and you get somebody wearing it. Measured on this
+	// catalogue, only a third of searches returned even one product-style shot in their top ten.
+	$noStock = ($product['stock'] ?? null) === false;
 
 	foreach ($sources as $source) {
-		if ($hasColours && $source instanceof DemoImagesStock) continue;
+		if (($hasColours || $noStock) && $source instanceof DemoImagesStock) continue;
 		$bytes = $source instanceof DemoImagesStock
-			? $source->imageFor($product['dept'], $product['thing'], $colour, $view, $product['stock'] ?? null)
+			? $source->imageFor($product['dept'], $product['thing'], $colour, $view, is_string($product['stock'] ?? null) ? $product['stock'] : null)
 			: $source->imageFor($product['dept'], $product['thing'], $colour, $view);
 		if ($bytes !== null && @file_put_contents($path, $bytes) !== false) return true;
 	}
