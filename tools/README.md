@@ -107,13 +107,47 @@ otherwise you find it in a screenshot later.
 The key comes from `PEXELS_API_KEY` in the environment, as with the generated images. Registering
 for one is free.
 
+### Attribution is required, and it is easy to miss
+
+The licence on the photographs does not ask for credit. The **API guidelines** do: always credit
+the photographer, and show a prominent link back to Pexels. Using the API therefore carries an
+obligation that downloading the same photograph by hand would not.
+
+So every run writes `tools/cache/stock-credits.txt`, naming each photographer with a link to the
+photo page. If these images ever ship as HikaShop sample data, that file has to ship with them and
+the shop needs a visible Pexels credit somewhere. That is a real condition on the sample-data
+idea, not a formality.
+
+### Rate limits
+
+200 requests an hour and 20,000 a month. Only the **search** counts; downloading the photograph
+afterwards is CDN traffic that does not. A theme is roughly 70 searches, so about two fresh themes
+an hour.
+
+Searches are cached to disk as well as the images, so a second run of a theme costs nothing, and
+clearing the images or adding a view costs nothing either. On a 429 the seeder stops asking rather
+than spending the rest of the run collecting refusals, and says so on stderr — otherwise a spent
+quota is indistinguishable from stock having no photographs, and you would conclude the whole idea
+does not work.
+
+One trap in their headers: `X-Ratelimit-Limit` / `-Remaining` / `-Reset` all describe the
+**monthly** allowance, and nothing describes the hourly cap. So a 429 usually arrives with 19,000
+requests still showing as available, and `-Reset` points a fortnight out at the monthly rollover,
+which has nothing to do with how long you have to wait.
+
 ### Why Pexels and not a paid stock account
 
 Distributing an image inside something end users install needs an **Extended** licence on both
 Adobe Stock and Shutterstock, at roughly $80-100 an image; their standard licences prohibit it
 outright, and cap reproduction at 500,000 copies besides. That rules paid stock out of the exact
 case this tool is aimed at, sample data shipped with HikaShop. Pexels, Pixabay and Unsplash permit
-it, restricted only from rebuilding a competing stock service.
+it, subject to the credit above and to not rebuilding a competing stock service.
+
+### Testing it
+
+`sh tools/tests/run-stock-test.sh` runs the source against a local server that really answers,
+including a real 429 with the real header semantics. Worth having, because every way this code can
+fail — no key, a bad search word, a spent quota — ends in the same drawn tile.
 
 ### Generated images
 

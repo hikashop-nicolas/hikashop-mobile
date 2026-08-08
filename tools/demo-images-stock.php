@@ -27,6 +27,8 @@ final class DemoImagesStock
 	private string $apiKey;
 	private string $cacheDir;
 	private int $timeout;
+	/** Overridable so the throttling behaviour can be tested against a server that really answers 429. */
+	private string $endpoint;
 
 	/** query => the API's photo list, so several views of one thing cost one call. */
 	private array $results = [];
@@ -34,11 +36,20 @@ final class DemoImagesStock
 	/** What was chosen for what, for the contact sheet and for crediting photographers. */
 	public array $picks = [];
 
-	public array $stats = ['fetched' => 0, 'cached' => 0, 'missed' => 0, 'skipped' => 0];
+	public array $stats = ['fetched' => 0, 'cached' => 0, 'missed' => 0, 'skipped' => 0, 'throttled' => 0];
 
-	public function __construct(string $apiKey, string $cacheDir = '', int $timeout = 30)
+	/** Set once Pexels answers 429, so the rest of the run stops spending requests on refusals. */
+	private bool $limited = false;
+
+	/** What Pexels last said about the allowance, from the headers it puts on every answer. */
+	private array $quota = ['limit' => null, 'remaining' => null, 'reset' => null];
+
+	public function isLimited(): bool { return $this->limited; }
+
+	public function __construct(string $apiKey, string $cacheDir = '', int $timeout = 30, string $endpoint = '')
 	{
 		$this->apiKey = $apiKey;
+		$this->endpoint = $endpoint !== '' ? $endpoint : self::ENDPOINT;
 		$this->cacheDir = $cacheDir !== '' ? rtrim($cacheDir, '/') : __DIR__.'/cache/stock';
 		$this->timeout = $timeout;
 		if (!is_dir($this->cacheDir)) @mkdir($this->cacheDir, 0775, true);
@@ -48,7 +59,7 @@ final class DemoImagesStock
 	public function reachable(): bool
 	{
 		if ($this->apiKey === '') return false;
-		[$raw, $code] = $this->get(self::ENDPOINT.'?query=shoe&per_page=1');
+		[$raw, $code] = $this->get($this->endpoint.'?query=shoe&per_page=1');
 		return $raw !== false && $code === 200;
 	}
 
@@ -85,9 +96,10 @@ final class DemoImagesStock
 		}
 
 		$photo = $photos[$index];
-		// "large" is around 940px wide, comfortably above the 800px the seeder writes and far
-		// smaller than the original, which can be 6000px of nothing useful.
-		$url = $photo['src']['large'] ?? $photo['src']['medium'] ?? $photo['src']['original'] ?? null;
+		// "large" is 940x650, whose short side is under the 800px square the seeder writes, so take
+		// large2x (the same frame at DPR 2, so 1880x1300) and leave "original" alone: it can be
+		// 6000px of mostly nothing.
+		$url = $photo['src']['large2x'] ?? $photo['src']['large'] ?? $photo['src']['original'] ?? null;
 		if (!is_string($url)) {
 			$this->stats['missed']++;
 			return null;
@@ -120,33 +132,52 @@ final class DemoImagesStock
 		return $at !== false ? (int)$at : count(self::VIEWS);
 	}
 
+	/**
+	 * The photo list for one query, from disk if it has ever been asked before.
+	 *
+	 * The search is what the quota counts -- 200 an hour, 20,000 a month -- and downloading the
+	 * photographs afterwards is CDN traffic that does not. So the JSON is kept, not just the
+	 * pictures: re-running the seeder, changing the image size, adding a view, or clearing the
+	 * images then costs nothing. A whole theme is about 70 searches, and a second run of it is
+	 * zero.
+	 */
 	private function search(string $query): array
 	{
 		$key = strtolower($query);
 		if (isset($this->results[$key])) return $this->results[$key];
 
-		// Square-ish photographs sit better in a grid of thumbnails than landscape ones do.
-		$url = self::ENDPOINT.'?'.http_build_query([
-			'query' => $query,
-			'per_page' => 10,
-			'orientation' => 'square',
-		]);
-		[$raw, $code] = $this->get($url);
-		$photos = [];
-		if ($raw !== false && $code === 200) {
-			$json = json_decode((string)$raw, true);
-			if (is_array($json['photos'] ?? null)) $photos = $json['photos'];
-		}
-		// A square-only search comes up empty on narrow terms; widen rather than give up on it.
-		if (!$photos) {
-			[$raw, $code] = $this->get(self::ENDPOINT.'?'.http_build_query(['query' => $query, 'per_page' => 10]));
-			if ($raw !== false && $code === 200) {
-				$json = json_decode((string)$raw, true);
-				if (is_array($json['photos'] ?? null)) $photos = $json['photos'];
-			}
+		$file = $this->cacheDir.'/search-'.sha1($key).'.json';
+		if (is_file($file)) {
+			$json = json_decode((string)file_get_contents($file), true);
+			if (is_array($json)) return $this->results[$key] = $json;
 		}
 
+		// Once the quota is gone, stop asking. Forty more refusals cost forty more requests and
+		// tell you nothing you did not know after the first.
+		if ($this->limited) return $this->results[$key] = [];
+
+		// Square-ish photographs sit better in a grid of thumbnails than landscape ones do.
+		$photos = $this->fetchPhotos(['query' => $query, 'per_page' => 10, 'orientation' => 'square']);
+		// A square-only search comes up empty on narrow terms; widen rather than give up on it.
+		if (!$photos && !$this->limited) $photos = $this->fetchPhotos(['query' => $query, 'per_page' => 10]);
+
+		// An empty result is worth remembering too, or every run re-asks for the words that have
+		// no photographs. A quota failure is not: that is not an answer about the word.
+		if (!$this->limited) @file_put_contents($file, json_encode($photos));
 		return $this->results[$key] = $photos;
+	}
+
+	private function fetchPhotos(array $params): array
+	{
+		[$raw, $code] = $this->get($this->endpoint.'?'.http_build_query($params));
+		if ($code === 429) {
+			$this->limited = true;
+			$this->stats['throttled']++;
+			return [];
+		}
+		if ($raw === false || $code !== 200) return [];
+		$json = json_decode((string)$raw, true);
+		return is_array($json['photos'] ?? null) ? $json['photos'] : [];
 	}
 
 	/** Pexels wants the key bare in Authorization, without a Bearer prefix. */
@@ -158,9 +189,72 @@ final class DemoImagesStock
 			CURLOPT_TIMEOUT => $this->timeout,
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_HTTPHEADER => $authenticated ? ['Authorization: '.$this->apiKey] : [],
+			// Pexels reports the quota on every answer, so track it rather than discover it at 429.
+			CURLOPT_HEADERFUNCTION => function ($ch, $line) {
+				$at = strpos($line, ':');
+				if ($at !== false) {
+					$name = strtolower(trim(substr($line, 0, $at)));
+					$value = trim(substr($line, $at + 1));
+					if ($name === 'x-ratelimit-limit') $this->quota['limit'] = (int)$value;
+					if ($name === 'x-ratelimit-remaining') $this->quota['remaining'] = (int)$value;
+					if ($name === 'x-ratelimit-reset') $this->quota['reset'] = (int)$value;
+				}
+				return strlen($line);
+			},
 		]);
 		$raw = curl_exec($ch);
 		return [$raw, (int)curl_getinfo($ch, CURLINFO_HTTP_CODE)];
+	}
+
+	/**
+	 * What is left of the allowance, in words, or null if Pexels never said.
+	 *
+	 * There are two limits and the headers only describe one of them. X-Ratelimit-Limit and
+	 * -Remaining are the MONTHLY 20,000, and -Reset is when that month rolls over, which is days
+	 * away and useless for the limit you actually hit. The 200-an-hour cap is not reported at all.
+	 * So when a 429 arrives with plenty of monthly allowance left, it was the hourly one, and the
+	 * honest thing to say is "within the hour" rather than to quote a reset a fortnight out.
+	 */
+	public function quotaLine(): ?string
+	{
+		if ($this->quota['remaining'] === null) return null;
+		$line = sprintf('%s of %s requests left this month',
+			number_format($this->quota['remaining']),
+			$this->quota['limit'] !== null ? number_format($this->quota['limit']) : '?');
+		if ($this->limited) {
+			$line = $this->quota['remaining'] > 0
+				? 'the 200-an-hour cap was reached, clears within the hour; '.$line
+				: 'the monthly allowance is spent; '.$line;
+			if ($this->quota['remaining'] === 0 && $this->quota['reset'] !== null && $this->quota['reset'] > time()) {
+				$line .= sprintf(', rolls over %s', date('j M', $this->quota['reset']));
+			}
+		}
+		return $line;
+	}
+
+	/**
+	 * The photographers behind every picture used, as a credits file.
+	 *
+	 * Not optional politeness: Pexels' API guidelines ask that photographers are always credited
+	 * and that a prominent link back to Pexels is shown. The licence on the photographs alone does
+	 * not require it, which is why it is easy to miss, and it is the one obligation that follows
+	 * these images if the shop ever ships as sample data.
+	 */
+	public function writeCredits(string $path): bool
+	{
+		if (!$this->picks) return false;
+		$seen = [];
+		foreach ($this->picks as $pick) {
+			if ($pick['photographer'] === '') continue;
+			$seen[$pick['photographer'].'|'.$pick['url']] = $pick;
+		}
+		if (!$seen) return false;
+		ksort($seen);
+		$lines = ["Photographs from Pexels (https://www.pexels.com).", ''];
+		foreach ($seen as $pick) {
+			$lines[] = 'Photo by '.$pick['photographer'].' on Pexels'.($pick['url'] !== '' ? ' - '.$pick['url'] : '');
+		}
+		return @file_put_contents($path, implode("\n", $lines)."\n") !== false;
 	}
 
 	private function note(string $search, int $index, string $department, string $thing, string $file, ?array $photo = null): void

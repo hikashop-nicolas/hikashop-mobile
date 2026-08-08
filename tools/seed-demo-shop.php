@@ -664,7 +664,20 @@ if ($stock !== null) {
 	$sheet = __DIR__.'/cache/stock-picks.html';
 	printf("\nstock        %d fetched, %d cached, %d without a usable result, %d left to the model\n",
 		$stock->stats['fetched'], $stock->stats['cached'], $stock->stats['missed'], $stock->stats['skipped']);
+	$quota = $stock->quotaLine();
+	if ($quota !== null) echo "             $quota\n";
+	// Running out of quota looks exactly like stock having no photographs, so say which it was.
+	// Otherwise you get a shop of drawn tiles and conclude the whole idea does not work.
+	if ($stock->isLimited()) {
+		fwrite(STDERR, "\nPexels stopped answering partway through: the rest of the pictures are drawn tiles,\n"
+			."not a verdict on the searches. Searches already made are cached, so re-running after\n"
+			."the reset picks up where this left off rather than starting again.\n");
+	}
 	if ($stock->writeContactSheet($sheet)) echo "review them at file://$sheet\n";
+	// Pexels asks that photographers are credited and that Pexels is linked. Produce the list, so
+	// the obligation travels with the images rather than being remembered later.
+	$credits = __DIR__.'/cache/stock-credits.txt';
+	if ($stock->writeCredits($credits)) echo "credits in $credits\n";
 }
 
 echo "\nsample of what a screenshot will show:\n";
