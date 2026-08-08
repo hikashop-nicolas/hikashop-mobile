@@ -73,12 +73,51 @@ ends up offered in shoe sizes. Use one theme per site, or remove the unused valu
 
 ## Product images
 
-By default the seeder draws a tile per product: a gradient in the department's colours with a
-composition seeded from the product's name. Instant, offline, no licence to honour, and nothing
-added to the repo. It is honestly a placeholder, which is better than a stock photo of a beach
-against a cast iron skillet.
+Three sources, tried in order, each falling through to the next:
 
-For screenshots that go somewhere people will see them, `--ai-images` fetches real product
+1. **Pexels** (`--stock-images`). Real photographs, free, and its licence explicitly allows using
+   them as part of a template you distribute. Declines anything with a colour, for the reason
+   below.
+2. **A generated image** (`--ai-images`). Handles the colour case, and anything stock has no
+   photograph of.
+3. **A drawn tile** (the default). A gradient in the department's colours with a composition
+   seeded from the product's name. Instant, offline, no licence to honour, nothing added to the
+   repo. Honestly a placeholder.
+
+### Why stock cannot do variants
+
+The point of a variant image is the *same* boot in seven colours, so the frontend swaps the photo
+when a customer picks one. A search returns seven different boots. So a thing offered in colours
+is generated end to end, base image included, rather than jumping from a photograph to a rendering
+the moment someone picks a colour.
+
+### Why stock needs supervising
+
+Searching is only as good as the word. "Chelsea Boot" is excellent; "Shoe Trees" returns shoes
+hanging from trees in a forest. A theme can therefore name a better query per thing:
+
+```php
+['name' => 'Shoe Trees', 'suffixes' => ['S', 'M', 'L'], 'stock' => 'wooden shoe last'],
+```
+
+Every pick is written to `tools/cache/stock-picks.html`: each photograph next to the query that
+chose it, on one page. A wrong one is obvious in the time it takes to scroll, which is the point —
+otherwise you find it in a screenshot later.
+
+The key comes from `PEXELS_API_KEY` in the environment, as with the generated images. Registering
+for one is free.
+
+### Why Pexels and not a paid stock account
+
+Distributing an image inside something end users install needs an **Extended** licence on both
+Adobe Stock and Shutterstock, at roughly $80-100 an image; their standard licences prohibit it
+outright, and cap reproduction at 500,000 copies besides. That rules paid stock out of the exact
+case this tool is aimed at, sample data shipped with HikaShop. Pexels, Pixabay and Unsplash permit
+it, restricted only from rebuilding a competing stock service.
+
+### Generated images
+
+For the colour variants, and anything stock has no photograph of, `--ai-images` fetches product
 photographs from any OpenAI-compatible images endpoint. A hosted one is the practical choice — see
 below for why the local one is not, on this machine:
 

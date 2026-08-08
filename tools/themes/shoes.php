@@ -81,12 +81,14 @@ return [
 			'subs' => ['Laces', 'Insoles', 'Care', 'Bags'],
 			'price' => [400, 3500],
 			'qualifiers' => ['Waxed', 'Cotton', 'Leather', 'Cedar', 'Merino'],
+			// 'stock' overrides what Pexels is searched for, where the product's own name is a bad
+			// search term. "Shoe Trees" returns shoes hanging from trees in a forest.
 			'things' => [
 				['name' => 'Laces', 'suffixes' => ['90 cm', '120 cm', '150 cm'], 'characteristics' => ['Colour']],
-				['name' => 'Insoles', 'suffixes' => ['38-40', '41-43', '44-46']],
-				['name' => 'Shoe Trees', 'suffixes' => ['S', 'M', 'L']],
-				['name' => 'Cleaning Kit', 'suffixes' => ['']],
-				['name' => 'Protector Spray', 'suffixes' => ['200 ml']],
+				['name' => 'Insoles', 'suffixes' => ['38-40', '41-43', '44-46'], 'stock' => 'shoe insole'],
+				['name' => 'Shoe Trees', 'suffixes' => ['S', 'M', 'L'], 'stock' => 'wooden shoe last'],
+				['name' => 'Cleaning Kit', 'suffixes' => [''], 'stock' => 'shoe polish brush'],
+				['name' => 'Protector Spray', 'suffixes' => ['200 ml'], 'stock' => 'spray bottle'],
 				['name' => 'Shoe Bag', 'suffixes' => ['Pair'], 'characteristics' => ['Colour']],
 			],
 		],

@@ -61,9 +61,9 @@ function insertRow(mysqli $db, string $table, array $values): int {
 	return (int)$db->insert_id;
 }
 
-$opts = getopt('', ['site:', 'products::', 'customers::', 'orders::', 'clean', 'no-images', 'ai-images::', 'ai-model::', 'theme::', 'help']);
+$opts = getopt('', ['site:', 'products::', 'customers::', 'orders::', 'clean', 'no-images', 'ai-images::', 'ai-model::', 'stock-images', 'theme::', 'help']);
 if (isset($opts['help']) || !isset($opts['site'])) {
-	fwrite(STDERR, "usage: php seed-demo-shop.php --site=/path/to/joomla [--products=300] [--customers=300] [--orders=300] [--theme=NAME] [--no-images] [--ai-images[=URL]] [--ai-model=NAME] [--clean]\n");
+	fwrite(STDERR, "usage: php seed-demo-shop.php --site=/path/to/joomla [--products=300] [--customers=300] [--orders=300] [--theme=NAME] [--no-images] [--ai-images[=URL]] [--ai-model=NAME] [--stock-images] [--clean]\n");
 	exit(isset($opts['help']) ? 0 : 1);
 }
 
@@ -112,13 +112,24 @@ if (isset($opts['clean'])) {
 }
 
 /**
- * Write one picture: a photograph from the model when there is one to be had, the drawn tile
- * otherwise. Returns whether anything was written.
+ * Write one picture, from the first source that can supply it, and the drawn tile if none can.
+ *
+ * The order is deliberate. Stock comes first because a real photograph beats a generated one and
+ * costs nothing, but it declines anything with a colour, because a search returns a different boot
+ * rather than the same boot in another colour. Those fall through to the model, which can hold a
+ * product's identity across a palette. So a thing sold in colours is generated throughout, base
+ * image included, and does not jump from a photograph to a rendering when a customer picks one.
  */
-function writeImage(string $path, array $product, ?string $colour, string $view, DemoImages $drawn, $ai, array $swatches = []): bool
+function writeImage(string $path, array $product, ?string $colour, string $view, DemoImages $drawn, array $sources, array $swatches = []): bool
 {
-	if ($ai !== null) {
-		$bytes = $ai->imageFor($product['dept'], $product['thing'], $colour, $view);
+	// Something offered in colours is generated end to end, so its images match each other.
+	$hasColours = in_array('Colour', $product['characteristics'] ?? [], true);
+
+	foreach ($sources as $source) {
+		if ($hasColours && $source instanceof DemoImagesStock) continue;
+		$bytes = $source instanceof DemoImagesStock
+			? $source->imageFor($product['dept'], $product['thing'], $colour, $view, $product['stock'] ?? null)
+			: $source->imageFor($product['dept'], $product['thing'], $colour, $view);
 		if ($bytes !== null && @file_put_contents($path, $bytes) !== false) return true;
 	}
 	return $drawn->write($path, $product['dept'], $product['name'].'|'.$colour.'|'.$view, $colour !== null ? ($swatches[$colour] ?? null) : null) > 0;
@@ -166,6 +177,28 @@ if ($wantImages && isset($opts['ai-images'])) {
 		echo "image model at $aiUrl\n";
 	}
 }
+
+// And photographs from Pexels, which is free and needs only a key. Preferred over the model for
+// anything without a colour: a real photograph is what a screenshot wants.
+$stock = null;
+if ($wantImages && isset($opts['stock-images'])) {
+	require __DIR__.'/demo-images-stock.php';
+	$stockKey = (string)(getenv('PEXELS_API_KEY') ?: '');
+	if ($stockKey === '') {
+		fwrite(STDERR, "no PEXELS_API_KEY in the environment; skipping stock photographs\n");
+	} else {
+		$stock = new DemoImagesStock($stockKey);
+		if (!$stock->reachable()) {
+			fwrite(STDERR, "Pexels did not accept that key; skipping stock photographs\n");
+			$stock = null;
+		} else {
+			echo "stock photographs from Pexels\n";
+		}
+	}
+}
+
+// Tried in this order, each falling through to the next, and to a drawn tile if none can serve.
+$sources = array_values(array_filter([$stock, $ai]));
 
 $nProducts = (int)($opts['products'] ?? 300);
 $nCustomers = (int)($opts['customers'] ?? 300);
@@ -247,7 +280,7 @@ if ($images !== null) {
 		if ($db->query("SELECT file_id FROM {$p}hikashop_file WHERE file_type = 'category' AND file_ref_id = $cid LIMIT 1")->num_rows) continue;
 		$fileName = 'demo-cat-'.$cid.'.png';
 		$fake = ['dept' => $deptName, 'thing' => $catName, 'name' => $catName];
-		if (writeImage($uploadDir.$fileName, $fake, null, 'front', $images, $ai)) {
+		if (writeImage($uploadDir.$fileName, $fake, null, 'front', $images, $sources)) {
 			insertRow($db, $p.'hikashop_file', [
 				'file_name' => $catName,
 				'file_path' => $fileName,
@@ -311,6 +344,8 @@ foreach ($catalogue['departments'] as $dept) {
 					// The options this product is offered in, if any. A thing that has them
 					// becomes a parent product with a variant per combination.
 					'characteristics' => $thing['characteristics'] ?? [],
+					// What to search stock for, where the thing's own name is a bad search term.
+					'stock' => $thing['stock'] ?? null,
 					'price' => $dept['price'],
 				];
 			}
@@ -390,7 +425,7 @@ for ($i = 0; $i < $nProducts; $i++) {
 			}
 			foreach ($views as $n => $view) {
 				$fileName = strtolower($code).($n > 0 ? '-'.($n + 1) : '').'.png';
-				if (writeImage($uploadDir.$fileName, $c, null, $view, $images, $ai)) {
+				if (writeImage($uploadDir.$fileName, $c, null, $view, $images, $sources)) {
 					insertRow($db, $p.'hikashop_file', [
 						'file_name' => $c['name'],
 						'file_path' => $fileName,
@@ -454,7 +489,7 @@ for ($i = 0; $i < $nProducts; $i++) {
 				if ($images !== null) {
 					$colour = $combo['Colour'] ?? null;
 					$vFile = strtolower($vCode).'.png';
-					if (writeImage($uploadDir.$vFile, $c, $colour, 'front', $images, $ai, $swatches)) {
+					if (writeImage($uploadDir.$vFile, $c, $colour, 'front', $images, $sources, $swatches)) {
 						insertRow($db, $p.'hikashop_file', [
 							'file_name' => $c['name'].' — '.$label,
 							'file_path' => $vFile,
@@ -624,6 +659,14 @@ foreach ([
 ] as $label => $sql) {
 	printf("%-12s %s\n", $label, $db->query($sql)->fetch_row()[0]);
 }
+// A search is only as good as the word it was given, so put every pick on one page and look once.
+if ($stock !== null) {
+	$sheet = __DIR__.'/cache/stock-picks.html';
+	printf("\nstock        %d fetched, %d cached, %d without a usable result, %d left to the model\n",
+		$stock->stats['fetched'], $stock->stats['cached'], $stock->stats['missed'], $stock->stats['skipped']);
+	if ($stock->writeContactSheet($sheet)) echo "review them at file://$sheet\n";
+}
+
 echo "\nsample of what a screenshot will show:\n";
 $r = $db->query("SELECT product_name, product_code FROM {$p}hikashop_product WHERE product_code LIKE '{$PRODUCT_PREFIX}%' ORDER BY RAND() LIMIT 5");
 while ($x = $r->fetch_assoc()) echo "  {$x['product_name']}  ({$x['product_code']})\n";
