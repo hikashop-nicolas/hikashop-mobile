@@ -41,12 +41,21 @@ export interface OrderItem {
 	editable: boolean; // false for legacy "additional" fee lines
 }
 
+// How an address reads is a shop setting (Configuration > Checkout) and the right order differs
+// by country, so the connector renders it with HikaShop's own format and the app shows that. The
+// individual columns stay for editing and for the rare shop that empties the format.
+export interface FormattedAddress {
+	text: string;      // full block, newline separated
+	one_line: string;  // condensed, for list rows
+}
+
 export interface OrderAddress {
 	name: string;
 	company: string;
 	street: string;
 	city: string;
 	post_code: string;
+	formatted?: FormattedAddress;
 }
 
 export interface OrderHistoryEntry {
@@ -282,6 +291,9 @@ export interface ProductDetail {
 	tags: number[];
 	custom_fields: Record<string, string | null>;
 	custom_field_files: Record<string, FieldFile[]>;
+	// The fields that apply to THIS product; a field can be restricted to certain categories
+	// or products, so the set differs per row and the global meta list is only a fallback.
+	fields?: ProductField[];
 	value_ids?: number[]; // characteristic value ids, present when this is a variant
 }
 
@@ -354,6 +366,8 @@ export interface CategoryDetail {
 	image: string;
 	custom_fields: Record<string, string | null>;
 	custom_field_files: Record<string, FieldFile[]>;
+	// The fields that apply to THIS category; a field can be restricted to part of the tree.
+	fields?: ProductField[];
 }
 
 // Payload for creating a category or a manufacturer (both are HikaShop categories).
@@ -545,6 +559,7 @@ export interface CustomerAddress {
 	post_code: string;
 	telephone: string;
 	default: boolean;
+	formatted?: FormattedAddress;
 }
 
 // A Joomla user group the customer belongs to.

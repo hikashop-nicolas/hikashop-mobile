@@ -129,7 +129,10 @@ export function ProductEdit() {
 		setForm((f) => (f ? { ...f, [key]: value } : f));
 	}
 
-	const fields: ProductField[] = meta?.product_fields ?? [];
+	// Prefer the definitions the product came with: a field can be restricted to certain
+	// categories or products, so only the product's own list reflects what actually applies.
+	// The meta list is the fallback for a product being created, which has no row yet.
+	const fields: ProductField[] = fetched?.fields ?? meta?.product_fields ?? [];
 	const isWritable = (f: ProductField) => WRITABLE_FIELD_TYPES.includes(f.type);
 	function setCustomField(namekey: string, value: string) {
 		setCustom((c) => ({ ...c, [namekey]: value }));

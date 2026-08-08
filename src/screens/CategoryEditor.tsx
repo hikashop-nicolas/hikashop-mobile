@@ -44,7 +44,7 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 	const [busy, setBusy] = useState(false);
 	const [err, setErr] = useState('');
 
-	const fields: ProductField[] = useMemo(() => meta?.category_fields ?? [], [meta]);
+	const fields: ProductField[] = useMemo(() => category?.fields ?? meta?.category_fields ?? [], [category, meta]);
 	const isWritable = (f: ProductField) => WRITABLE_FIELD_TYPES.includes(f.type);
 	function setCustomFieldFiles(namekey: string, next: FieldFile[]) {
 		setCustomFiles((cf) => ({ ...cf, [namekey]: next }));

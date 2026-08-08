@@ -10,6 +10,7 @@ import { CustomerEditModal } from './CustomerEditModal';
 import { CustomerAccountModal } from './CustomerAccountModal';
 import { CustomerAddressModal } from './CustomerAddressModal';
 import { addressesOfType, defaultAddressId, canSetDefault as offerSetDefault } from '../app/customers';
+import { addressOneLine } from './address-format';
 
 export function CustomerDetail() {
 	const { id } = useParams();
@@ -208,7 +209,7 @@ function AddressBlock({ address, isDefault, canSetDefault, defaultLabel, setDefa
 					{isDefault && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{defaultLabel}</span>}
 				</span>
 				{address.company && address.name && <span className="hk-row-sub">{address.company}</span>}
-				{address.street && <span className="hk-row-sub">{address.street}, {address.post_code} {address.city}</span>}
+				{addressOneLine(address) && <span className="hk-row-sub">{addressOneLine(address)}</span>}
 				{address.telephone && <span className="hk-row-sub">{address.telephone}</span>}
 				{canSetDefault && (
 					<button type="button" className="hk-linkbtn" disabled={busy} onClick={onSetDefault} style={{ marginTop: 'var(--hk-s1)' }}>{setDefaultLabel}</button>

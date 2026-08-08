@@ -10,6 +10,7 @@ import { fmtDate } from '../app/utils';
 import { AddProductModal } from './AddProductModal';
 import { AddressEditModal } from './AddressEditModal';
 import { useStatuses } from '../app/statuses';
+import { addressLines } from './address-format';
 
 // Standard HikaShop statuses offered as quick actions; the store validates the value.
 function codeOf(e: unknown): string {
@@ -323,7 +324,7 @@ function AddressCard({ label, address, editLabel, onEdit }: { label: string; add
 				<>
 					<div>{address.name}</div>
 					{address.company && <div className="hk-row-sub">{address.company}</div>}
-					<div className="hk-row-sub">{address.street}, {address.post_code} {address.city}</div>
+					<div className="hk-row-sub hk-addr">{addressLines(address)}</div>
 				</>
 			)}
 		</div>
