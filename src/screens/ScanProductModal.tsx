@@ -32,18 +32,21 @@ export function ScanProductModal({ onClose, onOpen }: {
 	async function resolve(barcode: string) {
 		const value = barcode.trim();
 		if (!client || !value || busy) return;
+		// The scanner shuts its camera off the moment it reads a code, so leave that view at once
+		// rather than sitting on a frozen preview, and show what was read while the lookup runs.
+		setCode(value);
+		setScanning(false);
 		setErr('');
 		setBusy(true);
 		try {
 			const m = await client.lookupBarcode(value);
 			setMatch(m);
 			setStock(m.quantity >= 0 ? String(m.quantity) : '');
-			setScanning(false);
 		} catch (e) {
 			const c = codeOf(e);
+			// Keep the code in the field: it says what was actually read, and can be retried or
+			// corrected without scanning again.
 			setErr(c === 'not_found' ? t('scan.noMatch', { code: value }) : tError(t, c));
-			setCode('');
-			// Stay on the scanner so the next item can just be scanned.
 		} finally {
 			setBusy(false);
 		}
