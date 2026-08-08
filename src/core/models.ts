@@ -421,6 +421,40 @@ export interface OrderAddressForm {
 	state_name: string;
 }
 
+// A coupon (discount_type='coupon'): a percentage or flat-amount code with optional limits.
+export interface Discount {
+	id: number;
+	code: string;
+	kind: 'percent' | 'flat';
+	value: number;
+	currency_id: number;
+	published: boolean;
+	start: number; // unix, 0 = none
+	end: number;   // unix, 0 = none
+	minimum_order: number;
+	maximum_order: number;
+	quota: number; // total uses, 0 = unlimited
+	quota_per_user: number; // 0 = unlimited
+	used_times: number;
+	tax_included: boolean; // flat amount includes tax
+}
+
+// The editable subset sent when creating/updating a coupon.
+export interface DiscountInput {
+	code: string;
+	kind: 'percent' | 'flat';
+	value: number;
+	currency_id?: number;
+	published?: boolean;
+	start?: number;
+	end?: number;
+	minimum_order?: number;
+	maximum_order?: number;
+	quota?: number;
+	quota_per_user?: number;
+	tax_included?: boolean;
+}
+
 // A HikaShop user for restricting a price to specific customers.
 export interface UserItem {
 	id: number;

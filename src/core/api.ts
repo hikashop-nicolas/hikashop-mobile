@@ -5,7 +5,7 @@ import type {
 	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, Coupon, OrderStatusDef, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
-	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup,
+	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup, Discount, DiscountInput,
 } from './models';
 
 export class ApiError extends Error {
@@ -211,6 +211,32 @@ export class ApiClient {
 	// The CMS user groups the operator can assign, from HikaShop's portable acl source (read scope).
 	async getGroups(): Promise<UserGroup[]> {
 		return (await this.request<UserGroup[]>('GET', 'groups')).data;
+	}
+
+	// Coupons (read scope), searchable and paginated.
+	async getDiscounts(params: { start?: number; limit?: number; search?: string } = {}): Promise<Paginated<Discount>> {
+		const query: Query = { start: params.start, limit: params.limit, search: params.search };
+		const { data, meta } = await this.request<Discount[]>('GET', 'discounts', { query });
+		return { items: data || [], total: Number(meta?.total ?? 0), start: Number(meta?.start ?? 0), limit: Number(meta?.limit ?? 0) };
+	}
+
+	async getDiscount(id: number): Promise<Discount> {
+		return (await this.request<Discount>('GET', `discounts/${id}`)).data;
+	}
+
+	// Create a coupon (write scope). Returns the saved coupon.
+	async createDiscount(input: DiscountInput): Promise<Discount> {
+		return (await this.request<Discount>('POST', 'discounts', { body: input })).data;
+	}
+
+	// Update a coupon (write scope). Returns the saved coupon.
+	async updateDiscount(id: number, input: DiscountInput): Promise<Discount> {
+		return (await this.request<Discount>('PUT', `discounts/${id}`, { body: input })).data;
+	}
+
+	// Delete a coupon (write scope).
+	async deleteDiscount(id: number): Promise<{ deleted: number }> {
+		return (await this.request<{ deleted: number }>('DELETE', `discounts/${id}`)).data;
 	}
 
 	async getOrders(filters: OrderFilters = {}): Promise<Paginated<OrderSummary>> {

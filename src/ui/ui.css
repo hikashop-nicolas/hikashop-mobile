@@ -39,6 +39,10 @@
 .hk-checkbox-row input:disabled + span { color: var(--hk-muted); }
 .hk-linkbtn { background: none; border: none; padding: 0; color: var(--hk-accent); font-size: .82rem; cursor: pointer; text-align: left; }
 .hk-linkbtn:disabled { color: var(--hk-muted); cursor: default; }
+.hk-segmented { display: inline-flex; border: 1px solid var(--hk-border); border-radius: var(--hk-radius); overflow: hidden; }
+.hk-seg { background: var(--hk-surface); color: var(--hk-text); border: none; padding: 8px 16px; font-size: .9rem; cursor: pointer; }
+.hk-seg + .hk-seg { border-left: 1px solid var(--hk-border); }
+.hk-seg.hk-on { background: var(--hk-accent); color: var(--hk-accent-ink); }
 
 .hk-input { border: 1px solid var(--hk-line); border-radius: var(--hk-r2); padding: 0 var(--hk-s3); min-height: var(--hk-tap); font-size: .95rem; background: var(--hk-surface); color: var(--hk-ink); width: 100%; }
 .hk-input::placeholder { color: var(--hk-faint); }

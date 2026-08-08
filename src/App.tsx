@@ -24,6 +24,8 @@ import { Categories } from './screens/Categories';
 import { CategoryEdit } from './screens/CategoryEdit';
 import { Customers } from './screens/Customers';
 import { CustomerDetail } from './screens/CustomerDetail';
+import { Discounts } from './screens/Discounts';
+import { DiscountEdit } from './screens/DiscountEdit';
 import { Stores } from './screens/Stores';
 
 const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
@@ -32,6 +34,7 @@ const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
 	{ key: 'products', icon: 'products', labelKey: 'tabs.products' },
 	{ key: 'categories', icon: 'categories', labelKey: 'tabs.categories' },
 	{ key: 'customers', icon: 'customers', labelKey: 'tabs.customers' },
+	{ key: 'discounts', icon: 'discount', labelKey: 'tabs.discounts' },
 	{ key: 'stores', icon: 'store', labelKey: 'tabs.stores' },
 ];
 
@@ -40,6 +43,7 @@ function activeKey(pathname: string): string {
 	if (pathname.startsWith('/products')) return 'products';
 	if (pathname.startsWith('/categories')) return 'categories';
 	if (pathname.startsWith('/customers')) return 'customers';
+	if (pathname.startsWith('/discounts')) return 'discounts';
 	if (pathname.startsWith('/stores')) return 'stores';
 	return 'dashboard';
 }
@@ -150,6 +154,9 @@ function Shell() {
 							<Route path="/categories/:id/edit" element={<CategoryEdit />} />
 								<Route path="/customers" element={<Customers />} />
 								<Route path="/customers/:id" element={<CustomerDetail />} />
+								<Route path="/discounts" element={<Discounts />} />
+								<Route path="/discounts/new" element={<DiscountEdit />} />
+								<Route path="/discounts/:id/edit" element={<DiscountEdit />} />
 								<Route path="/stores" element={<Stores />} />
 								<Route path="/connect" element={<Connect />} />
 								<Route path="*" element={<Navigate to="/dashboard" replace />} />

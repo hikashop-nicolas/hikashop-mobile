@@ -4,7 +4,7 @@
 // shapes on a schema bump until a full migration runner lands (Phase 3 queue/ledger).
 
 import type { KeyValueStore } from './storage';
-import type { OrderSummary, OrderDetail, DashboardStats, Paginated, ProductSummary, ProductDetail, ProductMeta, CategoryListItem, Settings, OrderStatusDef, CustomerSummary, CustomerDetail } from './models';
+import type { OrderSummary, OrderDetail, DashboardStats, Paginated, ProductSummary, ProductDetail, ProductMeta, CategoryListItem, Settings, OrderStatusDef, CustomerSummary, CustomerDetail, Discount } from './models';
 
 export const CACHE_VERSION = 1;
 
@@ -106,6 +106,20 @@ export class CacheRepository {
 	}
 	putProduct(storeId: string, productId: number, detail: ProductDetail): Promise<Cached<ProductDetail>> {
 		return this.write(this.key(storeId, 'product', String(productId)), detail);
+	}
+
+	getDiscounts(storeId: string, filterKey: string): Promise<Cached<Paginated<Discount>> | null> {
+		return this.read(this.key(storeId, 'discounts', filterKey));
+	}
+	putDiscounts(storeId: string, filterKey: string, page: Paginated<Discount>): Promise<Cached<Paginated<Discount>>> {
+		return this.write(this.key(storeId, 'discounts', filterKey), page);
+	}
+
+	getDiscount(storeId: string, id: number): Promise<Cached<Discount> | null> {
+		return this.read(this.key(storeId, 'discount', String(id)));
+	}
+	putDiscount(storeId: string, id: number, discount: Discount): Promise<Cached<Discount>> {
+		return this.write(this.key(storeId, 'discount', String(id)), discount);
 	}
 
 	getCustomers(storeId: string, filterKey: string): Promise<Cached<Paginated<CustomerSummary>> | null> {
