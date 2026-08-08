@@ -3,9 +3,14 @@ import type { ReactNode } from 'react';
 import { StoreRegistry, WebKeyValueStore, IdbKeyValueStore, ApiClient, CacheRepository, parseNotifySettings } from '../core';
 import type { Store, NotifySettings } from '../core';
 import { notifier } from './notifier';
+import { SecureKeyValueStore } from './secure-store';
 
 // One registry for the whole app: store metadata in the data namespace, tokens in the secrets one.
-const registry = new StoreRegistry(new WebKeyValueStore('hk.data.'), new WebKeyValueStore('hk.secret.'));
+// Tokens are store-admin credentials, so on a native build they live in the platform keystore;
+// in the browser there is nothing better than localStorage, which the fallback provides.
+const legacySecretStore = new WebKeyValueStore('hk.secret.');
+const secretStore = new SecureKeyValueStore('hk.secret.', legacySecretStore);
+const registry = new StoreRegistry(new WebKeyValueStore('hk.data.'), secretStore);
 // Read-model cache lives in its own namespace so clearing it never touches metadata or tokens.
 // It is backed by IndexedDB: the cached dictionaries and lists outgrow localStorage's ~5MB, and
 // its synchronous API would block the UI thread on every read. Metadata and tokens stay in
@@ -19,6 +24,8 @@ const cache = new CacheRepository(cacheStore);
 const MAX_CACHE_ENTRIES = 300;
 const cacheReady = (async () => {
 	try {
+		// Tokens first: a paired device must not appear unpaired if the cache work is slow.
+		await secretStore.migrateFrom(legacySecretStore);
 		await cacheStore.migrateFrom(legacyCacheStore);
 		await cache.pruneTo(MAX_CACHE_ENTRIES);
 	} catch { /* housekeeping is best-effort */ }

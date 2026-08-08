@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and below. Device tokens are store-admin credentials, so neither the keystore
+     preferences that hold them nor the WebView storage may leave the device in a backup. -->
+<full-backup-content>
+    <exclude domain="sharedpref" path="WSSecureStorageSharedPreferences.xml" />
+    <exclude domain="root" path="app_webview" />
+</full-backup-content>
