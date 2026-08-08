@@ -424,6 +424,12 @@ export interface OrderAddressForm {
 // HikaShop's two promotion types: a coupon (the customer enters a code) or an automatic discount.
 export type DiscountType = 'coupon' | 'discount';
 
+// Who a discount is open to: everyone, nobody, or specific customer groups.
+export interface DiscountAccess {
+	mode: 'all' | 'none' | 'groups';
+	groups: number[];
+}
+
 // A promotion: a percentage or flat-amount reduction with optional limits.
 export interface Discount {
 	id: number;
@@ -441,6 +447,26 @@ export interface Discount {
 	quota_per_user: number; // 0 = unlimited
 	used_times: number;
 	tax_included: boolean; // flat amount includes tax
+
+	tax_id: number;
+	shipping_percent: number;
+
+	minimum_products: number;
+	maximum_products: number;
+	product_ids: number[];
+	exclude_product_ids: number[];
+	category_ids: number[];
+	category_childs: boolean;
+	exclude_category_ids: number[];
+	exclude_category_childs: boolean;
+	zone_ids: number[];
+	user_ids: number[];
+	access: DiscountAccess;
+	exclude_access: DiscountAccess;
+
+	auto_load: boolean;      // the coupon applies without being entered
+	product_only: boolean;   // applies to product lines only, not shipping or fees
+	discounted_products: number; // 0 standard, 1 ignore discounted, 2 override them
 }
 
 // The editable subset sent when creating/updating a promotion.
@@ -458,6 +484,24 @@ export interface DiscountInput {
 	quota?: number;
 	quota_per_user?: number;
 	tax_included?: boolean;
+
+	tax_id?: number;
+	shipping_percent?: number;
+	minimum_products?: number;
+	maximum_products?: number;
+	product_ids?: number[];
+	exclude_product_ids?: number[];
+	category_ids?: number[];
+	category_childs?: boolean;
+	exclude_category_ids?: number[];
+	exclude_category_childs?: boolean;
+	zone_ids?: number[];
+	user_ids?: number[];
+	access?: DiscountAccess;
+	exclude_access?: DiscountAccess;
+	auto_load?: boolean;
+	product_only?: boolean;
+	discounted_products?: number;
 }
 
 // A scanned barcode resolved to a product. A variant resolves to its parent, the screen that

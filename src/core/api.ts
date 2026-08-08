@@ -345,8 +345,8 @@ export class ApiClient {
 		return (await this.request<DashboardStats>('GET', 'stats/dashboard', { query: { range } })).data;
 	}
 
-	async getProducts(filters: { start?: number; limit?: number; search?: string; category_id?: number } = {}): Promise<Paginated<ProductSummary>> {
-		const query: Query = { start: filters.start, limit: filters.limit, search: filters.search, category_id: filters.category_id };
+	async getProducts(filters: { start?: number; limit?: number; search?: string; category_id?: number; ids?: number[] } = {}): Promise<Paginated<ProductSummary>> {
+		const query: Query = { start: filters.start, limit: filters.limit, search: filters.search, category_id: filters.category_id, ids: filters.ids?.join(',') };
 		const { data, meta } = await this.request<ProductSummary[]>('GET', 'products', { query });
 		return {
 			items: data || [],
