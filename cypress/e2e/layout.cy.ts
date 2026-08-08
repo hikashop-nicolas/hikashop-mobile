@@ -59,4 +59,26 @@ describe('Split layout', () => {
 			cy.get('.hk-split-empty').should('be.visible');
 		}
 	});
+
+	it('shows the phone tabs as icons, still named for assistive tech', () => {
+		cy.viewport(NARROW.w, NARROW.h);
+		cy.visitApp('/orders');
+		cy.get('.hk-tabbar').should('be.visible');
+		cy.get('.hk-tab').should('have.length.greaterThan', 2);
+
+		// No painted label: at this width the words sat too close together to read.
+		cy.get('.hk-tab').first().then(($b) => {
+			expect($b[0].getBoundingClientRect().height).to.be.greaterThan(0);
+			// The only visible content is the icon; the text is clipped out of view.
+			const sr = $b[0].querySelector('.hk-sr-only') as HTMLElement;
+			expect(sr, 'label kept in the markup').to.exist;
+			expect(sr.getBoundingClientRect().width).to.be.at.most(1);
+		});
+
+		// Every tab is still named, and the current one is announced.
+		cy.get('.hk-tab').each(($b) => {
+			expect($b.attr('aria-label'), 'accessible name').to.be.a('string').and.not.equal('');
+		});
+		cy.get('.hk-tab[aria-current="page"]').should('have.length', 1);
+	});
 });
