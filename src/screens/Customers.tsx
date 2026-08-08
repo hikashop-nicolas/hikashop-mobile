@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
-import { useCached } from '../app/use-cached';
+import { usePaged } from '../app/use-paged';
 import { useI18n, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
-import type { CustomerSummary, Paginated } from '../core';
-import { Screen, Search, Spinner, NewButton } from '../ui';
+import type { CustomerSummary } from '../core';
+import { Screen, Search, Spinner, NewButton, LoadMore } from '../ui';
 import { fmtDate } from '../app/utils';
 import { NewCustomerModal } from './NewCustomerModal';
+
+// Rows per request. The connector caps a page at 100.
+const PAGE = 30;
 
 export function Customers() {
 	const { client, active, cache } = useStores();
@@ -18,17 +21,15 @@ export function Customers() {
 	const storeId = active?.id ?? '';
 	const filterKey = ordersFilterKey('', search);
 
-	const { data, loading, error } = useCached<Paginated<CustomerSummary>>({
+	const { items, total, loading, error, hasMore, loadingMore, moreError, loadMore } = usePaged<CustomerSummary>({
 		enabled: !!client && !!active,
 		read: () => cache.getCustomers(storeId, filterKey),
-		fetch: () => client!.getCustomers({ search: search || undefined, limit: 30 }),
+		fetch: (start) => client!.getCustomers({ search: search || undefined, limit: PAGE, start }),
 		write: async (p) => { await cache.putCustomers(storeId, filterKey, p); },
 		deps: [storeId, search],
 		debounceMs: search ? 300 : 0,
 	});
 
-	const items = data?.items ?? [];
-	const total = data?.total ?? 0;
 
 	return (
 		<Screen title={t('customers.title')} right={<NewButton onClick={() => setCreating(true)} />}>
@@ -56,7 +57,7 @@ export function Customers() {
 							</div>
 						</NavLink>
 					))}
-					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('customers.countOf', { shown: items.length, total })}</div>
+					<LoadMore shown={items.length} total={total} hasMore={hasMore} loading={loadingMore} error={moreError} onLoad={loadMore} />
 				</div>
 			)}
 			{creating && (

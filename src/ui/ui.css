@@ -307,3 +307,7 @@
 	.hk-split-list .hk-row--on { background: var(--hk-accent-soft); border-radius: var(--hk-r2); }
 	.hk-split-list .hk-row--on .hk-row-title { color: var(--hk-accent); }
 }
+
+/* Foot of a listing: the way to load the next page, and how much of it is loaded. */
+.hk-listfoot { display: flex; flex-direction: column; align-items: center; gap: var(--hk-s2); padding: var(--hk-s4) var(--hk-s2); }
+.hk-listfoot .hk-muted { font-size: .78rem; color: var(--hk-faint); }

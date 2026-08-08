@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
-import { useCached } from '../app/use-cached';
+import { usePaged } from '../app/use-paged';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
-import type { Discount, DiscountType, Paginated } from '../core';
-import { Screen, Search, Money, Spinner, NewButton } from '../ui';
+import type { Discount, DiscountType } from '../core';
+import { Screen, Search, Money, Spinner, NewButton, LoadMore } from '../ui';
+
+// Rows per request. The connector caps a page at 100.
+const PAGE = 30;
 
 export function Discounts() {
 	const { client, active, cache } = useStores();
@@ -16,17 +19,15 @@ export function Discounts() {
 	const storeId = active?.id ?? '';
 	const filterKey = ordersFilterKey(type, search);
 
-	const { data, loading, error } = useCached<Paginated<Discount>>({
+	const { items, total, loading, error, hasMore, loadingMore, moreError, loadMore } = usePaged<Discount>({
 		enabled: !!client && !!active,
 		read: () => cache.getDiscounts(storeId, filterKey),
-		fetch: () => client!.getDiscounts({ search: search || undefined, type: type || undefined, limit: 30 }),
+		fetch: (start) => client!.getDiscounts({ search: search || undefined, type: type || undefined, limit: PAGE, start }),
 		write: async (p) => { await cache.putDiscounts(storeId, filterKey, p); },
 		deps: [storeId, search, type],
 		debounceMs: search ? 300 : 0,
 	});
 
-	const items = data?.items ?? [];
-	const total = data?.total ?? 0;
 
 	function quotaLabel(d: Discount): string {
 		if (d.quota > 0) return t('discount.usedOfQuota', { used: d.used_times, quota: d.quota });
@@ -69,7 +70,7 @@ export function Discounts() {
 							</div>
 						</NavLink>
 					))}
-					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('discounts.countOf', { shown: items.length, total })}</div>
+					<LoadMore shown={items.length} total={total} hasMore={hasMore} loading={loadingMore} error={moreError} onLoad={loadMore} />
 				</div>
 			)}
 		</Screen>

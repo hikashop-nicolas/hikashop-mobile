@@ -9,3 +9,4 @@ export * from './tree-select';
 export * from './layout';
 export * from './QrScanner';
 export * from './icons';
+export * from './load-more';

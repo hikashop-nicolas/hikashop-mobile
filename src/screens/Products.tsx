@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
+import { usePaged } from '../app/use-paged';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
-import type { ProductSummary, Paginated, ProductMeta } from '../core';
-import { Screen, Search, Money, Spinner, Icon, TreeSelect, NewButton, Button } from '../ui';
+import type { ProductSummary, ProductMeta } from '../core';
+import { Screen, Search, Money, Spinner, Icon, TreeSelect, NewButton, Button, LoadMore } from '../ui';
 import { ScanProductModal } from './ScanProductModal';
 import { ListingFields } from './ListingFields';
+
+// Rows per request. The connector caps a page at 100.
+const PAGE = 30;
 
 export function Products() {
 	const { client, active, cache } = useStores();
@@ -42,17 +46,15 @@ export function Products() {
 	});
 	const activeCategory = meta?.categories.find((c) => c.id === categoryId);
 
-	const { data, loading, error } = useCached<Paginated<ProductSummary>>({
+	const { items, total, fields, loading, error, hasMore, loadingMore, moreError, loadMore } = usePaged<ProductSummary>({
 		enabled: !!client && !!active,
 		read: () => cache.getProducts(storeId, filterKey),
-		fetch: () => client!.getProducts({ search: search || undefined, category_id: categoryId || undefined, limit: 30 }),
+		fetch: (start) => client!.getProducts({ search: search || undefined, category_id: categoryId || undefined, limit: PAGE, start }),
 		write: async (p) => { await cache.putProducts(storeId, filterKey, p); },
 		deps: [storeId, search, categoryId],
 		debounceMs: search ? 300 : 0,
 	});
 
-	const items = data?.items ?? [];
-	const total = data?.total ?? 0;
 
 	function stockLabel(p: ProductSummary): string {
 		if (p.has_variants) return '';
@@ -103,12 +105,12 @@ export function Products() {
 							<div className="hk-row-grow">
 								<span className="hk-row-title">{p.name}{!p.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}</span>
 								<span className="hk-row-sub">{p.code} · {stockLabel(p)}</span>
-								<ListingFields fields={data?.fields} values={p.custom_fields} />
+								<ListingFields fields={fields} values={p.custom_fields} />
 							</div>
 							<div className="hk-row-rt">{p.price !== null && <Money value={p.price} currency={p.currency_id} />}</div>
 						</NavLink>
 					))}
-					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('products.countOf', { shown: items.length, total })}</div>
+					<LoadMore shown={items.length} total={total} hasMore={hasMore} loading={loadingMore} error={moreError} onLoad={loadMore} />
 				</div>
 			)}
 			{scanning && (

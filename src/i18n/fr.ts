@@ -463,4 +463,9 @@ export const fr: Messages = {
 
 	'discount.reference': 'Référence',
 	'discount.referenceHint': 'Identifie cette réduction dans la boutique. Laissée vide, la boutique en choisit une.',
+
+	// Listing foot: how much of a list is loaded, and how to get the rest.
+	'list.loadMore': 'Charger plus',
+	'list.loadMoreFailed': 'Impossible de charger la suite. Touchez pour réessayer.',
+	'list.countOf': '{shown} sur {total}',
 };

@@ -465,4 +465,9 @@ export const en: Messages = {
 
 	'discount.reference': 'Reference',
 	'discount.referenceHint': 'Names this discount in the shop. Left empty, the shop picks one.',
+
+	// Listing foot: how much of a list is loaded, and how to get the rest.
+	'list.loadMore': 'Load more',
+	'list.loadMoreFailed': 'Could not load more. Tap to try again.',
+	'list.countOf': '{shown} of {total}',
 };

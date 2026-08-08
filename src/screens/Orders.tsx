@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
-import { useCached } from '../app/use-cached';
+import { usePaged } from '../app/use-paged';
 import { useI18n, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
-import type { OrderSummary, Paginated } from '../core';
-import { Screen, Search, StatusChip, Money, Spinner, NewButton } from '../ui';
+import type { OrderSummary } from '../core';
+import { Screen, Search, StatusChip, Money, Spinner, NewButton, LoadMore } from '../ui';
 import { fmtDate } from '../app/utils';
 import { NewOrderModal } from './NewOrderModal';
 import { useStatuses } from '../app/statuses';
 import { ListingFields } from './ListingFields';
+
+// Rows per request. The connector caps a page at 100.
+const PAGE = 30;
 
 export function Orders() {
 	const { client, active, cache } = useStores();
@@ -22,17 +25,15 @@ export function Orders() {
 	const storeId = active?.id ?? '';
 	const filterKey = ordersFilterKey(status, search);
 
-	const { data, loading, error } = useCached<Paginated<OrderSummary>>({
+	const { items, total, fields, loading, error, hasMore, loadingMore, moreError, loadMore } = usePaged<OrderSummary>({
 		enabled: !!client && !!active,
 		read: () => cache.getOrders(storeId, filterKey),
-		fetch: () => client!.getOrders({ status: status || undefined, search: search || undefined, limit: 30 }),
+		fetch: (start) => client!.getOrders({ status: status || undefined, search: search || undefined, limit: PAGE, start }),
 		write: async (p) => { await cache.putOrders(storeId, filterKey, p); },
 		deps: [storeId, status, search],
 		debounceMs: search ? 300 : 0,
 	});
 
-	const items = data?.items ?? [];
-	const total = data?.total ?? 0;
 
 	return (
 		<Screen
@@ -64,12 +65,12 @@ export function Orders() {
 							<div className="hk-row-grow">
 								<span className="hk-row-title">#{o.number} · {o.customer.name || o.customer.email || t('common.guest')}</span>
 								<span className="hk-row-sub">{fmtDate(o.created, locale)}</span>
-								<ListingFields fields={data?.fields} values={o.custom_fields} />
+								<ListingFields fields={fields} values={o.custom_fields} />
 							</div>
 							<div className="hk-row-rt"><StatusChip status={o.status} /><Money value={o.total} currency={o.currency_id} /></div>
 						</NavLink>
 					))}
-					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('orders.countOf', { shown: items.length, total })}</div>
+					<LoadMore shown={items.length} total={total} hasMore={hasMore} loading={loadingMore} error={moreError} onLoad={loadMore} />
 				</div>
 			)}
 			{creating && (
