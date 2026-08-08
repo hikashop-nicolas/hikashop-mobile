@@ -13,6 +13,11 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <!-- The web app draws its own bar; give the system bars the same surface colour so the
+             inset strip does not read as a gap. -->
+        <item name="android:statusBarColor">@color/hkSurface</item>
+        <item name="android:navigationBarColor">@color/hkSurface</item>
+        <item name="android:windowBackground">@color/hkSurface</item>
     </style>
 
 

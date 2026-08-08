@@ -3,7 +3,13 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
+// Where the app will be served from. Root by default (a custom domain, and the Capacitor
+// shell, which loads from the bundle root); set PWA_BASE=/repo/ to build for a GitHub Pages
+// project site. Routing is hash-based, so no server rewrite rules are needed either way.
+const base = process.env.PWA_BASE || '/'
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     VitePWA({
@@ -17,8 +23,8 @@ export default defineConfig({
         background_color: '#0c6d77',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
-        scope: '/',
+        start_url: base,
+        scope: base,
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },

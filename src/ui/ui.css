@@ -11,7 +11,9 @@
 	.hk-bento { display: block; columns: 340px 3; column-gap: var(--hk-s3); }
 	.hk-bento > * { break-inside: avoid; margin: 0 0 var(--hk-s3); }
 }
-.hk-appbar { display: flex; align-items: center; gap: var(--hk-s2); padding: var(--hk-s3) var(--hk-s4); border-bottom: 1px solid var(--hk-line); background: var(--hk-surface); position: sticky; top: 0; z-index: 5; }
+/* The native shell and an installed PWA draw edge to edge, so the bar has to clear the
+   status bar itself; the tab bar does the same for the gesture area at the bottom. */
+.hk-appbar { display: flex; align-items: center; gap: var(--hk-s2); padding: calc(var(--hk-s3) + env(safe-area-inset-top, 0)) var(--hk-s4) var(--hk-s3); border-bottom: 1px solid var(--hk-line); background: var(--hk-surface); position: sticky; top: 0; z-index: 5; }
 .hk-appbar .hk-title { font-weight: 650; font-size: 1.05rem; letter-spacing: -.01em; }
 .hk-appbar .hk-grow { flex: 1; }
 .hk-iconbtn { display: inline-flex; align-items: center; justify-content: center; background: none; border: none; color: var(--hk-muted); padding: var(--hk-s2); border-radius: var(--hk-r1); cursor: pointer; min-width: var(--hk-tap); min-height: var(--hk-tap); }
