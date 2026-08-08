@@ -28,3 +28,9 @@ cypress.env.json
 cypress/screenshots/
 cypress/videos/
 cypress/downloads/
+
+# Signing material must never be committed.
+*.keystore
+*.jks
+*.p12
+keystore.b64

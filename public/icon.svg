@@ -1,8 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="HikaShop">
-  <rect width="512" height="512" fill="#0c6d77"/>
-  <!-- two tote handles (behind the bag body) -->
-  <path d="M196 214 L196 188 A30 30 0 0 1 256 188 L256 214" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
-  <path d="M256 214 L256 188 A30 30 0 0 1 316 188 L316 214" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
-  <!-- bag body -->
-  <path d="M150 210 h212 a20 20 0 0 1 20 20 l14 150 a26 26 0 0 1 -26 30 H142 a26 26 0 0 1 -26 -30 l14 -150 a20 20 0 0 1 20 -20 z" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="HikaShop">
+  <circle cx="48" cy="48" r="46" fill="#297EBA"/>
+  <g fill="#FBE8D4">
+    <rect x="46" y="14" width="4" height="14" rx="2" opacity="1"   transform="rotate(0 48 48)"/>
+    <rect x="46" y="14" width="4" height="14" rx="2" opacity="0.5" transform="rotate(45 48 48)"/>
+    <rect x="46" y="14" width="4" height="14" rx="2" opacity="1"   transform="rotate(90 48 48)"/>
+    <rect x="46" y="14" width="4" height="14" rx="2" opacity="0.5" transform="rotate(135 48 48)"/>
+    <rect x="46" y="14" width="4" height="14" rx="2" opacity="1"   transform="rotate(180 48 48)"/>
+    <rect x="46" y="14" width="4" height="14" rx="2" opacity="0.5" transform="rotate(225 48 48)"/>
+    <rect x="46" y="14" width="4" height="14" rx="2" opacity="1"   transform="rotate(270 48 48)"/>
+    <rect x="46" y="14" width="4" height="14" rx="2" opacity="0.5" transform="rotate(315 48 48)"/>
+  </g>
+  <circle cx="48" cy="48" r="14" fill="#FBE8D4"/>
 </svg>
