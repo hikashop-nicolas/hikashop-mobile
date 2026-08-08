@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { StoreRegistry, WebKeyValueStore, ApiClient, CacheRepository } from '../core';
-import type { Store } from '../core';
+import { StoreRegistry, WebKeyValueStore, ApiClient, CacheRepository, parseNotifySettings } from '../core';
+import type { Store, NotifySettings } from '../core';
 import { notifier } from './notifier';
 
 // One registry for the whole app: store metadata in the data namespace, tokens in the secrets one.
@@ -10,6 +10,7 @@ const registry = new StoreRegistry(new WebKeyValueStore('hk.data.'), new WebKeyV
 const cache = new CacheRepository(new WebKeyValueStore('hk.cache.'));
 
 const NOTIFY_PREF_KEY = 'hk.notify.enabled';
+const NOTIFY_SETTINGS_KEY = 'hk.notify.settings';
 
 interface StoreContextValue {
 	ready: boolean;
@@ -20,6 +21,8 @@ interface StoreContextValue {
 	cache: CacheRepository;
 	notifyEnabled: boolean;
 	notifySupported: boolean;
+	notifySettings: NotifySettings;
+	setNotifySettings: (s: NotifySettings) => void;
 	enableNotifications: () => Promise<boolean>;
 	disableNotifications: () => void;
 	refresh: () => Promise<void>;
@@ -60,6 +63,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 		setNotifyEnabled(false);
 	}, []);
 
+	// Per-device alerting preferences (which events, threshold, sound).
+	const [notifySettings, setNotifySettingsState] = useState<NotifySettings>(
+		() => parseNotifySettings(localStorage.getItem(NOTIFY_SETTINGS_KEY)),
+	);
+	const setNotifySettings = useCallback((next: NotifySettings) => {
+		localStorage.setItem(NOTIFY_SETTINGS_KEY, JSON.stringify(next));
+		setNotifySettingsState(next);
+	}, []);
+
 	const refresh = useCallback(async () => {
 		const list = await registry.list();
 		const act = await registry.getActive();
@@ -93,6 +105,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 		<StoreContext.Provider value={{
 			ready, stores, active, client, registry, cache,
 			notifyEnabled, notifySupported: notifier.supported, enableNotifications, disableNotifications,
+			notifySettings, setNotifySettings,
 			refresh, setActive, remove,
 		}}>
 			{children}

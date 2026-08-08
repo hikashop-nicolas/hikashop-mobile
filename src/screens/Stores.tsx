@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useI18n, LOCALES } from '../i18n';
@@ -6,20 +5,9 @@ import { Screen, Button, Icon, DeleteButton } from '../ui';
 import { hostOf } from '../app/utils';
 
 export function Stores() {
-	const { stores, active, setActive, remove, notifyEnabled, notifySupported, enableNotifications, disableNotifications } = useStores();
+	const { stores, active, setActive, remove, notifyEnabled, notifySupported } = useStores();
 	const { t, locale, setLocale } = useI18n();
 	const nav = useNavigate();
-	const [notifyErr, setNotifyErr] = useState('');
-
-	async function toggleNotifications() {
-		setNotifyErr('');
-		if (notifyEnabled) {
-			disableNotifications();
-			return;
-		}
-		const granted = await enableNotifications();
-		if (!granted) setNotifyErr(t('stores.notifBlocked'));
-	}
 
 	return (
 		<Screen title={t('stores.title')}>
@@ -46,21 +34,14 @@ export function Stores() {
 
 			{notifySupported && (
 				<div className="hk-card hk-card--pad" style={{ marginTop: 'var(--hk-s4)' }}>
-					<div className="hk-row" style={{ borderBottom: 'none', padding: 0 }}>
+					<button type="button" className="hk-row hk-row-btn" style={{ borderBottom: 'none', padding: 0, width: '100%' }} onClick={() => nav('/notifications')}>
 						<span className="hk-lead-ic"><Icon name="bell" size={20} /></span>
 						<div className="hk-row-grow">
-							<span className="hk-row-title">{t('stores.notifTitle')}</span>
-							<span className="hk-row-sub">{t('stores.notifSub')}</span>
+							<span className="hk-row-title">{t('notifications.title')}</span>
+							<span className="hk-row-sub">{notifyEnabled ? t('notifications.on') : t('notifications.off')}</span>
 						</div>
-						<button
-							className={`hk-btn${notifyEnabled ? '' : ' hk-btn--pri'}`}
-							style={{ minHeight: '36px', padding: '0 14px' }}
-							onClick={() => void toggleNotifications()}
-						>
-							{notifyEnabled ? t('stores.notifOn') : t('stores.notifEnable')}
-						</button>
-					</div>
-					{notifyErr && <div className="hk-error-note" style={{ marginTop: 'var(--hk-s3)' }}>{notifyErr}</div>}
+						<Icon name="chevron" size={16} />
+					</button>
 				</div>
 			)}
 

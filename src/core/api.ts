@@ -7,6 +7,7 @@ import type {
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup, Discount, DiscountInput, DiscountType,
 } from './models';
+import type { LowStockItem } from './notify-settings';
 
 export class ApiError extends Error {
 	code: string;
@@ -353,6 +354,12 @@ export class ApiClient {
 			start: Number(meta?.start ?? 0),
 			limit: Number(meta?.limit ?? 0),
 		};
+	}
+
+	// Sellable items at or below a stock threshold, lowest first (read scope), for stock alerts.
+	async getLowStock(params: { threshold?: number; limit?: number } = {}): Promise<LowStockItem[]> {
+		const query: Query = { threshold: params.threshold, limit: params.limit };
+		return (await this.request<LowStockItem[]>('GET', 'products/low-stock', { query })).data || [];
 	}
 
 	async getProduct(id: number): Promise<ProductDetail> {

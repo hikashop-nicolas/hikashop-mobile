@@ -27,6 +27,7 @@ import { CustomerDetail } from './screens/CustomerDetail';
 import { Discounts } from './screens/Discounts';
 import { DiscountEdit } from './screens/DiscountEdit';
 import { Stores } from './screens/Stores';
+import { Notifications } from './screens/Notifications';
 
 const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
 	{ key: 'dashboard', icon: 'dashboard', labelKey: 'tabs.dashboard' },
@@ -44,7 +45,7 @@ function activeKey(pathname: string): string {
 	if (pathname.startsWith('/categories')) return 'categories';
 	if (pathname.startsWith('/customers')) return 'customers';
 	if (pathname.startsWith('/discounts')) return 'discounts';
-	if (pathname.startsWith('/stores')) return 'stores';
+	if (pathname.startsWith('/stores') || pathname.startsWith('/notifications')) return 'stores';
 	return 'dashboard';
 }
 
@@ -108,11 +109,12 @@ function CurrencyGate({ children }: { children: React.ReactNode }) {
 	return <CurrencyProvider currencies={currencies}>{children}</CurrencyProvider>;
 }
 
-// Runs the foreground order poller whenever a store is active and notifications are enabled.
+// Runs the foreground poller (new orders + low stock) whenever a store is active and
+// notifications are enabled.
 function OrderPoller() {
-	const { client, active, notifyEnabled } = useStores();
+	const { client, active, notifyEnabled, notifySettings } = useStores();
 	const t = useT();
-	useOrderPoll(client, active, notifyEnabled, t);
+	useOrderPoll(client, active, notifyEnabled, t, notifySettings);
 	return null;
 }
 
@@ -158,6 +160,7 @@ function Shell() {
 								<Route path="/discounts/new" element={<DiscountEdit />} />
 								<Route path="/discounts/:id/edit" element={<DiscountEdit />} />
 								<Route path="/stores" element={<Stores />} />
+								<Route path="/notifications" element={<Notifications />} />
 								<Route path="/connect" element={<Connect />} />
 								<Route path="*" element={<Navigate to="/dashboard" replace />} />
 							</>
