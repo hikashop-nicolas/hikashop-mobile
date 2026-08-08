@@ -10,6 +10,26 @@
 
 return [
 
+	'name' => 'General store',
+
+	// The options a thing can offer. A colour carries a swatch so a drawn image can be tinted
+	// towards it and a generated one can be asked for that colour by name.
+	'characteristics' => [
+		'Colour' => [
+			'values' => [
+				'Charcoal' => '#3A3F45',
+				'Navy' => '#22314F',
+				'Oatmeal' => '#D8CBB4',
+				'Forest' => '#2F4A38',
+				'Rust' => '#9C4A2F',
+				'Ecru' => '#E4DED2',
+			],
+		],
+		'Size' => [
+			'values' => ['S' => null, 'M' => null, 'L' => null, 'XL' => null],
+		],
+	],
+
 	// Each department gives its products a shape: a material or qualifier, a thing, and sometimes
 	// a variant. The price band keeps a department's prices plausible against each other, and the
 	// sub-categories give the tree the depth a real shop's has, so browsing it means something.
@@ -20,16 +40,16 @@ return [
 			'price' => [1200, 14900],
 			'qualifiers' => ['Cast Iron', 'Stainless Steel', 'Enamelled', 'Copper', 'Stoneware', 'Bamboo', 'Non-Stick', 'Hand-Blown'],
 			'things' => [
-				['Skillet', ['20 cm', '24 cm', '26 cm', '28 cm']],
-				['Saucepan', ['1.5 L', '2 L', '3 L']],
-				['Casserole Dish', ['3 L', '4.5 L', '6 L']],
-				['Mixing Bowl', ['Small', 'Medium', 'Large']],
-				['Chopping Board', ['Small', 'Large']],
-				['Kettle', ['1.5 L', '1.7 L']],
-				['Cafetière', ['3 cup', '8 cup']],
-				['Roasting Tin', ['Medium', 'Large']],
-				['Colander', ['22 cm', '26 cm']],
-				['Pepper Mill', ['']],
+				['name' => 'Skillet', 'suffixes' => ['20 cm', '24 cm', '26 cm', '28 cm']],
+				['name' => 'Saucepan', 'suffixes' => ['1.5 L', '2 L', '3 L']],
+				['name' => 'Casserole Dish', 'suffixes' => ['3 L', '4.5 L', '6 L'], 'characteristics' => ['Colour']],
+				['name' => 'Mixing Bowl', 'suffixes' => ['Small', 'Medium', 'Large'], 'characteristics' => ['Colour']],
+				['name' => 'Chopping Board', 'suffixes' => ['Small', 'Large']],
+				['name' => 'Kettle', 'suffixes' => ['1.5 L', '1.7 L']],
+				['name' => 'Cafetière', 'suffixes' => ['3 cup', '8 cup']],
+				['name' => 'Roasting Tin', 'suffixes' => ['Medium', 'Large']],
+				['name' => 'Colander', 'suffixes' => ['22 cm', '26 cm']],
+				['name' => 'Pepper Mill', 'suffixes' => ['']],
 			],
 		],
 		[
@@ -38,14 +58,14 @@ return [
 			'price' => [1800, 22000],
 			'qualifiers' => ['Merino Wool', 'Organic Cotton', 'Linen', 'Waxed Cotton', 'Cashmere', 'Corduroy', 'Denim'],
 			'things' => [
-				['Scarf', ['Charcoal', 'Navy', 'Oatmeal', 'Rust']],
-				['Crew Jumper', ['S', 'M', 'L', 'XL']],
-				['Overshirt', ['S', 'M', 'L', 'XL']],
-				['Field Jacket', ['S', 'M', 'L', 'XL']],
-				['Chinos', ['30', '32', '34', '36']],
-				['Oxford Shirt', ['S', 'M', 'L', 'XL']],
-				['Beanie', ['Charcoal', 'Forest', 'Ecru']],
-				['Socks', ['39-42', '43-46']],
+				['name' => 'Scarf', 'suffixes' => [''], 'characteristics' => ['Colour']],
+				['name' => 'Crew Jumper', 'suffixes' => [''], 'characteristics' => ['Colour', 'Size']],
+				['name' => 'Overshirt', 'suffixes' => [''], 'characteristics' => ['Colour', 'Size']],
+				['name' => 'Field Jacket', 'suffixes' => [''], 'characteristics' => ['Colour', 'Size']],
+				['name' => 'Chinos', 'suffixes' => ['30', '32', '34', '36']],
+				['name' => 'Oxford Shirt', 'suffixes' => [''], 'characteristics' => ['Colour', 'Size']],
+				['name' => 'Beanie', 'suffixes' => [''], 'characteristics' => ['Colour']],
+				['name' => 'Socks', 'suffixes' => ['39-42', '43-46']],
 			],
 		],
 		[
@@ -54,14 +74,14 @@ return [
 			'price' => [2500, 39000],
 			'qualifiers' => ['Lightweight', 'Insulated', 'Packable', 'All-Weather', 'Trail', 'Alpine'],
 			'things' => [
-				['Backpack', ['20 L', '35 L', '60 L']],
-				['Sleeping Bag', ['Comfort 0°C', 'Comfort -5°C', 'Comfort 5°C']],
-				['Head Torch', ['200 lm', '400 lm']],
-				['Water Bottle', ['500 ml', '750 ml', '1 L']],
-				['Trekking Poles', ['Pair']],
-				['Dry Bag', ['5 L', '10 L', '20 L']],
-				['Camping Stove', ['']],
-				['Hammock', ['Single', 'Double']],
+				['name' => 'Backpack', 'suffixes' => ['20 L', '35 L', '60 L'], 'characteristics' => ['Colour']],
+				['name' => 'Sleeping Bag', 'suffixes' => ['Comfort 0°C', 'Comfort -5°C', 'Comfort 5°C']],
+				['name' => 'Head Torch', 'suffixes' => ['200 lm', '400 lm']],
+				['name' => 'Water Bottle', 'suffixes' => ['500 ml', '750 ml', '1 L'], 'characteristics' => ['Colour']],
+				['name' => 'Trekking Poles', 'suffixes' => ['Pair']],
+				['name' => 'Dry Bag', 'suffixes' => ['5 L', '10 L', '20 L'], 'characteristics' => ['Colour']],
+				['name' => 'Camping Stove', 'suffixes' => ['']],
+				['name' => 'Hammock', 'suffixes' => ['Single', 'Double']],
 			],
 		],
 		[
@@ -70,14 +90,14 @@ return [
 			'price' => [900, 26000],
 			'qualifiers' => ['Linen', 'Hand-Woven', 'Ceramic', 'Solid Oak', 'Recycled Glass', 'Brushed Brass'],
 			'things' => [
-				['Throw', ['130 × 170', '150 × 200']],
-				['Cushion Cover', ['40 × 40', '50 × 50']],
-				['Table Lamp', ['']],
-				['Picture Frame', ['A4', 'A3', '30 × 40']],
-				['Storage Basket', ['Small', 'Medium', 'Large']],
-				['Wall Clock', ['']],
-				['Vase', ['Small', 'Tall']],
-				['Door Mat', ['']],
+				['name' => 'Throw', 'suffixes' => ['130 × 170', '150 × 200'], 'characteristics' => ['Colour']],
+				['name' => 'Cushion Cover', 'suffixes' => ['40 × 40', '50 × 50'], 'characteristics' => ['Colour']],
+				['name' => 'Table Lamp', 'suffixes' => ['']],
+				['name' => 'Picture Frame', 'suffixes' => ['A4', 'A3', '30 × 40']],
+				['name' => 'Storage Basket', 'suffixes' => ['Small', 'Medium', 'Large']],
+				['name' => 'Wall Clock', 'suffixes' => ['']],
+				['name' => 'Vase', 'suffixes' => ['Small', 'Tall'], 'characteristics' => ['Colour']],
+				['name' => 'Door Mat', 'suffixes' => ['']],
 			],
 		],
 		[
@@ -86,13 +106,13 @@ return [
 			'price' => [300, 8500],
 			'qualifiers' => ['Leather-Bound', 'Recycled', 'Dotted', 'Ruled', 'Hand-Marbled', 'Cloth-Bound'],
 			'things' => [
-				['Notebook', ['A4', 'A5', 'A6', 'Pocket']],
-				['Sketchbook', ['A4', 'A5']],
-				['Fountain Pen', ['Fine', 'Medium']],
-				['Pencil Set', ['']],
-				['Desk Pad', ['']],
-				['Letter Set', ['']],
-				['Diary', ['A5', 'Pocket']],
+				['name' => 'Notebook', 'suffixes' => ['A4', 'A5', 'A6', 'Pocket'], 'characteristics' => ['Colour']],
+				['name' => 'Sketchbook', 'suffixes' => ['A4', 'A5']],
+				['name' => 'Fountain Pen', 'suffixes' => ['Fine', 'Medium']],
+				['name' => 'Pencil Set', 'suffixes' => ['']],
+				['name' => 'Desk Pad', 'suffixes' => ['']],
+				['name' => 'Letter Set', 'suffixes' => ['']],
+				['name' => 'Diary', 'suffixes' => ['A5', 'Pocket'], 'characteristics' => ['Colour']],
 			],
 		],
 		[
@@ -101,13 +121,13 @@ return [
 			'price' => [600, 4800],
 			'qualifiers' => ['Single Origin', 'Organic', 'Decaffeinated', 'Small Batch', 'Loose Leaf'],
 			'things' => [
-				['Espresso Blend', ['250 g', '500 g', '1 kg']],
-				['Filter Coffee', ['250 g', '500 g', '1 kg']],
-				['Earl Grey', ['100 g', '250 g']],
-				['Sencha', ['100 g', '250 g']],
-				['Rooibos', ['100 g', '250 g']],
-				['Breakfast Blend', ['250 g', '500 g']],
-				['Chai', ['100 g', '250 g']],
+				['name' => 'Espresso Blend', 'suffixes' => ['250 g', '500 g', '1 kg']],
+				['name' => 'Filter Coffee', 'suffixes' => ['250 g', '500 g', '1 kg']],
+				['name' => 'Earl Grey', 'suffixes' => ['100 g', '250 g']],
+				['name' => 'Sencha', 'suffixes' => ['100 g', '250 g']],
+				['name' => 'Rooibos', 'suffixes' => ['100 g', '250 g']],
+				['name' => 'Breakfast Blend', 'suffixes' => ['250 g', '500 g']],
+				['name' => 'Chai', 'suffixes' => ['100 g', '250 g']],
 			],
 		],
 	],
@@ -145,6 +165,19 @@ return [
 		'Tanaka', 'Suzuki', 'Sato', 'Watanabe', 'Chen', 'Wang',
 	],
 	'emailDomains' => ['example.com', 'example.org', 'example.net'],
+
+	'imagery' => [
+		'palettes' => [
+			'Kitchen'      => ['#2F4A5C', '#8EB8C4'],
+			'Clothing'     => ['#4A3B52', '#C3A5B4'],
+			'Outdoor'      => ['#254B3A', '#9CC08F'],
+			'Home'         => ['#5C4A35', '#D6BE9C'],
+			'Stationery'   => ['#333E52', '#A9B4C7'],
+			'Coffee & Tea' => ['#4A3328', '#C9A184'],
+		],
+		// How a generated photograph of this shop's goods should look.
+		'style' => 'plain light background, soft studio lighting, centred, sharp focus, e-commerce catalogue photo',
+	],
 
 	// Addresses. Street names are invented rather than real, so nothing here points at a real
 	// person's door: this data ends up in screenshots.

@@ -26,11 +26,13 @@ final class DemoImagesAi
 	private string $cacheDir;
 	private int $timeout;
 	private int $size;
+	private string $style;
 
 	public array $stats = ['generated' => 0, 'cached' => 0, 'failed' => 0];
 
-	public function __construct(string $baseUrl, string $model = '', string $cacheDir = '', int $timeout = 180, int $size = 768)
+	public function __construct(string $baseUrl, string $model = '', string $cacheDir = '', int $timeout = 180, int $size = 768, string $style = '')
 	{
+		$this->style = $style !== '' ? $style : 'plain light background, soft studio lighting, centred, sharp focus, e-commerce catalogue photo';
 		$this->endpoint = rtrim($baseUrl, '/').'/v1/images/generations';
 		$this->model = $model;
 		$this->cacheDir = $cacheDir !== '' ? rtrim($cacheDir, '/') : __DIR__.'/cache/images';
@@ -57,14 +59,21 @@ final class DemoImagesAi
 	 * object on a plain ground, and names what to avoid: a shop's own photographs do not have
 	 * captions, watermarks or hands in them.
 	 */
-	public function imageFor(string $department, string $thing): ?string
+	public function imageFor(string $department, string $thing, ?string $colour = null, string $view = 'front'): ?string
 	{
+		// The colour goes in the prompt, so a variant's photograph is of that colour rather than
+		// of the same object twice; the view varies a second image of the same product.
+		$subject = strtolower($thing);
+		if ($colour !== null && $colour !== '') $subject = strtolower($colour).' '.$subject;
+		$angle = $view === 'front' ? 'straight-on product shot' : $view.' of the product';
+
 		$prompt = sprintf(
-			'product photograph of a %s, %s, plain light background, soft studio lighting, centred, '
-			.'sharp focus, e-commerce catalogue photo|text, watermark, logo, people, hands, blurry, '
+			'product photograph of a %s, %s, %s, %s|text, watermark, logo, people, hands, blurry, '
 			.'cluttered background, collage, frame, border',
-			strtolower($thing),
-			strtolower($department)
+			$subject,
+			strtolower($department),
+			$angle,
+			$this->style
 		);
 
 		$cacheFile = $this->cacheDir.'/'.sha1($prompt.'|'.$this->model.'|'.$this->size).'.png';

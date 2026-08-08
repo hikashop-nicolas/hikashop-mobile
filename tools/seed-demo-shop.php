@@ -61,9 +61,9 @@ function insertRow(mysqli $db, string $table, array $values): int {
 	return (int)$db->insert_id;
 }
 
-$opts = getopt('', ['site:', 'products::', 'customers::', 'orders::', 'clean', 'no-images', 'ai-images::', 'ai-model::', 'help']);
+$opts = getopt('', ['site:', 'products::', 'customers::', 'orders::', 'clean', 'no-images', 'ai-images::', 'ai-model::', 'theme::', 'help']);
 if (isset($opts['help']) || !isset($opts['site'])) {
-	fwrite(STDERR, "usage: php seed-demo-shop.php --site=/path/to/joomla [--products=300] [--customers=300] [--orders=300] [--no-images] [--ai-images[=URL]] [--ai-model=NAME] [--clean]\n");
+	fwrite(STDERR, "usage: php seed-demo-shop.php --site=/path/to/joomla [--products=300] [--customers=300] [--orders=300] [--theme=NAME] [--no-images] [--ai-images[=URL]] [--ai-model=NAME] [--clean]\n");
 	exit(isset($opts['help']) ? 0 : 1);
 }
 
@@ -103,6 +103,7 @@ if (isset($opts['clean'])) {
 		if (is_file($file)) @unlink($file);
 	}
 	$db->query("DELETE FROM {$p}hikashop_file WHERE file_path LIKE 'demo-%'");
+	$db->query("DELETE v FROM {$p}hikashop_variant v JOIN {$p}hikashop_product pr ON pr.product_id = v.variant_product_id WHERE pr.product_code LIKE '{$PRODUCT_PREFIX}%'");
 	$db->query("DELETE FROM {$p}hikashop_product WHERE product_code LIKE '{$PRODUCT_PREFIX}%'");
 	$db->query("DELETE a FROM {$p}hikashop_address a JOIN {$p}hikashop_user u ON u.user_id = a.address_user_id WHERE u.user_email LIKE '%{$EMAIL_SUFFIX}'");
 	$db->query("DELETE FROM {$p}hikashop_user WHERE user_email LIKE '%{$EMAIL_SUFFIX}'");
@@ -110,7 +111,27 @@ if (isset($opts['clean'])) {
 	exit(0);
 }
 
-$catalogue = require __DIR__.'/demo-catalogue.php';
+/**
+ * Write one picture: a photograph from the model when there is one to be had, the drawn tile
+ * otherwise. Returns whether anything was written.
+ */
+function writeImage(string $path, array $product, ?string $colour, string $view, DemoImages $drawn, $ai, array $swatches = []): bool
+{
+	if ($ai !== null) {
+		$bytes = $ai->imageFor($product['dept'], $product['thing'], $colour, $view);
+		if ($bytes !== null && @file_put_contents($path, $bytes) !== false) return true;
+	}
+	return $drawn->write($path, $product['dept'], $product['name'].'|'.$colour.'|'.$view, $colour !== null ? ($swatches[$colour] ?? null) : null) > 0;
+}
+
+$theme = is_string($opts['theme'] ?? null) && $opts['theme'] !== '' ? $opts['theme'] : 'general-store';
+$themeFile = __DIR__.'/themes/'.basename($theme).'.php';
+if (!is_file($themeFile)) {
+	fwrite(STDERR, "no theme called $theme in tools/themes\n");
+	exit(1);
+}
+$catalogue = require $themeFile;
+echo 'theme: '.($catalogue['name'] ?? $theme)."\n";
 require __DIR__.'/demo-images.php';
 
 // Where HikaShop keeps uploaded images, as the shop itself has it configured.
@@ -125,7 +146,7 @@ if ($wantImages && !extension_loaded('gd')) {
 	fwrite(STDERR, "no GD extension; continuing without images\n");
 	$wantImages = false;
 }
-$images = $wantImages ? new DemoImages() : null;
+$images = $wantImages ? new DemoImages(800, $catalogue['imagery']['palettes'] ?? []) : null;
 
 // Optionally, photographs from a local image model instead of drawn tiles. One image per kind of
 // product rather than per product -- two skillets of different sizes are the same photograph as
@@ -134,7 +155,7 @@ $ai = null;
 if ($wantImages && isset($opts['ai-images'])) {
 	require __DIR__.'/demo-images-ai.php';
 	$aiUrl = is_string($opts['ai-images']) && $opts['ai-images'] !== '' ? $opts['ai-images'] : 'http://localhost:8080';
-	$ai = new DemoImagesAi($aiUrl, is_string($opts['ai-model'] ?? null) ? $opts['ai-model'] : '');
+	$ai = new DemoImagesAi($aiUrl, is_string($opts['ai-model'] ?? null) ? $opts['ai-model'] : '', '', 180, 768, $catalogue['imagery']['style'] ?? '');
 	if (!$ai->reachable()) {
 		fwrite(STDERR, "no image model answering at $aiUrl; drawing the tiles instead\n");
 		$ai = null;
@@ -152,6 +173,8 @@ $nOrders = (int)($opts['orders'] ?? 300);
 // number of random values, and every item after that point comes out different. Re-seeding from
 // the item's own index makes each item's data depend on nothing but its index.
 const DEMO_SEED = 20260808;
+// The most variants one product is given. Shared by every theme.
+const VARIANT_CAP = 24;
 $seedFor = function (string $kind, int $i) { mt_srand(crc32($kind.':'.$i) ^ DEMO_SEED); };
 
 $pick = function (array $a) { return $a[array_rand($a)]; };
@@ -206,7 +229,67 @@ foreach ($catalogue['departments'] as $dept) {
 		]);
 	}
 }
-echo "departments: ".count($departmentIds)." (".array_sum(array_map('count', $subIds))." sub-categories)\n";
+// A picture for each department and sub-category, so a category listing is furnished.
+$categoryImages = 0;
+if ($images !== null) {
+	$allCats = [];
+	foreach ($departmentIds as $deptName => $cid) $allCats[$cid] = [$deptName, $deptName];
+	foreach ($subIds as $deptName => $ids) {
+		foreach ($ids as $cid) {
+			$row = $db->query("SELECT category_name FROM {$p}hikashop_category WHERE category_id = $cid")->fetch_row();
+			$allCats[$cid] = [$deptName, $row ? $row[0] : $deptName];
+		}
+	}
+	foreach ($allCats as $cid => [$deptName, $catName]) {
+		if ($db->query("SELECT file_id FROM {$p}hikashop_file WHERE file_type = 'category' AND file_ref_id = $cid LIMIT 1")->num_rows) continue;
+		$fileName = 'demo-cat-'.$cid.'.png';
+		$fake = ['dept' => $deptName, 'thing' => $catName, 'name' => $catName];
+		if (writeImage($uploadDir.$fileName, $fake, null, 'front', $images, $ai)) {
+			insertRow($db, $p.'hikashop_file', [
+				'file_name' => $catName,
+				'file_path' => $fileName,
+				'file_type' => 'category',
+				'file_ref_id' => $cid,
+				'file_ordering' => 1,
+				'file_access' => 'all',
+			]);
+			$categoryImages++;
+		}
+	}
+}
+echo "departments: ".count($departmentIds)." (".array_sum(array_map('count', $subIds))." sub-categories, $categoryImages images)\n";
+
+// ---------------------------------------------------------------------------- characteristics
+
+// An option (Colour) is a characteristic with no parent; its values are its children. A variant
+// is joined to one value of each option it varies by.
+$optionIds = [];    // 'Colour' => characteristic_id
+$valueIds = [];     // 'Colour' => ['Charcoal' => characteristic_id, ...]
+$swatches = [];     // 'Charcoal' => '#3A3F45', for tinting a drawn image
+foreach (($catalogue['characteristics'] ?? []) as $option => $spec) {
+	$name = $db->real_escape_string($option);
+	$row = $db->query("SELECT characteristic_id FROM {$p}hikashop_characteristic WHERE characteristic_parent_id = 0 AND characteristic_value = '$name' LIMIT 1")->fetch_row();
+	$optionIds[$option] = $row ? (int)$row[0] : insertRow($db, $p.'hikashop_characteristic', [
+		'characteristic_parent_id' => 0,
+		'characteristic_value' => $option,
+		'characteristic_alias' => strtolower($option),
+	]);
+	foreach ($spec['values'] as $value => $swatch) {
+		if ($swatch !== null) $swatches[$value] = $swatch;
+		$vName = $db->real_escape_string($value);
+		$vRow = $db->query("SELECT characteristic_id FROM {$p}hikashop_characteristic WHERE characteristic_parent_id = {$optionIds[$option]} AND characteristic_value = '$vName' LIMIT 1")->fetch_row();
+		$valueIds[$option][$value] = $vRow ? (int)$vRow[0] : insertRow($db, $p.'hikashop_characteristic', [
+			'characteristic_parent_id' => $optionIds[$option],
+			'characteristic_value' => $value,
+			'characteristic_alias' => strtolower(preg_replace('#[^a-z0-9]+#i', '-', $value)),
+		]);
+	}
+}
+if ($optionIds) {
+	echo 'characteristics: '.implode(', ', array_map(
+		fn($o) => $o.' ('.count($valueIds[$o]).')', array_keys($optionIds)
+	))."\n";
+}
 
 // ---------------------------------------------------------------------------- products
 
@@ -215,13 +298,16 @@ echo "departments: ".count($departmentIds)." (".array_sum(array_map('count', $su
 $candidates = [];
 foreach ($catalogue['departments'] as $dept) {
 	foreach ($dept['qualifiers'] as $q) {
-		foreach ($dept['things'] as [$thing, $variants]) {
-			foreach ($variants as $variant) {
+		foreach ($dept['things'] as $thing) {
+			foreach (($thing['suffixes'] ?: ['']) as $suffix) {
 				$candidates[] = [
 					'dept' => $dept['name'],
-					'name' => trim($q.' '.$thing.($variant !== '' ? ' — '.$variant : '')),
+					'name' => trim($q.' '.$thing['name'].($suffix !== '' ? ' — '.$suffix : '')),
 					'qualifier' => $q,
-					'thing' => $thing,
+					'thing' => $thing['name'],
+					// The options this product is offered in, if any. A thing that has them
+					// becomes a parent product with a variant per combination.
+					'characteristics' => $thing['characteristics'] ?? [],
 					'price' => $dept['price'],
 				];
 			}
@@ -237,6 +323,7 @@ if (count($candidates) < $nProducts) {
 
 $productIds = [];
 $imagesMade = 0;
+$variantsMade = 0;
 $now = time();
 for ($i = 0; $i < $nProducts; $i++) {
 	$seedFor('product', $i);
@@ -284,35 +371,103 @@ for ($i = 0; $i < $nProducts; $i++) {
 		$catId = !empty($subIds[$c['dept']]) ? $pick($subIds[$c['dept']]) : $departmentIds[$c['dept']];
 		$db->query("INSERT IGNORE INTO {$p}hikashop_product_category (product_id, category_id) VALUES ($id, $catId)");
 
+		// --- pictures -------------------------------------------------------------
+		//
+		// A listing is mostly thumbnails, so every product gets at least one. Some get several,
+		// which is what the slider on the product page is for, and a product offered in colours
+		// gets one per colour on the variant itself -- that file row is what makes the picture
+		// change when a customer picks a colour.
 		if ($images !== null) {
-			// The code already carries the DEMO- prefix that --clean matches on.
-			$fileName = strtolower($code).'.png';
-			// A photograph of this kind of product when a model can supply one, the drawn tile
-			// otherwise. The fallback matters: a fixture must not fail because an optional
-			// service is slow or missing.
-			$written = 0;
-			if ($ai !== null) {
-				$bytes = $ai->imageFor($c['dept'], $c['thing']);
-				if ($bytes !== null && @file_put_contents($uploadDir.$fileName, $bytes) !== false) {
-					$written = strlen($bytes);
+			$views = ['front'];
+			// Roughly a third carry extra views, so the slider has something to slide without
+			// every product looking like a catalogue shoot.
+			if (mt_rand(1, 3) === 1) {
+				$views[] = 'three-quarter view';
+				if (mt_rand(1, 2) === 1) $views[] = 'detail';
+			}
+			foreach ($views as $n => $view) {
+				$fileName = strtolower($code).($n > 0 ? '-'.($n + 1) : '').'.png';
+				if (writeImage($uploadDir.$fileName, $c, null, $view, $images, $ai)) {
+					insertRow($db, $p.'hikashop_file', [
+						'file_name' => $c['name'],
+						'file_path' => $fileName,
+						'file_type' => 'product',
+						'file_ref_id' => $id,
+						'file_ordering' => $n + 1,
+						'file_access' => 'all',
+					]);
+					$imagesMade++;
 				}
 			}
-			if ($written === 0) {
-				$written = $images->write($uploadDir.$fileName, $c['dept'], $c['name']);
+		}
+
+		// --- variants -------------------------------------------------------------
+		if (!empty($c['characteristics'])) {
+			// Every combination of the options this thing is offered in. Seven colours and seven
+			// sizes is forty-nine variants for one shoe, so the number of VALUES per option is
+			// capped rather than the number of combinations: truncating the combinations instead
+			// leaves a shoe offered in every size but only the first three colours, which is not
+			// what a shop looks like.
+			$options = array_values(array_filter($c['characteristics'], fn($o) => !empty($valueIds[$o])));
+			$perOption = $options ? max(2, (int)floor(pow(VARIANT_CAP, 1 / count($options)))) : 0;
+
+			$combos = [[]];
+			foreach ($options as $option) {
+				$values = array_slice(array_keys($valueIds[$option]), 0, $perOption);
+				$next = [];
+				foreach ($combos as $combo) {
+					foreach ($values as $value) {
+						$next[] = $combo + [$option => $value];
+					}
+				}
+				$combos = $next;
 			}
-			if ($written > 0) {
-				insertRow($db, $p.'hikashop_file', [
-					'file_name' => $c['name'],
-					'file_path' => $fileName,
-					'file_type' => 'product',
-					'file_ref_id' => $id,
-					'file_ordering' => 1,
-					'file_access' => 'all',
+
+			$vOrder = 0;
+			foreach ($combos as $combo) {
+				if (!$combo) continue;
+				$vOrder++;
+				$label = implode(' / ', array_values($combo));
+				$vCode = $code.'-'.strtoupper(preg_replace('#[^a-z0-9]+#i', '', implode('', array_values($combo))));
+				$vId = insertRow($db, $p.'hikashop_product', [
+					'product_name' => $c['name'].' — '.$label,
+					'product_code' => $vCode,
+					'product_quantity' => mt_rand(0, 40),
+					'product_published' => 1,
+					'product_type' => 'variant',
+					'product_parent_id' => $id,
+					'product_created' => $now,
+					'product_modified' => $now,
+					'product_access' => 'all',
 				]);
-				$imagesMade++;
+				foreach ($combo as $option => $value) {
+					insertRow($db, $p.'hikashop_variant', [
+						'variant_characteristic_id' => $valueIds[$option][$value],
+						'variant_product_id' => $vId,
+						'ordering' => $vOrder,
+					]);
+				}
+				// The variant's own picture, in its own colour where it has one.
+				if ($images !== null) {
+					$colour = $combo['Colour'] ?? null;
+					$vFile = strtolower($vCode).'.png';
+					if (writeImage($uploadDir.$vFile, $c, $colour, 'front', $images, $ai, $swatches)) {
+						insertRow($db, $p.'hikashop_file', [
+							'file_name' => $c['name'].' — '.$label,
+							'file_path' => $vFile,
+							'file_type' => 'product',
+							'file_ref_id' => $vId,
+							'file_ordering' => 1,
+							'file_access' => 'all',
+						]);
+						$imagesMade++;
+					}
+				}
+				$variantsMade++;
 			}
 		}
 	}
+
 	$productIds[] = ['id' => $id, 'name' => $c['name'], 'code' => $code, 'price' => $price];
 }
 $imageNote = ' (no images)';
@@ -324,6 +479,7 @@ if ($images !== null) {
 	}
 }
 echo "products: ".count($productIds).$imageNote."\n";
+if ($variantsMade > 0) echo "variants: $variantsMade\n";
 
 // ---------------------------------------------------------------------------- customers
 
@@ -456,7 +612,9 @@ $db->commit();
 // ---------------------------------------------------------------------------- what you got
 
 foreach ([
-	'products' => "SELECT COUNT(*) FROM {$p}hikashop_product WHERE product_code LIKE '{$PRODUCT_PREFIX}%'",
+	'products' => "SELECT COUNT(*) FROM {$p}hikashop_product WHERE product_code LIKE '{$PRODUCT_PREFIX}%' AND product_type = 'main'",
+	'variants' => "SELECT COUNT(*) FROM {$p}hikashop_product WHERE product_code LIKE '{$PRODUCT_PREFIX}%' AND product_type = 'variant'",
+	'images' => "SELECT COUNT(*) FROM {$p}hikashop_file WHERE file_path LIKE 'demo-%'",
 	'customers' => "SELECT COUNT(*) FROM {$p}hikashop_user WHERE user_email LIKE '%{$EMAIL_SUFFIX}'",
 	'orders' => "SELECT COUNT(*) FROM {$p}hikashop_order WHERE order_number LIKE '{$ORDER_PREFIX}%'",
 	'order lines' => "SELECT COUNT(*) FROM {$p}hikashop_order_product op JOIN {$p}hikashop_order o ON o.order_id = op.order_id WHERE o.order_number LIKE '{$ORDER_PREFIX}%'",

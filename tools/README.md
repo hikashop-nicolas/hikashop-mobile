@@ -38,6 +38,39 @@ What it aims for, and why:
 Addresses use invented street names: this data ends up in screenshots, so nothing in it should
 point at a real person.
 
+## Themes
+
+A theme is the vocabulary a shop is built from — departments, the things they sell, the options
+those come in, the people who buy them, and a palette. It holds no logic, so a new shop is a new
+data file rather than a new script.
+
+```sh
+php tools/seed-demo-shop.php --site=... --theme=general-store   # the default
+php tools/seed-demo-shop.php --site=... --theme=shoes
+```
+
+`themes/shoes.php` exists mainly to prove the generator is not the general store: everything that
+differs between the two is data. It also leans harder on variants, since almost everything a shoe
+shop sells comes in a colour and a size.
+
+### Variants
+
+A thing that names characteristics becomes a parent product with a variant per combination. The
+option and its values are characteristics; each variant is a product joined to its values, and
+each variant carries **its own image**, which is the mechanism behind the picture changing when a
+customer picks a colour.
+
+The number of values per option is capped rather than the number of combinations. Seven colours
+and seven sizes is forty-nine variants for one shoe; capping the combinations instead would leave
+it offered in every size but only the first three colours, which is not what a shop looks like.
+
+### One caveat when switching themes
+
+`--clean` does not remove characteristics, because it cannot tell the ones it created from the
+ones the shop already had — deleting "Size: M" could destroy a real shop's data. Seeding a second
+theme onto the same site therefore leaves the first theme's colours and sizes behind, and a jumper
+ends up offered in shoe sizes. Use one theme per site, or remove the unused values by hand.
+
 ## Product images
 
 By default the seeder draws a tile per product: a gradient in the department's colours with a

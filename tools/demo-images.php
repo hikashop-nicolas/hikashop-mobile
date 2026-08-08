@@ -31,22 +31,55 @@ final class DemoImages
 	private const DEFAULT_PALETTE = [[0x3A, 0x3F, 0x45], [0xB0, 0xB6, 0xBD]];
 
 	private int $size;
+	private array $palettes;
 
-	public function __construct(int $size = 800)
+	/** A theme brings its own palette per department; the defaults are the general store's. */
+	public function __construct(int $size = 800, array $palettes = [])
 	{
 		$this->size = $size;
+		$this->palettes = [];
+		foreach ($palettes as $dept => $pair) {
+			$from = self::hexToRgb($pair[0]);
+			$to = self::hexToRgb($pair[1]);
+			if ($from && $to) $this->palettes[$dept] = [$from, $to];
+		}
+		if (!$this->palettes) $this->palettes = self::PALETTES;
+	}
+
+	private static function hexToRgb(string $hex): ?array
+	{
+		$hex = ltrim($hex, '#');
+		if (strlen($hex) !== 6 || !ctype_xdigit($hex)) return null;
+		return [hexdec(substr($hex, 0, 2)), hexdec(substr($hex, 2, 2)), hexdec(substr($hex, 4, 2))];
+	}
+
+	private static function mix(array $a, array $b, float $t): array
+	{
+		return [
+			(int)round($a[0] + ($b[0] - $a[0]) * $t),
+			(int)round($a[1] + ($b[1] - $a[1]) * $t),
+			(int)round($a[2] + ($b[2] - $a[2]) * $t),
+		];
 	}
 
 	/**
 	 * Draw one product's image and write it as a PNG. Returns the bytes written, or 0 on failure.
 	 */
-	public function write(string $path, string $department, string $productName): int
+	public function write(string $path, string $department, string $seedText, ?string $tintHex = null): int
 	{
-		// Everything about the picture comes from the name, so it is stable across runs.
-		$seed = crc32($productName);
-		mt_srand($seed);
+		// Everything about the picture comes from the seed text, so it is stable across runs and
+		// a second view or another colour of the same product differs from the first.
+		mt_srand(crc32($seedText));
 
-		[$from, $to] = self::PALETTES[$department] ?? self::DEFAULT_PALETTE;
+		[$from, $to] = $this->palettes[$department] ?? self::DEFAULT_PALETTE;
+		// A variant's picture leans towards the colour it is sold in, so the swap is visible.
+		if ($tintHex !== null) {
+			$tint = self::hexToRgb($tintHex);
+			if ($tint !== null) {
+				$from = self::mix($from, $tint, 0.55);
+				$to = self::mix($to, $tint, 0.35);
+			}
+		}
 		$im = imagecreatetruecolor($this->size, $this->size);
 		imagealphablending($im, true);
 
