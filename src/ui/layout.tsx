@@ -1,15 +1,25 @@
+import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { Icon } from './icons';
 import type { IconName } from './icons';
 
-export function Screen({ title, left, right, children, center }: {
+export function Screen({ title, left, right, children, center, scrollResetKey }: {
 	title?: ReactNode;
 	left?: ReactNode;
 	right?: ReactNode;
 	children: ReactNode;
 	center?: boolean;
+	// Change this when the content becomes a different list -- a new search or filter -- and the
+	// body returns to the top. Otherwise you keep the scroll position of a list you have left,
+	// which after a filter that returns fewer rows leaves you somewhere arbitrary in the new one.
+	scrollResetKey?: string | number;
 }) {
 	const hasBar = title || left || right;
+	const bodyRef = useRef<HTMLElement | null>(null);
+	useEffect(() => {
+		if (scrollResetKey === undefined) return;
+		bodyRef.current?.scrollTo({ top: 0 });
+	}, [scrollResetKey]);
 	return (
 		<>
 			{hasBar && (
@@ -20,7 +30,7 @@ export function Screen({ title, left, right, children, center }: {
 					{right}
 				</header>
 			)}
-			<main className={`hk-body${center ? ' hk-center' : ''}`}>{children}</main>
+			<main className={`hk-body${center ? ' hk-center' : ''}`} ref={bodyRef}>{children}</main>
 		</>
 	);
 }

@@ -41,4 +41,45 @@ describe('Listing pagination', () => {
 		cy.get('input').first().type('Vol test product 01');
 		cy.get('.hk-row', { timeout: 10000 }).should('have.length.lessThan', 60);
 	});
+
+	// A search that matches more than a page must page through its own results, not the whole list.
+	it('pages through the results of a search', () => {
+		cy.visitApp('/products');
+		cy.get('.hk-row').should('have.length', 30);
+		cy.get('input').first().type('Vol test product 1');
+
+		// The count is the search's count, not the shop's.
+		cy.get('.hk-listfoot', { timeout: 10000 }).should('contain', '100');
+		cy.get('.hk-row').should('have.length', 30);
+
+		cy.get('.hk-listfoot button').click();
+		cy.get('.hk-row').should('have.length', 60);
+		// Still only matching rows.
+		cy.get('.hk-row-title').each(($el) => expect($el.text()).to.contain('Vol test product 1'));
+	});
+
+	it('returns to the first page of everything when the search is cleared', () => {
+		cy.visitApp('/products');
+		cy.get('input').first().type('Vol test product 1');
+		cy.get('.hk-listfoot', { timeout: 10000 }).should('contain', '100');
+		cy.get('.hk-listfoot button').click();
+		cy.get('.hk-row').should('have.length', 60);
+
+		// Clearing is just another query change: back to page one, of the full list.
+		cy.get('input').first().clear();
+		cy.get('.hk-listfoot', { timeout: 10000 }).should('contain', '307');
+		cy.get('.hk-row').should('have.length', 30);
+	});
+
+	it('returns to the top of the list when the query changes', () => {
+		cy.visitApp('/products');
+		cy.get('.hk-listfoot button').click();
+		cy.get('.hk-row').should('have.length', 60);
+		cy.get('.hk-listfoot').scrollIntoView();
+		cy.get('.hk-body').first().its('0.scrollTop').should('be.greaterThan', 0);
+
+		cy.get('input').first().type('Vol test product 5');
+		cy.get('.hk-row', { timeout: 10000 }).should('have.length.lessThan', 60);
+		cy.get('.hk-body').first().its('0.scrollTop').should('equal', 0);
+	});
 });

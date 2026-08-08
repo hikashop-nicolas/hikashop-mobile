@@ -32,7 +32,7 @@ export function Customers() {
 
 
 	return (
-		<Screen title={t('customers.title')} right={<NewButton onClick={() => setCreating(true)} />}>
+		<Screen title={t('customers.title')} scrollResetKey={search} right={<NewButton onClick={() => setCreating(true)} />}>
 			<Search value={search} onChange={setSearch} placeholder={t('customers.search')} />
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>

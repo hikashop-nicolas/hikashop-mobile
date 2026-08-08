@@ -37,6 +37,7 @@ export function Orders() {
 
 	return (
 		<Screen
+			scrollResetKey={`${status}|${search}`}
 			title={t('orders.title')}
 			right={<NewButton onClick={() => setCreating(true)} />}
 		>

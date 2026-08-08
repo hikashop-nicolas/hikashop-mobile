@@ -64,6 +64,7 @@ export function Products() {
 
 	return (
 		<Screen
+			scrollResetKey={`${categoryId}|${search}`}
 			title={t('products.title')}
 			right={<>
 				<Button size="sm" onClick={() => setScanning(true)}><Icon name="scan" size={16} /> {t('scan.action')}</Button>

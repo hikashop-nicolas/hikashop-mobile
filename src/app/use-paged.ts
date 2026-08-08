@@ -49,10 +49,19 @@ export function usePaged<T>(params: {
 	const [more, setMore] = useState<T[]>([]);
 	const [loadingMore, setLoadingMore] = useState(false);
 	const [moreError, setMoreError] = useState('');
+	// Guard against a second call while one is in flight: the sentinel can come into view again
+	// while the rows that will push it away are still being fetched.
+	const inFlight = useRef(false);
 
-	// A different query is a different list: drop the pages loaded for the previous one.
+	// A different query is a different list: drop the pages loaded for the previous one, and
+	// stop accepting anything still in flight for the old one. Without the token, a page
+	// requested for the previous query can land after the new first page has arrived and be
+	// appended to it -- the row counts line up, so nothing else would catch it.
 	const depKey = JSON.stringify(deps);
+	const queryToken = useRef(0);
 	useEffect(() => {
+		queryToken.current += 1;
+		inFlight.current = false;
 		setMore([]);
 		setLoadingMore(false);
 		setMoreError('');
@@ -63,32 +72,32 @@ export function usePaged<T>(params: {
 	const items = more.length ? [...firstItems, ...more] : firstItems;
 	const hasMore = first.data != null && items.length < total;
 
-	// Guard against a second call while one is in flight: the sentinel can come into view again
-	// while the rows that will push it away are still being fetched.
-	const inFlight = useRef(false);
-
 	const loadMore = useCallback(() => {
 		if (inFlight.current) return;
 		inFlight.current = true;
 		setLoadingMore(true);
 		setMoreError('');
 		const start = items.length;
+		const token = queryToken.current;
 		fetchRef.current(start)
 			.then((page) => {
+				if (token !== queryToken.current) return; // answers a query we have left
 				setMore((m) => {
-					// Ignore a response for a page that is no longer the next one (the list was
-					// reset, or a refresh changed what the first page holds).
+					// Ignore a page that is no longer the next one, which a refresh of the first
+					// page can cause by changing how many rows it holds.
 					if (start !== (first.data?.items.length ?? 0) + m.length) return m;
 					return [...m, ...(page.items ?? [])];
 				});
 			})
 			.catch((e) => {
+				if (token !== queryToken.current) return;
 				const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string')
 					? (e as { code: string }).code
 					: 'generic';
 				setMoreError(code);
 			})
 			.finally(() => {
+				if (token !== queryToken.current) return;
 				inFlight.current = false;
 				setLoadingMore(false);
 			});

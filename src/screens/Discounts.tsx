@@ -35,7 +35,7 @@ export function Discounts() {
 	}
 
 	return (
-		<Screen title={t('discounts.title')} right={<NewButton onClick={() => nav('/discounts/new')} />}>
+		<Screen scrollResetKey={`${type}|${search}`} title={t('discounts.title')} right={<NewButton onClick={() => nav('/discounts/new')} />}>
 			<Search value={search} onChange={setSearch} placeholder={t('discounts.search')} />
 			<div className="hk-filter-bar">
 				{([['', 'discounts.filterAll'], ['coupon', 'discounts.filterCoupons'], ['discount', 'discounts.filterAuto']] as const).map(([v, key]) => (
