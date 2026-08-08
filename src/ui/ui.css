@@ -13,7 +13,10 @@
 }
 /* The native shell and an installed PWA draw edge to edge, so the bar has to clear the
    status bar itself; the tab bar does the same for the gesture area at the bottom. */
-.hk-appbar { display: flex; align-items: center; gap: var(--hk-s2); padding: calc(var(--hk-s3) + env(safe-area-inset-top, 0)) var(--hk-s4) var(--hk-s3); border-bottom: 1px solid var(--hk-line); background: var(--hk-surface); position: sticky; top: 0; z-index: 5; }
+/* The bar reserves a full tap target whatever it happens to contain, so a screen whose bar holds
+   only a title and a small button lines up with one that holds a 44px icon button. That matters
+   most side by side in a split, where the two bars sit level with each other. */
+.hk-appbar { display: flex; align-items: center; gap: var(--hk-s2); min-height: calc(var(--hk-tap) + var(--hk-s3) * 2 + 1px + env(safe-area-inset-top, 0)); padding: calc(var(--hk-s3) + env(safe-area-inset-top, 0)) var(--hk-s4) var(--hk-s3); border-bottom: 1px solid var(--hk-line); background: var(--hk-surface); position: sticky; top: 0; z-index: 5; }
 .hk-appbar .hk-title { font-weight: 650; font-size: 1.05rem; letter-spacing: -.01em; }
 .hk-appbar .hk-grow { flex: 1; }
 .hk-iconbtn { display: inline-flex; align-items: center; justify-content: center; background: none; border: none; color: var(--hk-muted); padding: var(--hk-s2); border-radius: var(--hk-r1); cursor: pointer; min-width: var(--hk-tap); min-height: var(--hk-tap); }
@@ -286,7 +289,6 @@
    points at fills the screen, exactly as before the split existed. */
 .hk-split { flex: 1; display: flex; min-height: 0; min-width: 0; }
 .hk-split-list, .hk-split-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
-.hk-split-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--hk-s3); color: var(--hk-faint); text-align: center; padding: var(--hk-s6); }
 
 /* Both panes at once once there is width for a readable list beside a form. Below this the
    detail needs the whole width, so a tablet in portrait stays single-pane. */

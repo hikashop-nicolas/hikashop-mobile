@@ -92,7 +92,7 @@ export function OrderFeesEdit() {
 			}
 			const res = await client.saveOrderFees(orderId, payload);
 			await cache.putOrderDetail(storeId, orderId, { ...order, fees: res.fees, totals: res.totals });
-			nav(-1);
+			nav(`/orders/${id}`);
 		} catch (e) {
 			setSaveErr(tError(t, codeOf(e)));
 		} finally {
@@ -103,7 +103,7 @@ export function OrderFeesEdit() {
 	return (
 		<Screen
 			title={t('order.adjustFees')}
-			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
+			left={<button className="hk-iconbtn" onClick={() => nav(`/orders/${id}`)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
 			right={rows ? <Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button> : undefined}
 		>
 			{loading ? (

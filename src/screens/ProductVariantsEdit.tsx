@@ -110,7 +110,7 @@ export function ProductVariantsEdit() {
 	return (
 		<Screen
 			title={t('product.editVariants')}
-			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
+			left={<button className="hk-iconbtn" onClick={() => nav(`/products/${id}`)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
 			right={<Button variant="pri" size="sm" disabled={busy} onClick={() => void addVariant()}><Icon name="plus" size={16} /> {t('product.addVariant')}</Button>}
 		>
 			{loading || options === null ? (

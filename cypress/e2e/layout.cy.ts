@@ -8,15 +8,14 @@ describe('Split layout', () => {
 		cy.viewport(NARROW.w, NARROW.h);
 		cy.visitApp('/orders');
 		cy.get('.hk-row').should('have.length.greaterThan', 0);
-		cy.get('.hk-split-list').should('be.visible');
-		// Not merely hidden: the pane that is off screen is not mounted, so it holds no data
-		// and does not keep re-fetching a listing nobody can see.
-		cy.get('.hk-split-detail').should('not.exist');
+		cy.get('.hk-split').should('not.exist');
+		cy.get('.hk-row').should('be.visible');
 
 		// Opening a row replaces the list rather than sitting beside it.
 		cy.get('.hk-row').first().click();
 		cy.hash().should('match', /#\/orders\/\d+/);
-		cy.get('.hk-split-detail').should('be.visible');
+		// The detail replaces the list rather than sitting beside a hidden copy of it.
+		cy.get('.hk-split').should('not.exist');
 		cy.get('.hk-split-list').should('not.exist');
 	});
 
@@ -24,16 +23,15 @@ describe('Split layout', () => {
 		cy.viewport(WIDE.w, WIDE.h);
 		cy.visitApp('/orders');
 		cy.get('.hk-row').should('have.length.greaterThan', 0);
-		// Nothing selected yet: the list is up and the detail pane invites a choice.
-		cy.get('.hk-split-list').should('be.visible');
-		cy.get('.hk-split-empty').should('be.visible');
+		// Nothing selected yet: the list has the whole width, with no pane held empty beside it.
+		cy.get('.hk-split').should('not.exist');
+		cy.get('.hk-row').should('be.visible');
 
 		cy.get('.hk-row').first().click();
 		cy.hash().should('match', /#\/orders\/\d+/);
 		// Both panes, and the list keeps its place.
 		cy.get('.hk-split-list').should('be.visible');
 		cy.get('.hk-split-detail').should('be.visible');
-		cy.get('.hk-split-empty').should('not.exist');
 		// The row whose detail is open is the marked one, and only it.
 		cy.get('.hk-split-list .hk-row--on').should('have.length', 1);
 		cy.get('.hk-row').first().should('have.class', 'hk-row--on');
@@ -42,6 +40,8 @@ describe('Split layout', () => {
 	it('keeps a long value from running under the right-hand column', () => {
 		cy.viewport(WIDE.w, WIDE.h);
 		cy.visitApp('/orders');
+		// The narrow list pane only exists beside an open detail, which is where the squeeze is.
+		cy.get('.hk-row').first().click();
 		cy.get('.hk-split-list .hk-row').should('have.length.greaterThan', 0);
 		// The title truncates rather than overflowing its column, whatever it contains.
 		cy.get('.hk-split-list .hk-row-title').first().then(($el) => {
@@ -55,8 +55,8 @@ describe('Split layout', () => {
 		cy.viewport(WIDE.w, WIDE.h);
 		for (const path of ['/products', '/customers', '/discounts']) {
 			cy.visitApp(path);
-			cy.get('.hk-split-list').should('be.visible');
-			cy.get('.hk-split-empty').should('be.visible');
+			cy.get('.hk-split').should('not.exist');
+			cy.get('.hk-row').should('exist');
 		}
 	});
 
@@ -80,5 +80,21 @@ describe('Split layout', () => {
 			expect($b.attr('aria-label'), 'accessible name').to.be.a('string').and.not.equal('');
 		});
 		cy.get('.hk-tab[aria-current="page"]').should('have.length', 1);
+	});
+
+	it('closes the detail rather than stepping back through the rows opened before', () => {
+		cy.viewport(WIDE.w, WIDE.h);
+		cy.visitApp('/orders');
+		// Open three rows in turn, as you would when working through a list.
+		cy.get('.hk-row').eq(0).click();
+		cy.hash().should('match', /#\/orders\/\d+/);
+		cy.get('.hk-row').eq(1).click();
+		cy.get('.hk-row').eq(2).click();
+		cy.hash().should('match', /#\/orders\/\d+/);
+
+		// Back means "close this", not "reopen the one before".
+		cy.get('.hk-split-detail .hk-appbar button').first().click();
+		cy.hash().should('match', /#\/orders$/);
+		cy.get('.hk-split').should('not.exist');
 	});
 });

@@ -65,7 +65,7 @@ export function CustomerDetail() {
 	return (
 		<Screen
 			title={customer ? (customer.name || customer.email || t('common.guest')) : t('customers.detailTitle')}
-			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
+			left={<button className="hk-iconbtn" onClick={() => nav('/customers')} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
 			right={customer ? <button className="hk-iconbtn" onClick={() => setEditing(true)} aria-label={t('customers.editProfile')}><Icon name="edit" size={22} /></button> : undefined}
 		>
 			{loading ? (

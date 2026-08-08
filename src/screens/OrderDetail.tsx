@@ -132,7 +132,7 @@ export function OrderDetail() {
 	return (
 		<Screen
 			title={order ? t('order.title', { number: order.number }) : t('order.titleFallback')}
-			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
+			left={<button className="hk-iconbtn" onClick={() => nav('/orders')} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
 			right={order ? <StatusChip status={order.status} /> : undefined}
 		>
 			{loading ? (

@@ -129,7 +129,7 @@ export function ProductPricesEdit() {
 				}));
 			const updated = await client.setProductPrices(productId, prices);
 			if (product) await cache.putProduct(storeId, productId, { ...product, prices: updated });
-			nav(-1);
+			nav(`/products/${id}`);
 		} catch (e) {
 			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
 			setSaveErr(tError(t, code));
@@ -141,7 +141,7 @@ export function ProductPricesEdit() {
 	return (
 		<Screen
 			title={t('product.editPrices')}
-			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
+			left={<button className="hk-iconbtn" onClick={() => nav(`/products/${id}`)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
 			right={rows ? <Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button> : undefined}
 		>
 			{loading || !rows ? (

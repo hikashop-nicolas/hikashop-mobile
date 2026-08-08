@@ -122,7 +122,6 @@ function OrderPoller() {
 
 function Shell() {
 	const { ready, active } = useStores();
-	const t = useT();
 	if (!ready) {
 		return (
 			<div className="hk-app">
@@ -146,11 +145,11 @@ function Shell() {
 								<Route path="/dashboard" element={<Dashboard />} />
 								{/* Each section is one route with its detail nested, so the list can stay on
 								    screen beside the detail where there is room. The URLs are unchanged. */}
-								<Route path="/orders" element={<SplitView list={<Orders />} icon="orders" empty={t('split.orders')} />}>
+								<Route path="/orders" element={<SplitView list={<Orders />} />}>
 									<Route path=":id" element={<OrderDetail />} />
 									<Route path=":id/fees" element={<OrderFeesEdit />} />
 								</Route>
-								<Route path="/products" element={<SplitView list={<Products />} icon="products" empty={t('split.products')} />}>
+								<Route path="/products" element={<SplitView list={<Products />} />}>
 									{/* Single product screen: the list links straight here (no read-only step). */}
 									<Route path=":id" element={<ProductEdit />} />
 									<Route path=":id/edit" element={<Navigate to=".." relative="path" replace />} />
@@ -158,14 +157,14 @@ function Shell() {
 									<Route path=":id/variants" element={<ProductVariantsEdit />} />
 									<Route path=":id/variants/:vid" element={<VariantEdit />} />
 								</Route>
-								<Route path="/categories" element={<SplitView list={<Categories />} icon="categories" empty={t('split.categories')} />}>
+								<Route path="/categories" element={<SplitView list={<Categories />} />}>
 									<Route path="new" element={<CategoryEdit />} />
 									<Route path=":id/edit" element={<CategoryEdit />} />
 								</Route>
-								<Route path="/customers" element={<SplitView list={<Customers />} icon="customers" empty={t('split.customers')} />}>
+								<Route path="/customers" element={<SplitView list={<Customers />} />}>
 									<Route path=":id" element={<CustomerDetail />} />
 								</Route>
-								<Route path="/discounts" element={<SplitView list={<Discounts />} icon="discount" empty={t('split.discounts')} />}>
+								<Route path="/discounts" element={<SplitView list={<Discounts />} />}>
 									<Route path="new" element={<DiscountEdit />} />
 									<Route path=":id/edit" element={<DiscountEdit />} />
 								</Route>
