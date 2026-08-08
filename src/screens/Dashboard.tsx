@@ -3,7 +3,7 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { DashboardStats } from '../core';
-import { Screen, StatCard, Spinner } from '../ui';
+import { Screen, StatCard, Spinner, Money } from '../ui';
 
 const RANGES: [string, string][] = [
 	['today', 'dashboard.range.today'],
@@ -40,9 +40,9 @@ export function Dashboard() {
 			) : data ? (
 				<>
 					<div className="hk-stats">
-						<StatCard label={t('dashboard.revenue')} value={data.totals.revenue.toFixed(2)} />
+						<StatCard label={t('dashboard.revenue')} value={<Money value={data.totals.revenue} currency={data.currency_id} />} />
 						<StatCard label={t('dashboard.orders')} value={data.totals.orders} />
-						<StatCard label={t('dashboard.avgOrder')} value={data.totals.average_order.toFixed(2)} />
+						<StatCard label={t('dashboard.avgOrder')} value={<Money value={data.totals.average_order} currency={data.currency_id} />} />
 						<StatCard label={t('dashboard.customers')} value={data.totals.customers} />
 					</div>
 					<div className="hk-card hk-card--pad">

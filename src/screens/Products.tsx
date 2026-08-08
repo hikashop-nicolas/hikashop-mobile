@@ -46,6 +46,9 @@ export function Products() {
 			nav(`/products/${p.id}`);
 		} catch (e) {
 			setCreateErr(tError(t, codeOf(e)));
+		} finally {
+			// Always, not only on failure: the listing stays mounted beside the product it just
+			// opened, so a flag left set here disables the button for good.
 			setCreating(false);
 		}
 	}

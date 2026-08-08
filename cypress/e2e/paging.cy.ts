@@ -92,6 +92,10 @@ describe('Listing pagination', () => {
 
 // A record edited in the detail pane changes how its row reads, and the list is still on screen.
 describe('Listing freshness', () => {
+	// A product created by these tests is deleted through the UI, which can race a re-render;
+	// sweep by name so a leftover never changes what the next run sees.
+	afterEach(() => cy.sweepProducts('New product'));
+
 	it('shows an edit made beside it', () => {
 		cy.viewport(1400, 900);
 		cy.visitApp('/products');
@@ -112,6 +116,26 @@ describe('Listing freshness', () => {
 		cy.contains('.hk-row', 'Vol test product 002', { timeout: 10000 }).should('exist');
 	});
 
+	// The listing stays mounted beside the product it opens, so a flag left set by the create
+	// disables the button for the rest of the session.
+	//
+	// Neither of these deletes anything itself. Deleting "the product the URL points at" looked
+	// safe and was not: the assertion that the URL names a product passes on the URL from before
+	// the click, so a slow navigation means the test removes whatever was already open. The
+	// afterEach sweep removes by exact name instead, which can only ever match what the app
+	// itself creates.
+	it('can create more than once without the button sticking', () => {
+		cy.viewport(1400, 900);
+		cy.visitApp('/products');
+
+		cy.contains('button', /New/i).should('not.be.disabled').click();
+		cy.get('.hk-split-detail input.hk-input', { timeout: 10000 }).first().should('have.value', 'New product');
+
+		// The second one is the point: before, the button stayed disabled after the first.
+		cy.contains('.hk-split-list button', /New/i).should('not.be.disabled').click();
+		cy.get('.hk-split-detail input.hk-input', { timeout: 10000 }).first().should('have.value', 'New product');
+	});
+
 	it('creates a product while another one is open', () => {
 		cy.viewport(1400, 900);
 		cy.visitApp('/products');
@@ -120,13 +144,7 @@ describe('Listing freshness', () => {
 
 		cy.contains('.hk-split-list button', /New/i).click();
 		// It opens the product it just created, rather than silently doing nothing.
-		cy.hash({ timeout: 10000 }).should('match', /#\/products\/\d+/);
+		cy.get('.hk-split-detail input.hk-input', { timeout: 10000 }).first().should('have.value', 'New product');
 		cy.get('.hk-split-list .hk-error-note').should('not.exist');
-		cy.get('.hk-split-detail input.hk-input').first().invoke('val').then((name) => {
-			// Clean up after ourselves.
-			cy.contains('.hk-split-detail button', /Delete product/i).click();
-			cy.contains('button', /^Delete$/).click();
-			cy.contains('.hk-row', String(name)).should('not.exist');
-		});
 	});
 });
