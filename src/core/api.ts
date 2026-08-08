@@ -6,6 +6,7 @@ import type {
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup, Discount, DiscountInput, DiscountType, BarcodeMatch,
+	Access,
 } from './models';
 import type { LowStockItem } from './notify-settings';
 
@@ -398,17 +399,17 @@ export class ApiClient {
 		return (await this.request<{ id: number; name: string }[]>('PUT', `products/${id}/categories`, { body: { categories } })).data;
 	}
 
-	async uploadProductMedia(id: number, kind: 'images' | 'files', file: { name: string; data: string; description?: string; access?: string }): Promise<ProductFile> {
+	async uploadProductMedia(id: number, kind: 'images' | 'files', file: { name: string; data: string; description?: string; access?: Access }): Promise<ProductFile> {
 		return (await this.request<ProductFile>('POST', `products/${id}/${kind}`, { body: file })).data;
 	}
 
 	// Attach an already-uploaded file (from the media browser) by its path.
-	async attachProductMedia(id: number, kind: 'images' | 'files', file: { path: string; name?: string; description?: string; access?: string }): Promise<ProductFile> {
+	async attachProductMedia(id: number, kind: 'images' | 'files', file: { path: string; name?: string; description?: string; access?: Access }): Promise<ProductFile> {
 		return (await this.request<ProductFile>('POST', `products/${id}/${kind}`, { body: file })).data;
 	}
 
 	// Edit a file's options (name, description, access, free_download).
-	async updateProductFile(id: number, fileId: number, opts: { name?: string; description?: string; access?: string; free_download?: boolean }): Promise<ProductFile> {
+	async updateProductFile(id: number, fileId: number, opts: { name?: string; description?: string; access?: Access; free_download?: boolean }): Promise<ProductFile> {
 		return (await this.request<ProductFile>('PUT', `products/${id}/files/${fileId}`, { body: opts })).data;
 	}
 

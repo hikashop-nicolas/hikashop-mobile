@@ -3,14 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile, RelatedProduct, Settings } from '../core';
+import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile, RelatedProduct, Settings, Access } from '../core';
 import { WRITABLE_FIELD_TYPES, tsToDate, dateToTs } from '../core';
 import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button, RichText, CustomFieldInput, DeleteButton } from '../ui';
 import type { TreeNode } from '../ui';
 import { CategoryEditor } from './CategoryEditor';
 import { ProductMediaSection } from './ProductMediaSection';
 import { RelatedProducts } from './RelatedProducts';
+import { AccessField, ACCESS_ALL, accessSummary, toAccess } from './AccessField';
 
+// Everything the form edits as a scalar. Access is structured, so it has its own state.
 type Form = Record<string, string | boolean>;
 
 function toForm(p: ProductDetail): Form {
@@ -22,7 +24,7 @@ function toForm(p: ProductDetail): Form {
 		dimension_unit: p.dimension_unit || 'cm',
 		min_per_order: String(p.min_per_order || ''), max_per_order: String(p.max_per_order || ''),
 		tax_id: String(p.tax_id || 0), manufacturer_id: String(p.manufacturer_id || 0),
-		access: p.access || 'all', contact: p.contact, warehouse_id: String(p.warehouse_id || 0),
+		contact: p.contact, warehouse_id: String(p.warehouse_id || 0),
 		sale_start: tsToDate(p.sale_start), sale_end: tsToDate(p.sale_end),
 		page_title: p.page_title, meta_description: p.meta_description, keywords: p.keywords,
 		canonical: p.canonical, alias: p.alias, url: p.url,
@@ -63,6 +65,7 @@ export function ProductEdit() {
 	});
 
 	const [form, setForm] = useState<Form | null>(null);
+	const [access, setAccess] = useState<Access>(ACCESS_ALL);
 	const [cats, setCats] = useState<number[]>([]);
 	const [manufacturerId, setManufacturerId] = useState<number>(0);
 	const [custom, setCustom] = useState<Record<string, string>>({});
@@ -75,6 +78,7 @@ export function ProductEdit() {
 	useEffect(() => {
 		if (fetched && !form) {
 			setForm(toForm(fetched));
+			setAccess(toAccess(fetched.access));
 			setCats(fetched.categories.map((c) => c.id));
 			setManufacturerId(fetched.manufacturer_id || 0);
 			setStockInput(fetched.quantity >= 0 ? String(fetched.quantity) : '');
@@ -154,7 +158,7 @@ export function ProductEdit() {
 				width: num(form.width), height: num(form.height), length: num(form.length), dimension_unit: form.dimension_unit,
 				min_per_order: int(form.min_per_order), max_per_order: int(form.max_per_order),
 				tax_id: int(form.tax_id), manufacturer_id: manufacturerId,
-				access: form.access, contact: form.contact, warehouse_id: int(form.warehouse_id),
+				access, contact: form.contact, warehouse_id: int(form.warehouse_id),
 				sale_start: dateToTs(form.sale_start as string), sale_end: dateToTs(form.sale_end as string),
 				page_title: form.page_title, meta_description: form.meta_description, keywords: form.keywords,
 				canonical: form.canonical, alias: form.alias, url: form.url,
@@ -282,12 +286,7 @@ export function ProductEdit() {
 								{(meta?.tax_categories ?? []).map((tc) => <option key={tc.id} value={tc.id}>{tc.name}</option>)}
 							</select>
 						</Field>
-						<Field label={t('product.access')}>
-							<select className="hk-select" value={s('access')} onChange={(e) => set('access', e.target.value)}>
-								<option value="all">{t('product.allUsers')}</option>
-								{(meta?.access_levels ?? []).map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
-							</select>
-						</Field>
+						<AccessField label={t('product.access')} value={access} onChange={setAccess} />
 						{(meta?.tags ?? []).length > 0 && (
 							<Field label={t('product.tags')}>
 								<TreeSelect nodes={meta!.tags} selected={tags} onChange={setTags}
@@ -304,7 +303,7 @@ export function ProductEdit() {
 						) : fetched!.prices.map((p) => (
 							<div key={p.id} className="hk-row">
 								<div className="hk-row-grow"><span className="hk-row-title"><Money value={p.value} currency={p.currency_id} /></span>
-									{(p.min_quantity > 1 || p.access) && <span className="hk-row-sub">{p.min_quantity > 1 ? t('product.priceFrom', { qty: p.min_quantity }) : ''}{p.access ? ` · ${p.access}` : ''}</span>}</div>
+									{(p.min_quantity > 1 || accessSummary(p.access, t)) && <span className="hk-row-sub">{p.min_quantity > 1 ? t('product.priceFrom', { qty: p.min_quantity }) : ''}{accessSummary(p.access, t) ? ` · ${accessSummary(p.access, t)}` : ''}</span>}</div>
 							</div>
 						))}
 					</div>
@@ -322,7 +321,6 @@ export function ProductEdit() {
 
 					{media && (
 						<ProductMediaSection productId={productId} images={media.images} files={media.files}
-							accessLevels={meta?.access_levels ?? []}
 							onChange={(images, files) => setMedia({ images, files })} />
 					)}
 

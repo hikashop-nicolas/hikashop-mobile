@@ -455,7 +455,11 @@ export const en: Messages = {
 	'discount.accessHint': 'Which customer groups may use it',
 	'discount.excludeAccess': 'Excluded groups',
 	'discount.excludeAccessHint': 'Groups that may never use it',
-	'discount.accessAll': 'Everyone',
-	'discount.accessNone': 'No one',
-	'discount.accessGroups': 'Selected groups',
+
+	// Visibility restrictions, shared by products, categories, prices, files and discounts.
+	'access.all': 'Everyone',
+	'access.none': 'No one',
+	'access.groups': 'Selected groups',
+	'access.noGroups': 'No customer groups found.',
+	'access.groupCount': '{count} group(s)',
 };

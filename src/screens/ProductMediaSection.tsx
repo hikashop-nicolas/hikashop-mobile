@@ -6,15 +6,15 @@ import type { ProductImage, ProductFile } from '../core';
 import { Icon, Spinner, Button } from '../ui';
 import { FileOptionsModal } from './FileOptionsModal';
 import { MediaBrowser } from './MediaBrowser';
+import { accessSummary } from './AccessField';
 
 // Inline image + downloadable-file management for a product, embedded in the edit
 // form: upload (base64 or drag & drop), attach an already-uploaded file via the media
 // browser, edit each file's options, reorder and delete. Writes are immediate.
-export function ProductMediaSection({ productId, images, files, accessLevels = [], onChange }: {
+export function ProductMediaSection({ productId, images, files, onChange }: {
 	productId: number;
 	images: ProductImage[];
 	files: ProductFile[];
-	accessLevels?: { id: number; name: string }[];
 	onChange: (images: ProductImage[], files: ProductFile[]) => void;
 }) {
 	const { client } = useStores();
@@ -130,7 +130,7 @@ export function ProductMediaSection({ productId, images, files, accessLevels = [
 					onDrop={(e) => onDrop('files', e)}>
 					{files.map((f) => (
 						<div key={f.id} className="hk-row">
-							<button type="button" className="hk-row-grow hk-row-btn" onClick={() => setEditing({ file: f, kind: 'files' })}><span className="hk-row-title">{f.name}</span>{f.access && <span className="hk-row-sub">{f.access}</span>}</button>
+							<button type="button" className="hk-row-grow hk-row-btn" onClick={() => setEditing({ file: f, kind: 'files' })}><span className="hk-row-title">{f.name}</span>{accessSummary(f.access, t) && <span className="hk-row-sub">{accessSummary(f.access, t)}</span>}</button>
 							<button className="hk-iconbtn hk-danger" disabled={busy} aria-label={t('common.delete')} onClick={() => void del('files', f.id)}><Icon name="trash" size={18} /></button>
 						</div>
 					))}
@@ -145,7 +145,7 @@ export function ProductMediaSection({ productId, images, files, accessLevels = [
 			</div>
 
 			{browsing && <MediaBrowser kind={browsing} onClose={() => setBrowsing(null)} onPick={(path, name) => attachFromBrowser(browsing, path, name)} />}
-			{editing && <FileOptionsModal productId={productId} file={editing.file} kind={editing.kind} accessLevels={accessLevels} onClose={() => setEditing(null)} onSaved={onFileEdited} />}
+			{editing && <FileOptionsModal productId={productId} file={editing.file} kind={editing.kind} onClose={() => setEditing(null)} onSaved={onFileEdited} />}
 		</>
 	);
 }

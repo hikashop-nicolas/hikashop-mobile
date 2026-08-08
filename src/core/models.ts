@@ -176,7 +176,7 @@ export interface ProductPrice {
 	value: number; // always tax-exclusive
 	currency_id: number;
 	min_quantity: number;
-	access: string;
+	access: Access;
 	users: number[]; // restrict to specific users (preserved round-trip)
 	zone_ids: number[]; // restrict to zones (preserved round-trip)
 	start_date: number;
@@ -193,7 +193,7 @@ export interface ProductImage {
 }
 
 export interface ProductFile extends ProductImage {
-	access: string;
+	access: Access;
 	free_download: boolean;
 }
 
@@ -260,7 +260,7 @@ export interface ProductDetail {
 	canonical: string;
 	url: string;
 	alias: string;
-	access: string;
+	access: Access;
 	contact: boolean;
 	warehouse_id: number;
 	tax_rate: number; // the product's tax rate (e.g. 0.06) for excl/incl price entry
@@ -350,6 +350,7 @@ export interface CategoryDetail {
 	description: string;
 	meta_description: string;
 	published: boolean;
+	access: Access;
 	image: string;
 	custom_fields: Record<string, string | null>;
 	custom_field_files: Record<string, FieldFile[]>;
@@ -362,6 +363,7 @@ export interface CategoryInput {
 	description?: string;
 	meta_description?: string;
 	published?: boolean;
+	access?: Access;
 	image?: string;
 	image_name?: string;
 	custom_fields?: Record<string, string>;
@@ -391,7 +393,6 @@ export interface ProductMeta {
 	tax_categories: { id: number; name: string; parent_id: number }[];
 	manufacturers: { id: number; name: string; parent_id: number }[];
 	categories: { id: number; name: string; parent_id: number }[];
-	access_levels: { id: number; name: string }[];
 	characteristics: ProductCharacteristic[];
 	weight_units: string[];
 	dimension_units: string[];
@@ -424,8 +425,9 @@ export interface OrderAddressForm {
 // HikaShop's two promotion types: a coupon (the customer enters a code) or an automatic discount.
 export type DiscountType = 'coupon' | 'discount';
 
-// Who a discount is open to: everyone, nobody, or specific customer groups.
-export interface DiscountAccess {
+// Who a row is visible to: everyone, nobody, or specific customer groups. HikaShop stores this
+// identically for products, categories, prices, files and discounts.
+export interface Access {
 	mode: 'all' | 'none' | 'groups';
 	groups: number[];
 }
@@ -461,8 +463,8 @@ export interface Discount {
 	exclude_category_childs: boolean;
 	zone_ids: number[];
 	user_ids: number[];
-	access: DiscountAccess;
-	exclude_access: DiscountAccess;
+	access: Access;
+	exclude_access: Access;
 
 	auto_load: boolean;      // the coupon applies without being entered
 	product_only: boolean;   // applies to product lines only, not shipping or fees
@@ -497,8 +499,8 @@ export interface DiscountInput {
 	exclude_category_childs?: boolean;
 	zone_ids?: number[];
 	user_ids?: number[];
-	access?: DiscountAccess;
-	exclude_access?: DiscountAccess;
+	access?: Access;
+	exclude_access?: Access;
 	auto_load?: boolean;
 	product_only?: boolean;
 	discounted_products?: number;

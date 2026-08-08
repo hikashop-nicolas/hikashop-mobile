@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
-import type { ProductFile } from '../core';
+import type { ProductFile, Access } from '../core';
 import { Modal, Field, Button } from '../ui';
+import { AccessField, toAccess } from './AccessField';
 
 // Edit one file's options: name, description, access, and (for downloadable files)
 // the free-download flag. Persists via PUT /products/{id}/files/{fileId}.
-export function FileOptionsModal({ productId, file, kind, accessLevels, onClose, onSaved }: {
+export function FileOptionsModal({ productId, file, kind, onClose, onSaved }: {
 	productId: number;
 	file: ProductFile;
 	kind: 'images' | 'files';
-	accessLevels: { id: number; name: string }[];
 	onClose: () => void;
 	onSaved: (file: ProductFile) => void;
 }) {
@@ -18,7 +18,7 @@ export function FileOptionsModal({ productId, file, kind, accessLevels, onClose,
 	const t = useT();
 	const [name, setName] = useState(file.name);
 	const [description, setDescription] = useState(file.description);
-	const [access, setAccess] = useState(file.access || 'all');
+	const [access, setAccess] = useState<Access>(toAccess(file.access));
 	const [freeDownload, setFreeDownload] = useState(file.free_download);
 	const [busy, setBusy] = useState(false);
 	const [err, setErr] = useState('');
@@ -52,12 +52,7 @@ export function FileOptionsModal({ productId, file, kind, accessLevels, onClose,
 				)}
 				<Field label={t('media.name')}><input className="hk-input" value={name} onChange={(e) => setName(e.target.value)} /></Field>
 				<Field label={t('media.description')}><textarea className="hk-input hk-textarea" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} /></Field>
-				<Field label={t('product.access')}>
-					<select className="hk-select" value={access} onChange={(e) => setAccess(e.target.value)}>
-						<option value="all">{t('product.allUsers')}</option>
-						{accessLevels.map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
-					</select>
-				</Field>
+				<AccessField label={t('product.access')} value={access} onChange={setAccess} />
 				{kind === 'files' && (
 					<label className="hk-check"><input type="checkbox" checked={freeDownload} onChange={(e) => setFreeDownload(e.target.checked)} /><span>{t('media.freeDownload')}</span></label>
 				)}

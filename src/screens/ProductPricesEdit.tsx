@@ -3,22 +3,23 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { ProductDetail, ProductMeta, ProductPrice, Settings } from '../core';
+import type { ProductDetail, ProductMeta, ProductPrice, Settings, Access } from '../core';
 import { tsToDate, dateToTs, inclFromExcl, exclFromIncl } from '../core';
 import { Screen, Spinner, Icon, Field, Button, DeleteButton } from '../ui';
 import { SearchPicker } from './SearchPicker';
 import type { PickItem } from './SearchPicker';
+import { AccessField, ACCESS_ALL, toAccess } from './AccessField';
 
 // A row keeps the tax-exclusive value (what HikaShop stores) and preserves the
 // users/zone restrictions so an edit never wipes them.
 type Row = {
-	value: string; currency_id: number; min_quantity: string; access: string;
+	value: string; currency_id: number; min_quantity: string; access: Access;
 	start: string; end: string; users: number[]; zone_ids: number[];
 };
 
 const toRow = (p: ProductPrice): Row => ({
 	value: String(p.value), currency_id: p.currency_id, min_quantity: String(p.min_quantity || ''),
-	access: p.access || 'all', start: tsToDate(p.start_date), end: tsToDate(p.end_date),
+	access: toAccess(p.access), start: tsToDate(p.start_date), end: tsToDate(p.end_date),
 	users: p.users ?? [], zone_ids: p.zone_ids ?? [],
 });
 
@@ -92,7 +93,7 @@ export function ProductPricesEdit() {
 		update(i, { value: inclStr.trim() === '' ? '' : String(exclFromIncl(incl, taxRate)) });
 	}
 	function add() {
-		setRows((r) => [...(r ?? []), { value: '', currency_id: defaultCurrency, min_quantity: '', access: 'all', start: '', end: '', users: [], zone_ids: [] }]);
+		setRows((r) => [...(r ?? []), { value: '', currency_id: defaultCurrency, min_quantity: '', access: ACCESS_ALL, start: '', end: '', users: [], zone_ids: [] }]);
 	}
 	function remove(i: number) {
 		setRows((r) => (r ? r.filter((_, idx) => idx !== i) : r));
@@ -123,7 +124,7 @@ export function ProductPricesEdit() {
 				.filter((r) => r.value.trim() !== '')
 				.map((r) => ({
 					value: Number(r.value) || 0, currency_id: r.currency_id, min_quantity: Number(r.min_quantity) || 0,
-					access: r.access || 'all', start_date: dateToTs(r.start), end_date: dateToTs(r.end),
+					access: toAccess(r.access), start_date: dateToTs(r.start), end_date: dateToTs(r.end),
 					users: r.users, zone_ids: r.zone_ids,
 				}));
 			const updated = await client.setProductPrices(productId, prices);
@@ -178,12 +179,7 @@ export function ProductPricesEdit() {
 								)}
 								<div className="hk-form-row">
 									<Field label={t('product.minQuantity')}><input className="hk-input" type="number" inputMode="numeric" value={r.min_quantity} onChange={(e) => update(i, { min_quantity: e.target.value })} /></Field>
-									<Field label={t('product.access')}>
-										<select className="hk-select" value={r.access} onChange={(e) => update(i, { access: e.target.value })}>
-											<option value="all">{t('product.allUsers')}</option>
-											{(meta?.access_levels ?? []).map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
-										</select>
-									</Field>
+									<AccessField label={t('product.access')} value={r.access} onChange={(a) => update(i, { access: a })} />
 								</div>
 								<div className="hk-form-row">
 									<Field label={t('product.priceStart')}><input className="hk-input" type="date" value={r.start} onChange={(e) => update(i, { start: e.target.value })} /></Field>

@@ -3,10 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { Discount, DiscountInput, DiscountType, DiscountAccess, CategoryListItem, UserGroup } from '../core';
+import type { Discount, DiscountInput, DiscountType, Access, CategoryListItem } from '../core';
 import { Screen, Spinner, Field, Button, Icon, DeleteButton, TreeSelect } from '../ui';
 import { validateDiscount } from '../app/discounts';
 import { IdChips } from './IdChips';
+import { AccessField } from './AccessField';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -62,8 +63,8 @@ export function DiscountEdit() {
 	const [excludeCategoryChilds, setExcludeCategoryChilds] = useState(false);
 	const [zoneIds, setZoneIds] = useState<number[]>([]);
 	const [userIds, setUserIds] = useState<number[]>([]);
-	const [access, setAccess] = useState<DiscountAccess>({ mode: 'all', groups: [] });
-	const [excludeAccess, setExcludeAccess] = useState<DiscountAccess>({ mode: 'none', groups: [] });
+	const [access, setAccess] = useState<Access>({ mode: 'all', groups: [] });
+	const [excludeAccess, setExcludeAccess] = useState<Access>({ mode: 'none', groups: [] });
 
 	// Coupon behaviour
 	const [autoLoad, setAutoLoad] = useState(false);
@@ -82,14 +83,6 @@ export function DiscountEdit() {
 		write: async (c) => { await cache.putCategories(storeId, 'product', c); },
 		deps: [storeId],
 	});
-	const [groups, setGroups] = useState<UserGroup[]>([]);
-	useEffect(() => {
-		if (!client) return;
-		let alive = true;
-		void client.getGroups().then((g) => { if (alive) setGroups(g); }).catch(() => {});
-		return () => { alive = false; };
-	}, [client]);
-
 	useEffect(() => {
 		if (!client || !editing) return;
 		let alive = true;
@@ -169,32 +162,6 @@ export function DiscountEdit() {
 	}
 
 	const catNodes = (categories ?? []).map((c) => ({ id: c.id, name: c.name, parent_id: c.parent_id }));
-
-	// The two access levels share a shape: a mode, plus a group list when the mode is "groups".
-	const accessField = (label: string, hint: string, val: DiscountAccess, set: (a: DiscountAccess) => void) => (
-		<Field label={label} hint={hint}>
-			<select className="hk-select" value={val.mode}
-				onChange={(e) => set({ mode: e.target.value as DiscountAccess['mode'], groups: val.groups })}>
-				<option value="all">{t('discount.accessAll')}</option>
-				<option value="none">{t('discount.accessNone')}</option>
-				<option value="groups">{t('discount.accessGroups')}</option>
-			</select>
-			{val.mode === 'groups' && (
-				<div className="hk-checkbox-list" style={{ marginTop: 'var(--hk-s2)' }}>
-					{groups.map((g) => (
-						<label key={g.id} className="hk-checkbox-row">
-							<input type="checkbox" checked={val.groups.includes(g.id)}
-								onChange={() => set({
-									mode: 'groups',
-									groups: val.groups.includes(g.id) ? val.groups.filter((x: number) => x !== g.id) : [...val.groups, g.id],
-								})} />
-							<span>{g.title}</span>
-						</label>
-					))}
-				</div>
-			)}
-		</Field>
-	);
 
 	return (
 		<Screen
@@ -348,8 +315,8 @@ export function DiscountEdit() {
 									resolve={(ids) => client!.getUsers({ ids }).then((u) => u.map((x) => ({ id: x.id, label: x.name || x.email })))}
 								/>
 
-								{accessField(t('discount.access'), t('discount.accessHint'), access, setAccess)}
-								{accessField(t('discount.excludeAccess'), t('discount.excludeAccessHint'), excludeAccess, setExcludeAccess)}
+								<AccessField label={t('discount.access')} hint={t('discount.accessHint')} value={access} onChange={setAccess} />
+								<AccessField label={t('discount.excludeAccess')} hint={t('discount.excludeAccessHint')} value={excludeAccess} onChange={setExcludeAccess} />
 							</>
 						)}
 					</div>

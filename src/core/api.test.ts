@@ -131,10 +131,10 @@ describe('ApiClient', () => {
 	it('updateProductFile PUTs the options to the file endpoint', async () => {
 		let seenUrl = ''; let seenMethod = ''; let seenBody: Record<string, unknown> = {};
 		const fetchFn: FetchLike = async (url, init) => { seenUrl = url; seenMethod = String(init?.method); seenBody = JSON.parse(String(init?.body)); return jsonResponse({ data: { id: 3 }, meta: null }); };
-		await new ApiClient('http://shop', 't', fetchFn).updateProductFile(5, 3, { name: 'x', access: 'all' });
+		await new ApiClient('http://shop', 't', fetchFn).updateProductFile(5, 3, { name: 'x', access: { mode: 'all', groups: [] } });
 		expect(seenUrl).toBe('http://shop/index.php/hikashop-api/v1/products/5/files/3');
 		expect(seenMethod).toBe('PUT');
-		expect(seenBody).toEqual({ name: 'x', access: 'all' });
+		expect(seenBody).toEqual({ name: 'x', access: { mode: 'all', groups: [] } });
 	});
 
 	it('setProductMediaOrder PUTs the ordered ids', async () => {

@@ -2,9 +2,10 @@ import { useMemo, useRef, useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl, WRITABLE_FIELD_TYPES } from '../core';
-import type { ProductMeta, ProductField, CategoryDetail, FieldFile } from '../core';
+import type { ProductMeta, ProductField, CategoryDetail, FieldFile, Access } from '../core';
 import { Modal, Screen, Field, Button, Icon, TreeSelect, RichText, CustomFieldInput, DeleteButton } from '../ui';
 import type { TreeNode } from '../ui';
+import { AccessField, toAccess } from './AccessField';
 
 type Kind = 'product' | 'manufacturer';
 
@@ -31,6 +32,7 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 	const [parent, setParent] = useState<number[]>(category?.parent_id ? [category.parent_id] : []);
 	const [description, setDescription] = useState(category?.description ?? '');
 	const [published, setPublished] = useState(category?.published ?? true);
+	const [access, setAccess] = useState<Access>(toAccess(category?.access));
 	const [existingImage] = useState(category?.image ?? '');
 	const [image, setImage] = useState<{ data: string; name: string; preview: string } | null>(null);
 	const [custom, setCustom] = useState<Record<string, string>>(() => {
@@ -75,6 +77,7 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 				parent_id: parent[0] || undefined,
 				description,
 				published,
+				access,
 				image: image?.data,
 				image_name: image?.name,
 				custom_fields: writableCustom(),
@@ -121,6 +124,7 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 					)}
 				</Field>
 
+				<AccessField label={t('product.access')} value={access} onChange={setAccess} />
 				<label className="hk-check"><input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} /><span>{t('product.publishedLabel')}</span></label>
 
 				{fields.map((f) => (
