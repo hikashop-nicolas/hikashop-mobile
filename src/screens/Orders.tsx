@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useI18n, tError } from '../i18n';
@@ -59,7 +59,7 @@ export function Orders() {
 			) : (
 				<div>
 					{items.map((o) => (
-						<Link key={o.id} to={`/orders/${o.id}`} className="hk-row">
+						<NavLink key={o.id} to={`/orders/${o.id}`} className={({ isActive }) => `hk-row${isActive ? ' hk-row--on' : ''}`}>
 							<div className="hk-avatar">{(o.customer.name || o.customer.email || '?').charAt(0).toUpperCase()}</div>
 							<div className="hk-row-grow">
 								<span className="hk-row-title">#{o.number} · {o.customer.name || o.customer.email || t('common.guest')}</span>
@@ -67,7 +67,7 @@ export function Orders() {
 								<ListingFields fields={data?.fields} values={o.custom_fields} />
 							</div>
 							<div className="hk-row-rt"><StatusChip status={o.status} /><Money value={o.total} currency={o.currency_id} /></div>
-						</Link>
+						</NavLink>
 					))}
 					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('orders.countOf', { shown: items.length, total })}</div>
 				</div>

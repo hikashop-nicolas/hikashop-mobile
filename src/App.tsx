@@ -29,6 +29,7 @@ import { Discounts } from './screens/Discounts';
 import { DiscountEdit } from './screens/DiscountEdit';
 import { Stores } from './screens/Stores';
 import { Notifications } from './screens/Notifications';
+import { SplitView } from './ui/split';
 
 const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
 	{ key: 'dashboard', icon: 'dashboard', labelKey: 'tabs.dashboard' },
@@ -121,6 +122,7 @@ function OrderPoller() {
 
 function Shell() {
 	const { ready, active } = useStores();
+	const t = useT();
 	if (!ready) {
 		return (
 			<div className="hk-app">
@@ -142,24 +144,31 @@ function Shell() {
 						) : (
 							<>
 								<Route path="/dashboard" element={<Dashboard />} />
-								<Route path="/orders" element={<Orders />} />
-								<Route path="/orders/:id" element={<OrderDetail />} />
-								<Route path="/orders/:id/fees" element={<OrderFeesEdit />} />
-								<Route path="/products" element={<Products />} />
-								{/* Single product screen: the list links straight here (no read-only step). */}
-								<Route path="/products/:id" element={<ProductEdit />} />
-								<Route path="/products/:id/edit" element={<Navigate to=".." relative="path" replace />} />
-								<Route path="/products/:id/prices" element={<ProductPricesEdit />} />
-								<Route path="/products/:id/variants" element={<ProductVariantsEdit />} />
-							<Route path="/products/:id/variants/:vid" element={<VariantEdit />} />
-								<Route path="/categories" element={<Categories />} />
-							<Route path="/categories/new" element={<CategoryEdit />} />
-							<Route path="/categories/:id/edit" element={<CategoryEdit />} />
-								<Route path="/customers" element={<Customers />} />
-								<Route path="/customers/:id" element={<CustomerDetail />} />
-								<Route path="/discounts" element={<Discounts />} />
-								<Route path="/discounts/new" element={<DiscountEdit />} />
-								<Route path="/discounts/:id/edit" element={<DiscountEdit />} />
+								{/* Each section is one route with its detail nested, so the list can stay on
+								    screen beside the detail where there is room. The URLs are unchanged. */}
+								<Route path="/orders" element={<SplitView list={<Orders />} icon="orders" empty={t('split.orders')} />}>
+									<Route path=":id" element={<OrderDetail />} />
+									<Route path=":id/fees" element={<OrderFeesEdit />} />
+								</Route>
+								<Route path="/products" element={<SplitView list={<Products />} icon="products" empty={t('split.products')} />}>
+									{/* Single product screen: the list links straight here (no read-only step). */}
+									<Route path=":id" element={<ProductEdit />} />
+									<Route path=":id/edit" element={<Navigate to=".." relative="path" replace />} />
+									<Route path=":id/prices" element={<ProductPricesEdit />} />
+									<Route path=":id/variants" element={<ProductVariantsEdit />} />
+									<Route path=":id/variants/:vid" element={<VariantEdit />} />
+								</Route>
+								<Route path="/categories" element={<SplitView list={<Categories />} icon="categories" empty={t('split.categories')} />}>
+									<Route path="new" element={<CategoryEdit />} />
+									<Route path=":id/edit" element={<CategoryEdit />} />
+								</Route>
+								<Route path="/customers" element={<SplitView list={<Customers />} icon="customers" empty={t('split.customers')} />}>
+									<Route path=":id" element={<CustomerDetail />} />
+								</Route>
+								<Route path="/discounts" element={<SplitView list={<Discounts />} icon="discount" empty={t('split.discounts')} />}>
+									<Route path="new" element={<DiscountEdit />} />
+									<Route path=":id/edit" element={<DiscountEdit />} />
+								</Route>
 								<Route path="/stores" element={<Stores />} />
 								<Route path="/notifications" element={<Notifications />} />
 								<Route path="/connect" element={<Connect />} />

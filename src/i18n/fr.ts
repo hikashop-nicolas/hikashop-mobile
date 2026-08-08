@@ -460,4 +460,13 @@ export const fr: Messages = {
 	'access.groups': 'Groupes sélectionnés',
 	'access.noGroups': 'Aucun groupe client trouvé.',
 	'access.groupCount': '{count} groupe(s)',
+
+	// Shown in the detail pane, on a wide screen, while nothing is selected.
+	'split.orders': 'Sélectionnez une commande pour voir son détail',
+	'split.products': 'Sélectionnez un produit pour le modifier',
+	'split.categories': 'Sélectionnez une catégorie pour la modifier',
+	'split.customers': 'Sélectionnez un client pour voir sa fiche',
+	'split.discounts': 'Sélectionnez une réduction pour la modifier',
+	'discount.reference': 'Référence',
+	'discount.referenceHint': 'Identifie cette réduction dans la boutique. Laissée vide, la boutique en choisit une.',
 };

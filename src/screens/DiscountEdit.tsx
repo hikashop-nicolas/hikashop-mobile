@@ -180,9 +180,15 @@ export function DiscountEdit() {
 								<button type="button" className={`hk-seg${type === 'discount' ? ' hk-on' : ''}`} onClick={() => setType('discount')}>{t('discount.typeAuto')}</button>
 							</div>
 						</Field>
-						{type === 'coupon' && (
+						{/* Both types carry a code. The customer types a coupon's; an automatic discount's
+						    is its reference, as in the backend, and the shop names one if left blank. */}
+						{type === 'coupon' ? (
 							<Field label={t('discount.code')}>
 								<input className="hk-input" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} autoCapitalize="characters" autoCorrect="off" />
+							</Field>
+						) : (
+							<Field label={t('discount.reference')} hint={t('discount.referenceHint')}>
+								<input className="hk-input" value={code} onChange={(e) => setCode(e.target.value)} />
 							</Field>
 						)}
 						<Field label={t('discount.type')}>

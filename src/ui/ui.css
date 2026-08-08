@@ -81,9 +81,11 @@
 .hk-row { display: flex; align-items: center; gap: var(--hk-s3); padding: var(--hk-s3) 0; border-bottom: 1px solid var(--hk-line); text-decoration: none; color: inherit; }
 .hk-row:last-child { border-bottom: none; }
 .hk-row .hk-row-grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.hk-row .hk-row-title { font-weight: 600; font-size: .92rem; }
-.hk-row .hk-row-sub { color: var(--hk-muted); font-size: .78rem; }
-.hk-row .hk-row-rt { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+/* A long unbroken value (an email, a SKU) must not run under the right-hand column, which is
+   easy to hit once the list is a 380px pane rather than the whole screen. */
+.hk-row .hk-row-title { font-weight: 600; font-size: .92rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hk-row .hk-row-sub { color: var(--hk-muted); font-size: .78rem; overflow-wrap: anywhere; }
+.hk-row .hk-row-rt { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex: none; }
 .hk-avatar { width: 2rem; height: 2rem; border-radius: 50%; background: var(--hk-surface-2); flex: none; display: grid; place-items: center; color: var(--hk-muted); font-size: .8rem; }
 
 .hk-search { display: flex; align-items: center; gap: var(--hk-s2); border: 1px solid var(--hk-line); border-radius: var(--hk-r2); padding: 0 var(--hk-s3); background: var(--hk-surface); }
@@ -271,3 +273,28 @@
    merchant picked these deliberately, but stays visually secondary to the row's own subtitle. */
 .hk-row-fields { display: flex; flex-wrap: wrap; gap: var(--hk-s1) var(--hk-s3); }
 .hk-row-field-label { color: var(--hk-faint); }
+
+/* ---- split view: list + detail ---------------------------------------------
+   Below the breakpoint this is a plain single pane: whichever of the two the URL
+   points at fills the screen, exactly as before the split existed. */
+.hk-split { flex: 1; display: flex; min-height: 0; min-width: 0; }
+.hk-split-list, .hk-split-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+.hk-split-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--hk-s3); color: var(--hk-faint); text-align: center; padding: var(--hk-s6); }
+
+/* Both panes at once once there is width for a readable list beside a form. Below this the
+   detail needs the whole width, so a tablet in portrait stays single-pane. */
+@media (min-width: 1100px) {
+	.hk-split-list { flex: none; width: 380px; border-right: 1px solid var(--hk-line); }
+	/* The shell centres content within 1140px, which is for a single pane; inside a split each
+	   pane sets its own padding or the two would be pushed apart by their own gutters. */
+	.hk-split .hk-appbar, .hk-split .hk-body { padding-inline: var(--hk-s4); }
+	/* The detail pane keeps a comfortable measure on a very wide screen. */
+	.hk-split-detail .hk-body { max-width: 900px; width: 100%; }
+}
+
+/* The row whose detail is open. Only meaningful beside a detail pane, so it is scoped to the
+   split breakpoint: on a phone the list is never on screen at the same time as its detail. */
+@media (min-width: 1100px) {
+	.hk-split-list .hk-row--on { background: var(--hk-accent-soft); border-radius: var(--hk-r2); }
+	.hk-split-list .hk-row--on .hk-row-title { color: var(--hk-accent); }
+}

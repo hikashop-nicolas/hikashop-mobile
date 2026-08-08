@@ -462,4 +462,13 @@ export const en: Messages = {
 	'access.groups': 'Selected groups',
 	'access.noGroups': 'No customer groups found.',
 	'access.groupCount': '{count} group(s)',
+
+	// Shown in the detail pane, on a wide screen, while nothing is selected.
+	'split.orders': 'Select an order to see its details',
+	'split.products': 'Select a product to edit it',
+	'split.categories': 'Select a category to edit it',
+	'split.customers': 'Select a customer to see their details',
+	'split.discounts': 'Select a discount to edit it',
+	'discount.reference': 'Reference',
+	'discount.referenceHint': 'Names this discount in the shop. Left empty, the shop picks one.',
 };

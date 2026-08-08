@@ -37,9 +37,10 @@ describe('Discounts', () => {
 		cy.visitApp('/discounts');
 		cy.contains('button', 'New').click();
 
-		// Switching to Automatic hides the code field entirely.
+		// Switching to Automatic swaps the customer-facing code for an internal reference.
 		cy.contains('.hk-seg', 'Automatic').click();
-		cy.contains('label', 'Code').should('not.exist');
+		cy.contains('.hk-label', 'Code').should('not.exist');
+		cy.contains('.hk-label', 'Reference').should('be.visible');
 		cy.get('input[type=number]').first().type('9');
 		cy.contains('button', 'Save').click();
 

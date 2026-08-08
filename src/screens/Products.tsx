@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
@@ -96,7 +96,7 @@ export function Products() {
 			) : (
 				<div>
 					{items.map((p) => (
-						<Link key={p.id} to={`/products/${p.id}`} className="hk-row">
+						<NavLink key={p.id} to={`/products/${p.id}`} className={({ isActive }) => `hk-row${isActive ? ' hk-row--on' : ''}`}>
 							{p.image
 								? <img className="hk-avatar-img" src={p.image} alt="" loading="lazy" />
 								: <div className="hk-avatar">{(p.name || '?').charAt(0).toUpperCase()}</div>}
@@ -106,7 +106,7 @@ export function Products() {
 								<ListingFields fields={data?.fields} values={p.custom_fields} />
 							</div>
 							<div className="hk-row-rt">{p.price !== null && <Money value={p.price} currency={p.currency_id} />}</div>
-						</Link>
+						</NavLink>
 					))}
 					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('products.countOf', { shown: items.length, total })}</div>
 				</div>

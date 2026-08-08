@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useI18n, tError } from '../i18n';
@@ -42,7 +42,7 @@ export function Customers() {
 			) : (
 				<div>
 					{items.map((c) => (
-						<Link key={c.id} to={`/customers/${c.id}`} className="hk-row">
+						<NavLink key={c.id} to={`/customers/${c.id}`} className={({ isActive }) => `hk-row${isActive ? ' hk-row--on' : ''}`}>
 							<div className="hk-avatar">{(c.name || c.email || '?').charAt(0).toUpperCase()}</div>
 							<div className="hk-row-grow">
 								<span className="hk-row-title">
@@ -54,7 +54,7 @@ export function Customers() {
 							<div className="hk-row-rt">
 								<span className="hk-muted">{t('customers.orderCount', { count: c.order_count })}</span>
 							</div>
-						</Link>
+						</NavLink>
 					))}
 					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('customers.countOf', { shown: items.length, total })}</div>
 				</div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
@@ -52,7 +52,7 @@ export function Discounts() {
 			) : (
 				<div>
 					{items.map((d) => (
-						<Link key={d.id} to={`/discounts/${d.id}/edit`} className="hk-row">
+						<NavLink key={d.id} to={`/discounts/${d.id}/edit`} className={({ isActive }) => `hk-row${isActive ? ' hk-row--on' : ''}`}>
 							<div className="hk-row-grow">
 								<span className="hk-row-title">
 									{d.type === 'coupon' ? d.code : t('discount.typeAuto')}
@@ -67,7 +67,7 @@ export function Discounts() {
 									{d.kind === 'percent' ? `${d.value}%` : <Money value={d.value} currency={d.currency_id} />}
 								</span>
 							</div>
-						</Link>
+						</NavLink>
 					))}
 					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('discounts.countOf', { shown: items.length, total })}</div>
 				</div>
