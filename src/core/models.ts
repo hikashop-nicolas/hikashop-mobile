@@ -165,6 +165,10 @@ export interface OrderDetail {
 	items: OrderItem[];
 	billing_address: OrderAddress | null;
 	shipping_address: OrderAddress | null;
+	// Where the parcel actually goes when the shipping method delivers somewhere other than the
+	// customer: a parcel shop, a locker, a pickup point. It replaces the shipping address rather
+	// than adding to it, and is not the merchant's to edit. Empty when there is none.
+	shipping_address_override?: string[];
 	history: OrderHistoryEntry[];
 	// Shop-defined custom order fields: definitions (same shape as ProductField),
 	// their current values, and resolved files for ajax image/file fields.

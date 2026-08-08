@@ -252,7 +252,8 @@ export function OrderDetail() {
 					)}
 
 					<AddressCard label={t('order.billing')} address={order.billing_address} editLabel={t('product.edit')} onEdit={() => setEditingAddress('billing')} />
-					<AddressCard label={t('order.shippingAddress')} address={order.shipping_address} editLabel={t('product.edit')} onEdit={() => setEditingAddress('shipping')} />
+					<AddressCard label={t('order.shippingAddress')} address={order.shipping_address} editLabel={t('product.edit')}
+					onEdit={() => setEditingAddress('shipping')} override={order.shipping_address_override} />
 
 					<div className="hk-card hk-card--pad">
 						<span className="hk-muted">{t('order.history')}</span>
@@ -313,14 +314,25 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 	);
 }
 
-function AddressCard({ label, address, editLabel, onEdit }: { label: string; address: OrderAddress | null; editLabel: string; onEdit: () => void }) {
+function AddressCard({ label, address, editLabel, onEdit, override }: {
+	label: string;
+	address: OrderAddress | null;
+	editLabel: string;
+	onEdit: () => void;
+	// Where the shipping method delivers instead, when it is not the customer's address. It comes
+	// from the carrier, so it replaces the address and there is nothing here to edit.
+	override?: string[];
+}) {
+	const overridden = !!override?.length;
 	return (
 		<div className="hk-card hk-card--pad">
 			<div className="hk-card-head">
 				<span className="hk-muted hk-row-grow">{label}</span>
-				<Button size="sm" onClick={onEdit}>{editLabel}</Button>
+				{!overridden && <Button size="sm" onClick={onEdit}>{editLabel}</Button>}
 			</div>
-			{address && (
+			{overridden ? (
+				<div className="hk-addr">{override.map((line, i) => <div key={i} className={i === 0 ? undefined : 'hk-row-sub'}>{line}</div>)}</div>
+			) : address && (
 				<>
 					<div>{address.name}</div>
 					{address.company && <div className="hk-row-sub">{address.company}</div>}
