@@ -1,0 +1,31 @@
+#!/bin/sh
+# Pre-commit gate: lint, tests, then the production build.
+#
+# The build is the important one. `tsc --noEmit` alone misses errors that only the app's
+# stricter tsconfig catches, and a broken `npm run build` means no release can be produced --
+# which went unnoticed for a while precisely because nothing ran it. `npm run build` also runs
+# `tsc -b`, so it covers the typecheck.
+#
+# CI (.github/workflows/ci.yml) runs the same gates, but this repository has no remote yet, so
+# nothing triggers it. Install with: npm run hooks
+# Skip deliberately with: git commit --no-verify
+
+set -e
+
+cd "$(git rev-parse --show-toplevel)"
+
+# Nothing to check if the commit touches no JS/TS/config (docs, Android resources, and so on).
+if ! git diff --cached --name-only --diff-filter=ACMR | grep -qE '\.(ts|tsx|js|jsx|json|css)$'; then
+	exit 0
+fi
+
+printf '\npre-commit: lint\n'
+npm run --silent lint
+
+printf 'pre-commit: tests\n'
+npm test --silent -- --silent
+
+printf 'pre-commit: build\n'
+npm run --silent build >/dev/null
+
+printf 'pre-commit: ok\n\n'

@@ -14,7 +14,8 @@
 		"sync": "cap sync",
 		"build:app": "npm run build && cap sync",
 		"cypress": "cypress open",
-		"e2e": "cypress run"
+		"e2e": "cypress run",
+		"hooks": "git config core.hooksPath .githooks"
 	},
 	"dependencies": {
 		"@aparajita/capacitor-secure-storage": "^7.1.6",
