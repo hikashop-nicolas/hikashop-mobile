@@ -416,6 +416,9 @@ export interface Currency {
 
 export interface ProductMeta {
 	currencies: Currency[];
+	// The currency the shop sells in. A form defaults to this, rather than to whichever currency
+	// happens to sort first in the list.
+	main_currency_id?: number;
 	tax_categories: { id: number; name: string; parent_id: number }[];
 	characteristics: ProductCharacteristic[];
 	weight_units: string[];

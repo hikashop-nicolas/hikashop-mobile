@@ -80,10 +80,10 @@ export function ProductVariantsEdit() {
 				id: v.id,
 				value_ids: v.values.map((x) => x.value_id).filter((x) => x > 0),
 				code: v.code, quantity: v.quantity, published: v.published,
-				price: v.price, currency_id: meta?.currencies[0]?.id ?? 1,
+				price: v.price, currency_id: meta?.main_currency_id ?? meta?.currencies[0]?.id ?? 1,
 			}));
 			const oldIds = new Set(product.variants.map((v) => v.id));
-			const res = await client.setProductVariants(productId, [...existing, { value_ids: [], code: '', quantity: -1, published: false, price: null, currency_id: meta?.currencies[0]?.id ?? 1 }]);
+			const res = await client.setProductVariants(productId, [...existing, { value_ids: [], code: '', quantity: -1, published: false, price: null, currency_id: meta?.main_currency_id ?? meta?.currencies[0]?.id ?? 1 }]);
 			const created = res.variants.find((v) => !oldIds.has(v.id));
 			if (product) await cache.putProduct(storeId, productId, { ...product, characteristics: res.characteristics, variants: res.variants });
 			if (created) nav(`/products/${productId}/variants/${created.id}`);
@@ -97,7 +97,7 @@ export function ProductVariantsEdit() {
 		try {
 			const kept = product.variants.filter((v) => v.id !== variantId).map((v) => ({
 				id: v.id, value_ids: v.values.map((x) => x.value_id).filter((x) => x > 0),
-				code: v.code, quantity: v.quantity, published: v.published, price: v.price, currency_id: meta?.currencies[0]?.id ?? 1,
+				code: v.code, quantity: v.quantity, published: v.published, price: v.price, currency_id: meta?.main_currency_id ?? meta?.currencies[0]?.id ?? 1,
 			}));
 			const res = await client.setProductVariants(productId, kept);
 			await cache.putProduct(storeId, productId, { ...product, characteristics: res.characteristics, variants: res.variants });
@@ -158,7 +158,7 @@ export function ProductVariantsEdit() {
 									<span className="hk-row-title">{label(v)}{!v.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}</span>
 									<span className="hk-row-sub hk-mono">{v.code}{v.quantity >= 0 ? ` · ${v.quantity}` : ''}</span>
 								</button>
-								{v.price != null && <span className="hk-row-rt"><Money value={v.price} currency={meta?.currencies[0]?.id} /></span>}
+								{v.price != null && <span className="hk-row-rt"><Money value={v.price} currency={meta?.main_currency_id ?? meta?.currencies[0]?.id} /></span>}
 								<DeleteButton mode="icon" disabled={busy} label={t('common.delete')}
 										confirmMessage={t('product.deleteVariantConfirm')} onConfirm={() => void del(v.id)} />
 							</div>

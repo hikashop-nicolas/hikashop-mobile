@@ -94,7 +94,7 @@ export function ProductPricesEdit() {
 	const [saveErr, setSaveErr] = useState('');
 	const [restrictRow, setRestrictRow] = useState<number | null>(null);
 	const [picking, setPicking] = useState<{ row: number; kind: 'users' | 'zones' } | null>(null);
-	const defaultCurrency = meta?.currencies[0]?.id ?? 1;
+	const defaultCurrency = meta?.main_currency_id ?? meta?.currencies[0]?.id ?? 1;
 
 	// Tax entry: the product carries the tax rate; when the shop enters prices with tax
 	// (price_with_tax) or the tax is fixed, show a linked incl-tax field. When the tax
