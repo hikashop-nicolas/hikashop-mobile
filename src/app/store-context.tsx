@@ -1,13 +1,28 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { StoreRegistry, WebKeyValueStore, ApiClient, CacheRepository, parseNotifySettings } from '../core';
+import { StoreRegistry, WebKeyValueStore, IdbKeyValueStore, ApiClient, CacheRepository, parseNotifySettings } from '../core';
 import type { Store, NotifySettings } from '../core';
 import { notifier } from './notifier';
 
 // One registry for the whole app: store metadata in the data namespace, tokens in the secrets one.
 const registry = new StoreRegistry(new WebKeyValueStore('hk.data.'), new WebKeyValueStore('hk.secret.'));
 // Read-model cache lives in its own namespace so clearing it never touches metadata or tokens.
-const cache = new CacheRepository(new WebKeyValueStore('hk.cache.'));
+// It is backed by IndexedDB: the cached dictionaries and lists outgrow localStorage's ~5MB, and
+// its synchronous API would block the UI thread on every read. Metadata and tokens stay in
+// localStorage (small, and the tokens belong in the platform keystore, not a shared database).
+const legacyCacheStore = new WebKeyValueStore('hk.cache.');
+const cacheStore = new IdbKeyValueStore('hikashop-cache', legacyCacheStore);
+const cache = new CacheRepository(cacheStore);
+
+// One-time housekeeping: adopt anything an older localStorage-backed build left behind, then
+// keep the cache bounded so a long-lived install cannot grow without limit.
+const MAX_CACHE_ENTRIES = 300;
+const cacheReady = (async () => {
+	try {
+		await cacheStore.migrateFrom(legacyCacheStore);
+		await cache.pruneTo(MAX_CACHE_ENTRIES);
+	} catch { /* housekeeping is best-effort */ }
+})();
 
 const NOTIFY_PREF_KEY = 'hk.notify.enabled';
 const NOTIFY_SETTINGS_KEY = 'hk.notify.settings';
@@ -73,6 +88,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	const refresh = useCallback(async () => {
+		await cacheReady;
 		const list = await registry.list();
 		const act = await registry.getActive();
 		setStores(list);

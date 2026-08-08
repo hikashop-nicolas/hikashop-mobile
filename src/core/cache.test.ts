@@ -71,3 +71,68 @@ describe('CacheRepository', () => {
 		expect(ordersFilterKey(undefined, undefined)).toBe('all:');
 	});
 });
+
+// A store that starts rejecting writes, to model a full quota.
+class FullStore extends MemoryKeyValueStore {
+	full = false;
+	async set(key: string, value: string) {
+		if (this.full) throw new Error('QuotaExceededError');
+		return super.set(key, value);
+	}
+}
+
+describe('CacheRepository eviction and write safety', () => {
+	it('never rejects when the backing store is full', async () => {
+		const kv = new FullStore();
+		const c = new CacheRepository(kv, () => 1);
+		kv.full = true;
+		// The caller awaits this before navigating, so it must resolve rather than throw.
+		await expect(c.putOrders('s1', 'all:', page(1))).resolves.toBeTruthy();
+	});
+
+	it('still returns the entry when it could not be persisted', async () => {
+		const kv = new FullStore();
+		const c = new CacheRepository(kv, () => 7);
+		kv.full = true;
+		const entry = await c.putOrderDetail('s1', 1, { id: 1 } as OrderDetail);
+		expect(entry.fetchedAt).toBe(7);
+		expect(await c.getOrderDetail('s1', 1)).toBeNull(); // nothing was stored
+	});
+
+	it('evicts the oldest entries first', async () => {
+		const kv = new MemoryKeyValueStore();
+		let t = 0;
+		const c = new CacheRepository(kv, () => t);
+		t = 100; await c.putOrderDetail('s1', 1, { id: 1 } as OrderDetail); // oldest
+		t = 200; await c.putOrderDetail('s1', 2, { id: 2 } as OrderDetail);
+		t = 300; await c.putOrderDetail('s1', 3, { id: 3 } as OrderDetail); // newest
+
+		await c.evictOldest(1 / 3);
+		expect(await c.getOrderDetail('s1', 1)).toBeNull();
+		expect(await c.getOrderDetail('s1', 3)).not.toBeNull();
+	});
+
+	it('keeps the translation dictionary, which is expensive to refetch', async () => {
+		const kv = new MemoryKeyValueStore();
+		const c = new CacheRepository(kv, () => 1);
+		await c.putTranslations('s1', 'fr-FR', { locale: 'fr-FR', strings: { A: 'B' } });
+		await c.putOrderDetail('s1', 1, { id: 1 } as OrderDetail);
+
+		await c.evictOldest(1); // evict everything evictable
+		expect(await c.getOrderDetail('s1', 1)).toBeNull();
+		expect(await c.getTranslations('s1', 'fr-FR')).not.toBeNull();
+	});
+
+	it('prunes down to a cap, and is a no-op under it', async () => {
+		const kv = new MemoryKeyValueStore();
+		let t = 0;
+		const c = new CacheRepository(kv, () => ++t);
+		for (let i = 0; i < 10; i++) await c.putOrderDetail('s1', i, { id: i } as OrderDetail);
+
+		expect(await c.pruneTo(20)).toBe(0);
+		await c.pruneTo(4);
+		const left = (await kv.keys()).length;
+		expect(left).toBeLessThanOrEqual(4);
+		expect(await c.getOrderDetail('s1', 9)).not.toBeNull(); // newest survives
+	});
+});

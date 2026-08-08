@@ -43,10 +43,69 @@ export class CacheRepository {
 		}
 	}
 
+	// A cache write is best-effort and must never break the caller: several screens await it
+	// before navigating, so a full-storage error here would strand the user on a saved form.
+	// When the backing store rejects (typically a quota error), evict the oldest entries and
+	// retry once; if it still fails, carry on with the value in memory.
 	private async write<T>(k: string, data: T): Promise<Cached<T>> {
 		const entry: Cached<T> = { data, fetchedAt: this.now() };
-		await this.kv.set(k, JSON.stringify(entry));
+		const payload = JSON.stringify(entry);
+		try {
+			await this.kv.set(k, payload);
+		} catch {
+			try {
+				await this.evictOldest(0.5);
+				await this.kv.set(k, payload);
+			} catch {
+				// Out of room and nothing left to reclaim: the read model still works, just uncached.
+			}
+		}
 		return entry;
+	}
+
+	// Cache slots that can be refetched cheaply on demand. The translation dictionary and the
+	// change tokens are deliberately excluded: they are large or expensive to re-download and
+	// are already invalidated by their version token.
+	private static EVICTABLE = ['orders', 'order', 'products', 'product', 'productmeta',
+		'customers', 'customer', 'discounts', 'discount', 'dashboard', 'categories', 'settings'];
+
+	private static isEvictable(key: string): boolean {
+		// Keys look like v1.<storeId>.<kind>[.<rest>]; the kind is the third segment.
+		const kind = key.split('.')[2];
+		return kind !== undefined && CacheRepository.EVICTABLE.includes(kind);
+	}
+
+	// Drop the oldest evictable entries (a fraction of them, 0..1), oldest first. Returns how
+	// many were removed. Used on a failed write and callable at startup to cap growth.
+	async evictOldest(fraction: number): Promise<number> {
+		const keys = (await this.kv.keys()).filter(CacheRepository.isEvictable);
+		if (keys.length === 0) return 0;
+
+		const dated: { key: string; at: number }[] = [];
+		for (const key of keys) {
+			const raw = await this.kv.get(key);
+			let at = 0;
+			try {
+				const parsed = raw ? (JSON.parse(raw) as Cached<unknown>) : null;
+				at = parsed && typeof parsed.fetchedAt === 'number' ? parsed.fetchedAt : 0;
+			} catch {
+				at = 0; // unparseable: treat as oldest so it goes first
+			}
+			dated.push({ key, at });
+		}
+		dated.sort((a, b) => a.at - b.at);
+
+		const target = Math.max(1, Math.ceil(dated.length * Math.min(1, Math.max(0, fraction))));
+		for (const { key } of dated.slice(0, target)) await this.kv.remove(key);
+		return target;
+	}
+
+	// Keep the cache bounded: if more than `max` evictable entries exist, drop the oldest ones.
+	// Called once at startup, so a long-lived install does not grow without limit.
+	async pruneTo(max: number): Promise<number> {
+		const count = (await this.kv.keys()).filter(CacheRepository.isEvictable).length;
+		if (count <= max) return 0;
+		return this.evictOldest((count - max) / count);
 	}
 
 	getOrders(storeId: string, filterKey: string): Promise<Cached<Paginated<OrderSummary>> | null> {
