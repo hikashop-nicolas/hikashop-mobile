@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hkSurface">#181d21</color>
+    <bool name="hkLightStatusBar">false</bool>
+</resources>

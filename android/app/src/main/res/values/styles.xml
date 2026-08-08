@@ -17,6 +17,8 @@
              inset strip does not read as a gap. -->
         <item name="android:statusBarColor">@color/hkSurface</item>
         <item name="android:navigationBarColor">@color/hkSurface</item>
+        <!-- Dark icons on the light surface, light on the dark one. -->
+        <item name="android:windowLightStatusBar">@bool/hkLightStatusBar</item>
         <item name="android:windowBackground">@color/hkSurface</item>
     </style>
 

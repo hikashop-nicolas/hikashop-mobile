@@ -14,6 +14,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Register the worker ourselves (see src/main.tsx): the native shell must not have one.
+      injectRegister: null,
       includeAssets: ['favicon-64.png', 'apple-touch-icon.png', 'icon.svg'],
       manifest: {
         name: 'HikaShop',
@@ -38,7 +40,6 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: 'index.html',
       },
-      // The Capacitor native build ships assets locally and does not need a SW in dev.
       devOptions: { enabled: false },
     }),
   ],

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Mirrors the hk-surface token from the web app's dark theme. -->
-    <color name="hkSurface">#181d21</color>
+    <!-- Mirrors the hk-surface token; values-night carries the dark counterpart. -->
+    <color name="hkSurface">#ffffff</color>
+    <bool name="hkLightStatusBar">true</bool>
 </resources>
