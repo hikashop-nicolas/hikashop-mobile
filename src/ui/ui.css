@@ -120,6 +120,8 @@
 
 .hk-select { border: 1px solid var(--hk-line); border-radius: var(--hk-r2); background: var(--hk-surface); color: var(--hk-ink); min-height: 36px; padding: 0 var(--hk-s3); font-size: .9rem; cursor: pointer; }
 .hk-select:focus { border-color: var(--hk-accent); outline: none; }
+/* A select used as a listing filter takes the row it is on, up to a readable width. */
+.hk-filter-select { min-height: 2.1rem; width: 100%; max-width: 20rem; }
 
 .hk-check { display: inline-flex; align-items: center; gap: var(--hk-s2); margin-top: var(--hk-s3); font-size: .85rem; color: var(--hk-muted); cursor: pointer; }
 .hk-check input { width: 1.05rem; height: 1.05rem; accent-color: var(--hk-accent); cursor: pointer; }
@@ -220,13 +222,6 @@
 .hk-viewer-foot { position: absolute; left: 0; right: 0; bottom: calc(var(--hk-s4) + env(safe-area-inset-bottom, 0)); display: flex; justify-content: center; align-items: baseline; gap: var(--hk-s3); padding-inline: 4rem; color: rgba(255,255,255,.85); font-size: .85rem; }
 .hk-viewer-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hk-viewer-count { color: rgba(255,255,255,.6); font-variant-numeric: tabular-nums; flex: none; }
-
-/* Published state as a control. On is affirmative; off is quiet rather than alarming, since an
-   unpublished record is a decision, not a fault. */
-.hk-pub { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--hk-line); background: var(--hk-surface); color: var(--hk-faint); cursor: pointer; display: grid; place-items: center; padding: 0; }
-.hk-pub:hover { border-color: var(--hk-muted); color: var(--hk-muted); }
-.hk-pub.hk-on { border-color: transparent; background: var(--hk-ok-soft); color: var(--hk-ok); }
-.hk-pub:disabled { opacity: .45; cursor: default; }
 
 /* The shop's own logo, beside its name in the app bar and in the store list. */
 .hk-logo { height: 1.5rem; max-width: 7rem; object-fit: contain; display: block; flex: none; }

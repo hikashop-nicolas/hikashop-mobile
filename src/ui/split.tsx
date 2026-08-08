@@ -44,9 +44,6 @@ export function SplitView({ list }: { list: ReactNode }) {
 	// would throw away edits. Caught on the way down, before the link acts on it.
 	function onListClick(e: MouseEvent<HTMLDivElement>) {
 		if (!unsaved.isDirty()) return;
-		// A control inside a row (the publish toggle) acts on that row without opening it, so it
-		// is not a navigation and must not be treated as one.
-		if ((e.target as HTMLElement).closest?.('button')) return;
 		const link = (e.target as HTMLElement).closest?.('a[href]');
 		if (!link) return;
 		const href = link.getAttribute('href') ?? '';

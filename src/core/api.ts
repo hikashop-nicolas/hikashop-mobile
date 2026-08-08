@@ -2,7 +2,7 @@
 // so native builds can swap in a CORS-free HTTP bridge and tests can mock responses.
 
 import type {
-	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, Coupon, OrderStatusDef, DashboardStats, Paginated, OrderStatusResult,
+	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderMethods, OrderProductPrecompute, Coupon, OrderStatusDef, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup, Discount, DiscountInput, DiscountType, BarcodeMatch,
@@ -239,7 +239,7 @@ export class ApiClient {
 	}
 
 	// Update a coupon (write scope). Returns the saved coupon. Partial: the connector keeps every
-	// column the payload does not mention, so a single field can be sent on its own.
+	// column the payload does not mention.
 	async updateDiscount(id: number, input: Partial<DiscountInput>): Promise<Discount> {
 		return (await this.request<Discount>('PUT', `discounts/${id}`, { body: input })).data;
 	}
@@ -332,7 +332,13 @@ export class ApiClient {
 
 	// Set the order-level discount / shipping / payment fees (write scope). amount is ex-tax;
 	// tax is recomputed by the store from the chosen rate namekeys. Returns the new fees + totals.
-	async saveOrderFees(id: number, fees: Record<'discount' | 'shipping' | 'payment', { amount: number; tax_namekeys: string[]; code?: string }>): Promise<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }> {
+	// The shipping / payment methods this order can be moved to (read scope). Built by the shop's
+	// own plugins, so it includes the services a carrier plugin expands from one stored method.
+	async getOrderMethods(id: number): Promise<OrderMethods> {
+		return (await this.request<OrderMethods>('GET', `orders/${id}/methods`)).data;
+	}
+
+	async saveOrderFees(id: number, fees: Record<'discount' | 'shipping' | 'payment', { amount: number; tax_namekeys: string[]; code?: string; method?: string }>): Promise<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }> {
 		const { data } = await this.request<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }>('PUT', `orders/${id}/fees`, { body: { fees } });
 		return data;
 	}

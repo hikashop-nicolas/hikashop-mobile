@@ -214,7 +214,8 @@ export const en: Messages = {
 
 	'orders.title': 'Orders',
 	'orders.search': 'Search order # or customer',
-	'orders.filter.all': 'All',
+	'orders.filter.all': 'All statuses',
+	'orders.filterByStatus': 'Filter by status',
 	'orders.filter.confirmed': 'Confirmed',
 	'orders.filter.created': 'Created',
 	'orders.filter.shipped': 'Shipped',
@@ -282,6 +283,7 @@ export const en: Messages = {
 
 	'order.discount': 'Discount',
 	'order.paymentFee': 'Payment fee',
+	'order.methodPerShipment': 'This order ships from several warehouses, so its shipping methods are set per shipment in the shop backend.',
 	'order.tax': 'Tax',
 	'order.payment': 'Payment method',
 	'order.shippingMethod': 'Shipping method',
@@ -494,8 +496,6 @@ export const en: Messages = {
 	'media.nextImage': 'Next image',
 	'media.imageOf': '{shown} of {total}',
 	'common.close': 'Close',
-	'common.publish': 'Publish',
-	'common.unpublish': 'Unpublish',
 	'category.imageBrowse': 'Choose from the media library',
 	'category.imageUpload': 'Upload an image',
 };

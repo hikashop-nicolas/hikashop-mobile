@@ -212,7 +212,8 @@ export const fr: Messages = {
 
 	'orders.title': 'Commandes',
 	'orders.search': 'Rechercher n° de commande ou client',
-	'orders.filter.all': 'Toutes',
+	'orders.filter.all': 'Tous les statuts',
+	'orders.filterByStatus': 'Filtrer par statut',
 	'orders.filter.confirmed': 'Confirmées',
 	'orders.filter.created': 'Créées',
 	'orders.filter.shipped': 'Expédiées',
@@ -280,6 +281,7 @@ export const fr: Messages = {
 
 	'order.discount': 'Remise',
 	'order.paymentFee': 'Frais de paiement',
+	'order.methodPerShipment': 'Cette commande est expédiée depuis plusieurs entrepôts : ses modes de livraison se règlent par expédition, dans l\'administration de la boutique.',
 	'order.tax': 'Taxe',
 	'order.payment': 'Moyen de paiement',
 	'order.shippingMethod': 'Mode de livraison',
@@ -492,8 +494,6 @@ export const fr: Messages = {
 	'media.nextImage': 'Image suivante',
 	'media.imageOf': '{shown} sur {total}',
 	'common.close': 'Fermer',
-	'common.publish': 'Publier',
-	'common.unpublish': 'Dépublier',
 	'category.imageBrowse': 'Choisir dans la médiathèque',
 	'category.imageUpload': 'Envoyer une image',
 };

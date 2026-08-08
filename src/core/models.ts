@@ -91,6 +91,21 @@ export interface OrderFees {
 	payment: OrderFee;
 }
 
+// The methods an order can be moved to, as the shop's own plugins enumerate them. `current` and
+// each option's `value` pair the method with its id ("manual_3"); '_' means none is set.
+export interface OrderMethodChoice {
+	current: string;
+	// An order shipped from several warehouses holds one method per shipment, which a single
+	// choice cannot express: the picker steps aside rather than flattening them.
+	multiple: boolean;
+	options: { value: string; label: string }[];
+}
+
+export interface OrderMethods {
+	shipping: OrderMethodChoice;
+	payment: OrderMethodChoice;
+}
+
 // A shop order status (from GET /statuses), in the shop's configured order.
 export interface OrderStatusDef {
 	namekey: string; // what the status endpoint expects

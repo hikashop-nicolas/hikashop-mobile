@@ -44,15 +44,16 @@ export function Orders() {
 			right={<NewButton onClick={() => setCreating(true)} />}
 		>
 			<Search value={search} onChange={setSearch} placeholder={t('orders.search')} />
-			<div style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap' }}>
-				<button key="all" className={`hk-chip${status === '' ? ' hk-on' : ''}`} onClick={() => setStatus('')}>
-					{t('orders.filter.all')}
-				</button>
-				{statuses.map((s) => (
-					<button key={s.namekey} className={`hk-chip${status === s.namekey ? ' hk-on' : ''}`} onClick={() => setStatus(s.namekey)}>
-						{statusLabel(s.namekey)}
-					</button>
-				))}
+			{/* A chip per status is fine for a shop with four of them and fills the screen for a
+			    shop with fifteen, so this is the same select the order form changes a status with. */}
+			<div className="hk-filter-bar">
+				<select className="hk-select hk-filter-select" value={status} onChange={(e) => setStatus(e.target.value)}
+					aria-label={t('orders.filterByStatus')}>
+					<option value="">{t('orders.filter.all')}</option>
+					{statuses.map((s) => (
+						<option key={s.namekey} value={s.namekey}>{statusLabel(s.namekey)}</option>
+					))}
+				</select>
 			</div>
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>

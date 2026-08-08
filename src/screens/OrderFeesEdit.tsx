@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { OrderDetail, OrderFee, TaxRate } from '../core';
+import type { OrderDetail, OrderFee, OrderMethods, TaxRate } from '../core';
 import { Screen, Spinner, Icon, Field, Money, Button } from '../ui';
 import { ApplyCouponModal } from './ApplyCouponModal';
 
@@ -19,6 +19,9 @@ type FeeRow = { amount: string; rates: string[]; code: string };
 function toRow(fee: OrderFee): FeeRow {
 	return { amount: fee.amount ? String(fee.amount) : '', rates: [...(fee.tax_namekeys ?? [])], code: fee.code ?? '' };
 }
+
+// The two fees that belong to a method.
+type MethodType = 'shipping' | 'payment';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -45,6 +48,25 @@ export function OrderFeesEdit() {
 		if (!order) return;
 		setRows({ discount: toRow(order.fees.discount), shipping: toRow(order.fees.shipping), payment: toRow(order.fees.payment) });
 	}, [order]);
+
+	// Which method each fee is for. Asked of the shop rather than assembled here: only its own
+	// plugins know what they offer, and a carrier plugin can expand one stored method into
+	// several named services. Kept beside the fee rows rather than inside them, so the two
+	// requests can land in either order without one clearing the other.
+	const [methods, setMethods] = useState<OrderMethods | null>(null);
+	const [picked, setPicked] = useState<Record<MethodType, string>>({ shipping: '', payment: '' });
+	useEffect(() => {
+		if (!client || !orderId) return;
+		let alive = true;
+		void client.getOrderMethods(orderId)
+			.then((m) => {
+				if (!alive) return;
+				setMethods(m);
+				setPicked({ shipping: m.shipping.current, payment: m.payment.current });
+			})
+			.catch(() => { if (alive) setMethods(null); });
+		return () => { alive = false; };
+	}, [client, orderId]);
 
 	const [busy, setBusy] = useState(false);
 	const [saveErr, setSaveErr] = useState('');
@@ -82,13 +104,15 @@ export function OrderFeesEdit() {
 		setSaveErr('');
 		setBusy(true);
 		try {
-			const payload = {} as Record<FeeType, { amount: number; tax_namekeys: string[]; code?: string }>;
+			const payload = {} as Record<FeeType, { amount: number; tax_namekeys: string[]; code?: string; method?: string }>;
 			for (const type of FEE_TYPES) {
 				const row = rows[type];
 				// Drop blanks and de-duplicate rates before sending.
 				const nks = [...new Set(row.rates.filter((nk) => nk))];
 				payload[type] = { amount: Number(row.amount) || 0, tax_namekeys: nks };
 				if (type === 'discount') payload[type].code = row.code;
+				// Send the method only where there is a picker to have chosen one.
+				else if (methods && !methods[type].multiple && picked[type]) payload[type].method = picked[type];
 			}
 			const res = await client.saveOrderFees(orderId, payload);
 			await cache.putOrderDetail(storeId, orderId, { ...order, fees: res.fees, totals: res.totals });
@@ -126,6 +150,20 @@ export function OrderFeesEdit() {
 									</div>
 								) : (
 									<span className="hk-muted">{t(FEE_LABEL[type])}</span>
+								)}
+								{type !== 'discount' && methods && (
+									methods[type].multiple ? (
+										<div className="hk-row-sub">{t('order.methodPerShipment')}</div>
+									) : (
+										<Field label={t(type === 'shipping' ? 'order.shippingMethod' : 'order.payment')}>
+											<select className="hk-select" value={picked[type]}
+												onChange={(e) => setPicked((p) => ({ ...p, [type]: e.target.value }))}>
+												{methods[type].options.map((o) => (
+													<option key={o.value} value={o.value}>{o.label}</option>
+												))}
+											</select>
+										</Field>
+									)
 								)}
 								<Field label={t('order.feeAmount')}>
 									<input className="hk-input" type="number" inputMode="decimal" value={row.amount}
