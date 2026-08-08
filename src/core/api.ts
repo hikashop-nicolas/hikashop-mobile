@@ -5,7 +5,7 @@ import type {
 	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, Coupon, OrderStatusDef, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
-	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup, Discount, DiscountInput,
+	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup, Discount, DiscountInput, DiscountType,
 } from './models';
 
 export class ApiError extends Error {
@@ -213,9 +213,10 @@ export class ApiClient {
 		return (await this.request<UserGroup[]>('GET', 'groups')).data;
 	}
 
-	// Coupons (read scope), searchable and paginated.
-	async getDiscounts(params: { start?: number; limit?: number; search?: string } = {}): Promise<Paginated<Discount>> {
-		const query: Query = { start: params.start, limit: params.limit, search: params.search };
+	// Promotions (read scope), searchable and paginated. Omit `type` for both coupons and
+	// automatic discounts.
+	async getDiscounts(params: { start?: number; limit?: number; search?: string; type?: DiscountType } = {}): Promise<Paginated<Discount>> {
+		const query: Query = { start: params.start, limit: params.limit, search: params.search, type: params.type };
 		const { data, meta } = await this.request<Discount[]>('GET', 'discounts', { query });
 		return { items: data || [], total: Number(meta?.total ?? 0), start: Number(meta?.start ?? 0), limit: Number(meta?.limit ?? 0) };
 	}

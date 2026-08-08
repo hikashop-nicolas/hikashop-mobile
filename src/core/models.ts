@@ -421,10 +421,14 @@ export interface OrderAddressForm {
 	state_name: string;
 }
 
-// A coupon (discount_type='coupon'): a percentage or flat-amount code with optional limits.
+// HikaShop's two promotion types: a coupon (the customer enters a code) or an automatic discount.
+export type DiscountType = 'coupon' | 'discount';
+
+// A promotion: a percentage or flat-amount reduction with optional limits.
 export interface Discount {
 	id: number;
-	code: string;
+	type: DiscountType;
+	code: string; // empty for an automatic discount
 	kind: 'percent' | 'flat';
 	value: number;
 	currency_id: number;
@@ -439,8 +443,9 @@ export interface Discount {
 	tax_included: boolean; // flat amount includes tax
 }
 
-// The editable subset sent when creating/updating a coupon.
+// The editable subset sent when creating/updating a promotion.
 export interface DiscountInput {
+	type: DiscountType;
 	code: string;
 	kind: 'percent' | 'flat';
 	value: number;

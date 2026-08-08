@@ -4,7 +4,7 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
-import type { Discount, Paginated } from '../core';
+import type { Discount, DiscountType, Paginated } from '../core';
 import { Screen, Search, Money, Spinner, NewButton } from '../ui';
 
 export function Discounts() {
@@ -12,15 +12,16 @@ export function Discounts() {
 	const t = useT();
 	const nav = useNavigate();
 	const [search, setSearch] = useState('');
+	const [type, setType] = useState<DiscountType | ''>('');
 	const storeId = active?.id ?? '';
-	const filterKey = ordersFilterKey('', search);
+	const filterKey = ordersFilterKey(type, search);
 
 	const { data, loading, error } = useCached<Paginated<Discount>>({
 		enabled: !!client && !!active,
 		read: () => cache.getDiscounts(storeId, filterKey),
-		fetch: () => client!.getDiscounts({ search: search || undefined, limit: 30 }),
+		fetch: () => client!.getDiscounts({ search: search || undefined, type: type || undefined, limit: 30 }),
 		write: async (p) => { await cache.putDiscounts(storeId, filterKey, p); },
-		deps: [storeId, search],
+		deps: [storeId, search, type],
 		debounceMs: search ? 300 : 0,
 	});
 
@@ -35,6 +36,13 @@ export function Discounts() {
 	return (
 		<Screen title={t('discounts.title')} right={<NewButton onClick={() => nav('/discounts/new')} />}>
 			<Search value={search} onChange={setSearch} placeholder={t('discounts.search')} />
+			<div className="hk-filter-bar">
+				{([['', 'discounts.filterAll'], ['coupon', 'discounts.filterCoupons'], ['discount', 'discounts.filterAuto']] as const).map(([v, key]) => (
+					<button key={v || 'all'} type="button" className={`hk-chip${type === v ? ' hk-on' : ''}`} onClick={() => setType(v)}>
+						{t(key)}
+					</button>
+				))}
+			</div>
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>
 			) : error ? (
@@ -47,10 +55,12 @@ export function Discounts() {
 						<Link key={d.id} to={`/discounts/${d.id}/edit`} className="hk-row">
 							<div className="hk-row-grow">
 								<span className="hk-row-title">
-									{d.code}
+									{d.type === 'coupon' ? d.code : t('discount.typeAuto')}
 									{!d.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('discount.unpublished')}</span>}
 								</span>
-								<span className="hk-row-sub">{quotaLabel(d)}</span>
+								<span className="hk-row-sub">
+									{d.type === 'coupon' ? t('discount.typeCoupon') : t('discount.autoApplied')} · {quotaLabel(d)}
+								</span>
 							</div>
 							<div className="hk-row-rt">
 								<span className="hk-row-title">

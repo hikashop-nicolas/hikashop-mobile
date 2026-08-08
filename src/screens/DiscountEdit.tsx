@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
-import type { Discount, DiscountInput } from '../core';
+import type { Discount, DiscountInput, DiscountType } from '../core';
 import { Screen, Spinner, Field, Button, Icon } from '../ui';
 import { validateDiscount } from '../app/discounts';
 
@@ -32,6 +32,7 @@ export function DiscountEdit() {
 	const editing = !!id;
 
 	const [loaded, setLoaded] = useState(!editing);
+	const [type, setType] = useState<DiscountType>('coupon');
 	const [code, setCode] = useState('');
 	const [kind, setKind] = useState<'percent' | 'flat'>('percent');
 	const [value, setValue] = useState('');
@@ -43,6 +44,7 @@ export function DiscountEdit() {
 	const [perUser, setPerUser] = useState('');
 	const [busy, setBusy] = useState(false);
 	const [err, setErr] = useState('');
+	const [confirmDelete, setConfirmDelete] = useState(false);
 
 	useEffect(() => {
 		if (!client || !editing) return;
@@ -51,7 +53,7 @@ export function DiscountEdit() {
 			try {
 				const d = await client.getDiscount(Number(id));
 				if (!alive) return;
-				setCode(d.code); setKind(d.kind); setValue(String(d.value));
+				setType(d.type); setCode(d.code); setKind(d.kind); setValue(String(d.value));
 				setPublished(d.published);
 				setStart(toDateInput(d.start)); setEnd(toDateInput(d.end));
 				setMinOrder(d.minimum_order ? String(d.minimum_order) : '');
@@ -66,12 +68,12 @@ export function DiscountEdit() {
 	async function save() {
 		if (!client || busy) return;
 		const num = Number(value.replace(',', '.'));
-		const verr = validateDiscount({ code, kind, value: num });
+		const verr = validateDiscount({ type, code, kind, value: num });
 		if (verr) { setErr(t(verr)); return; }
 		setErr('');
 		setBusy(true);
 		const input: DiscountInput = {
-			code: code.trim(), kind, value: num, published,
+			type, code: code.trim(), kind, value: num, published,
 			start: fromDateInput(start), end: fromDateInput(end),
 			minimum_order: minOrder ? Number(minOrder.replace(',', '.')) : 0,
 			quota: quota ? parseInt(quota, 10) : 0,
@@ -89,6 +91,7 @@ export function DiscountEdit() {
 
 	async function remove() {
 		if (!client || busy || !editing) return;
+		setConfirmDelete(false);
 		setBusy(true);
 		try {
 			await client.deleteDiscount(Number(id));
@@ -109,9 +112,17 @@ export function DiscountEdit() {
 				<div className="hk-center-col"><Spinner /></div>
 			) : (
 				<div className="hk-card hk-card--pad hk-form">
-					<Field label={t('discount.code')}>
-						<input className="hk-input" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} autoCapitalize="characters" autoCorrect="off" />
+					<Field label={t('discount.promotionType')} hint={type === 'coupon' ? t('discount.couponHint') : t('discount.autoHint')}>
+						<div className="hk-segmented">
+							<button type="button" className={`hk-seg${type === 'coupon' ? ' hk-on' : ''}`} onClick={() => setType('coupon')}>{t('discount.typeCoupon')}</button>
+							<button type="button" className={`hk-seg${type === 'discount' ? ' hk-on' : ''}`} onClick={() => setType('discount')}>{t('discount.typeAuto')}</button>
+						</div>
 					</Field>
+					{type === 'coupon' && (
+						<Field label={t('discount.code')}>
+							<input className="hk-input" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} autoCapitalize="characters" autoCorrect="off" />
+						</Field>
+					)}
 					<Field label={t('discount.type')}>
 						<div className="hk-segmented">
 							<button type="button" className={`hk-seg${kind === 'percent' ? ' hk-on' : ''}`} onClick={() => setKind('percent')}>{t('discount.percent')}</button>
@@ -147,9 +158,19 @@ export function DiscountEdit() {
 					</div>
 
 					{err && <div className="hk-error-note">{err}</div>}
-					{editing && (
-						<Button variant="danger" block disabled={busy} onClick={() => void remove()}>{t('discount.delete')}</Button>
-					)}
+					{editing && (confirmDelete ? (
+						<div className="hk-card hk-card--pad" style={{ display: 'grid', gap: 'var(--hk-s2)' }}>
+							<span className="hk-row-sub">{t('discount.confirmDelete')}</span>
+							<div style={{ display: 'flex', gap: 'var(--hk-s2)' }}>
+								<Button variant="danger" disabled={busy} onClick={() => void remove()}>{t('common.delete')}</Button>
+								<Button disabled={busy} onClick={() => setConfirmDelete(false)}>{t('common.cancel')}</Button>
+							</div>
+						</div>
+					) : (
+						<Button variant="danger" block disabled={busy} onClick={() => setConfirmDelete(true)}>
+							<Icon name="trash" size={16} /> {t('discount.delete')}
+						</Button>
+					))}
 				</div>
 			)}
 		</Screen>
