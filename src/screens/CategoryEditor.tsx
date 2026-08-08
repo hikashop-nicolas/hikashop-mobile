@@ -3,7 +3,7 @@ import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl, WRITABLE_FIELD_TYPES } from '../core';
 import type { ProductMeta, ProductField, CategoryDetail, FieldFile } from '../core';
-import { Modal, Screen, Field, Button, Icon, TreeSelect, RichText, CustomFieldInput } from '../ui';
+import { Modal, Screen, Field, Button, Icon, TreeSelect, RichText, CustomFieldInput, DeleteButton } from '../ui';
 import type { TreeNode } from '../ui';
 
 type Kind = 'product' | 'manufacturer';
@@ -12,13 +12,14 @@ type Kind = 'product' | 'manufacturer';
 // categories): name, parent, description, image, published and category custom fields.
 // Presents as a modal (inline create from the product editor) or a full screen
 // (from the category management listing).
-export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onSaved, presentation = 'modal' }: {
+export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onSaved, onDelete, presentation = 'modal' }: {
 	kind: Kind;
 	category?: CategoryDetail | null;
 	meta: ProductMeta | null;
 	parentNodes: TreeNode[];
 	onClose: () => void;
 	onSaved: (node: TreeNode) => void;
+	onDelete?: () => void | Promise<void>;
 	presentation?: 'modal' | 'screen';
 }) {
 	const { client } = useStores();
@@ -131,6 +132,12 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 				))}
 
 				{err && <div className="hk-error-note">{err}</div>}
+
+				{/* Deleting the entity lives with its edit form, like every other entity in the app. */}
+				{editing && onDelete && (
+					<DeleteButton block disabled={busy} label={t('category.deleteCategory')}
+						confirmMessage={t('category.deleteConfirm')} onConfirm={onDelete} />
+				)}
 			</div>
 	);
 

@@ -4,6 +4,7 @@ export * from './currency';
 export * from './rich-text';
 export * from './date-calendar';
 export * from './custom-field';
+export * from './delete-button';
 export * from './tree-select';
 export * from './layout';
 export * from './QrScanner';

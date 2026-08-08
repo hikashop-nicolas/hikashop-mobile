@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductPrice, Settings } from '../core';
 import { tsToDate, dateToTs, inclFromExcl, exclFromIncl } from '../core';
-import { Screen, Spinner, Icon, Field, Button } from '../ui';
+import { Screen, Spinner, Icon, Field, Button, DeleteButton } from '../ui';
 import { SearchPicker } from './SearchPicker';
 import type { PickItem } from './SearchPicker';
 
@@ -72,7 +72,6 @@ export function ProductPricesEdit() {
 
 	const [busy, setBusy] = useState(false);
 	const [saveErr, setSaveErr] = useState('');
-	const [confirmDel, setConfirmDel] = useState<number | null>(null);
 	const [restrictRow, setRestrictRow] = useState<number | null>(null);
 	const [picking, setPicking] = useState<{ row: number; kind: 'users' | 'zones' } | null>(null);
 	const defaultCurrency = meta?.currencies[0]?.id ?? 1;
@@ -216,14 +215,8 @@ export function ProductPricesEdit() {
 										</div>
 									)}
 								</div>
-								{confirmDel === i ? (
-									<div className="hk-form-row">
-										<Button size="sm" onClick={() => setConfirmDel(null)}>{t('common.cancel')}</Button>
-										<Button variant="danger" size="sm" onClick={() => remove(i)}>{t('product.confirmDelete')}</Button>
-									</div>
-								) : (
-									<Button variant="danger" size="sm" onClick={() => setConfirmDel(i)}>{t('common.delete')}</Button>
-								)}
+								<DeleteButton size="sm" label={t('common.delete')}
+									confirmMessage={t('product.deletePriceConfirm')} onConfirm={() => remove(i)} />
 							</div>
 						);
 					})}

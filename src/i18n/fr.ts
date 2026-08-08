@@ -258,6 +258,13 @@ export const fr: Messages = {
 	'error.unauthorized': 'Cet appareil n’est plus autorisé. Associez-le à nouveau.',
 	'error.invalid_code': 'Ce code d’association est invalide ou a expiré.',
 	'error.not_found': 'Introuvable.',
+	'error.has_orders': 'Ce client a des commandes et ne peut pas être supprimé. Supprimez d\'abord ses commandes.',
+	'error.code_taken': 'Ce code promo est déjà utilisé.',
+	'error.email_taken': 'Cette adresse email est déjà utilisée.',
+	'error.username_taken': 'Cet identifiant est déjà utilisé.',
+	'error.invalid_email': 'Cette adresse email n\'est pas valide.',
+	'error.forbidden_group': 'Vous n\'êtes pas autorisé à attribuer ce groupe.',
+	'error.forbidden_target': 'Vous n\'êtes pas autorisé à modifier ce client.',
 
 	'status.created': 'Créée',
 	'status.confirmed': 'Confirmée',
@@ -379,4 +386,9 @@ export const fr: Messages = {
 	'discount.errCode': 'Un code promo est requis.',
 	'discount.errValue': 'Saisissez une valeur supérieure à zéro.',
 	'discount.errPercent': 'Un pourcentage ne peut pas dépasser 100.',
+	'category.deleteCategory': 'Supprimer la catégorie',
+	'customers.deleteCustomer': 'Supprimer le client',
+	'customers.deleteConfirm': 'Supprimer ce client ? Cette action est irréversible. Un client ayant des commandes ne peut pas être supprimé.',
+	'customers.deleteAddressConfirm': 'Supprimer cette adresse ?',
+	'product.deletePriceConfirm': 'Supprimer ce tarif ?',
 };

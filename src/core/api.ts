@@ -170,6 +170,11 @@ export class ApiClient {
 		return (await this.request<CustomerDetail>('GET', `customers/${id}`)).data;
 	}
 
+	// Delete a customer (write scope). The store refuses (409 has_orders) if they have orders.
+	async deleteCustomer(id: number): Promise<{ deleted: number }> {
+		return (await this.request<{ deleted: number }>('DELETE', `customers/${id}`)).data;
+	}
+
 	// Create a new (guest) customer from an email and optional name (write scope). A login can be
 	// added afterwards from the customer's detail. Returns the new customer id.
 	async createCustomer(customer: { email: string; name?: string }): Promise<{ id: number }> {

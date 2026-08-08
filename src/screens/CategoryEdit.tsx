@@ -69,6 +69,7 @@ export function CategoryEdit() {
 			presentation="screen"
 			onClose={() => nav('/categories')}
 			onSaved={() => nav('/categories')}
+			onDelete={editing ? async () => { await client!.deleteCategory(Number(id)); nav('/categories'); } : undefined}
 		/>
 	);
 }

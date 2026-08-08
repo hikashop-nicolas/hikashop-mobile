@@ -4,7 +4,7 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useI18n, tError } from '../i18n';
 import type { CustomerDetail as CustomerDetailType, CustomerAddress } from '../core';
-import { Screen, StatusChip, Money, Spinner, Icon, Button } from '../ui';
+import { Screen, StatusChip, Money, Spinner, Icon, Button, DeleteButton } from '../ui';
 import { fmtDate } from '../app/utils';
 import { CustomerEditModal } from './CustomerEditModal';
 import { CustomerAccountModal } from './CustomerAccountModal';
@@ -154,6 +154,7 @@ export function CustomerDetail() {
 										setDefaultLabel={t('customers.setDefault')}
 										editLabel={t('product.edit')}
 										deleteLabel={t('common.delete')}
+										confirmLabel={t('customers.deleteAddressConfirm')}
 										busy={addrBusy === a.id}
 										onEdit={() => setEditingAddress({ addressId: a.id, types: a.types.length ? a.types : [type] })}
 										onDelete={() => void removeAddress(a.id)}
@@ -167,7 +168,7 @@ export function CustomerDetail() {
 			)}
 
 			{editing && customer && (
-				<CustomerEditModal customer={customer} onClose={() => setEditing(false)} onSaved={(u) => { setEditing(false); void applyUpdate(u); }} />
+				<CustomerEditModal customer={customer} onClose={() => setEditing(false)} onSaved={(u) => { setEditing(false); void applyUpdate(u); }} onDeleted={() => nav('/customers')} />
 			)}
 			{creatingAccount && customer && (
 				<CustomerAccountModal customer={customer} onClose={() => setCreatingAccount(false)} onSaved={(u) => { setCreatingAccount(false); void applyUpdate(u); }} />
@@ -185,7 +186,7 @@ export function CustomerDetail() {
 	);
 }
 
-function AddressBlock({ address, isDefault, canSetDefault, defaultLabel, setDefaultLabel, editLabel, deleteLabel, busy, onEdit, onDelete, onSetDefault }: {
+function AddressBlock({ address, isDefault, canSetDefault, defaultLabel, setDefaultLabel, editLabel, deleteLabel, confirmLabel, busy, onEdit, onDelete, onSetDefault }: {
 	address: CustomerAddress;
 	isDefault: boolean;
 	canSetDefault: boolean;
@@ -193,6 +194,7 @@ function AddressBlock({ address, isDefault, canSetDefault, defaultLabel, setDefa
 	setDefaultLabel: string;
 	editLabel: string;
 	deleteLabel: string;
+	confirmLabel: string;
 	busy: boolean;
 	onEdit: () => void;
 	onDelete: () => void;
@@ -214,7 +216,7 @@ function AddressBlock({ address, isDefault, canSetDefault, defaultLabel, setDefa
 			</div>
 			<div className="hk-row-rt" style={{ flexDirection: 'row', gap: 'var(--hk-s2)' }}>
 				<Button variant="default" size="sm" disabled={busy} onClick={onEdit}>{editLabel}</Button>
-				<Button variant="danger" size="sm" disabled={busy} onClick={onDelete}>{deleteLabel}</Button>
+				<DeleteButton mode="icon" disabled={busy} label={deleteLabel} confirmMessage={confirmLabel} onConfirm={onDelete} />
 			</div>
 		</div>
 	);

@@ -5,7 +5,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductField, ProductImage, ProductFile, FieldFile, RelatedProduct, Settings } from '../core';
 import { WRITABLE_FIELD_TYPES, tsToDate, dateToTs } from '../core';
-import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button, RichText, CustomFieldInput } from '../ui';
+import { Screen, Spinner, Icon, Field, TreeSelect, Money, Button, RichText, CustomFieldInput, DeleteButton } from '../ui';
 import type { TreeNode } from '../ui';
 import { CategoryEditor } from './CategoryEditor';
 import { ProductMediaSection } from './ProductMediaSection';
@@ -180,7 +180,6 @@ export function ProductEdit() {
 
 	async function del() {
 		if (!client || busy) return;
-		if (!window.confirm(t('product.deleteConfirm', { name: (form?.name as string) || '' }))) return;
 		setSaveErr('');
 		setBusy(true);
 		try {
@@ -201,10 +200,7 @@ export function ProductEdit() {
 			title={t('product.editTitle')}
 			left={<button className="hk-iconbtn" onClick={() => nav(-1)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
 			right={form ? (
-				<span className="hk-appbar-acts">
-					<button className="hk-iconbtn hk-danger" disabled={busy} onClick={() => void del()} aria-label={t('product.deleteProduct')}><Icon name="trash" size={22} /></button>
-					<Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button>
-				</span>
+				<Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button>
 			) : undefined}
 		>
 			{loading || !form ? (
@@ -366,6 +362,10 @@ export function ProductEdit() {
 					)}
 
 					{saveErr && <div className="hk-error-note">{saveErr}</div>}
+
+					<DeleteButton block disabled={busy} label={t('product.deleteProduct')}
+						confirmMessage={t('product.deleteConfirm', { name: (form?.name as string) || '' })}
+						onConfirm={() => void del()} />
 				</div>
 			)}
 			{editorKind && (

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useT, tError } from '../i18n';
 import { useStores } from '../app/store-context';
 import type { CustomerDetail, FieldFile } from '../core';
-import { Modal, Field, Button, CustomFieldInput } from '../ui';
+import { Modal, Field, Button, CustomFieldInput, DeleteButton } from '../ui';
 import { editableGroups, buildProfilePatch } from '../app/customers';
 
 function codeOf(e: unknown): string {
@@ -11,10 +11,11 @@ function codeOf(e: unknown): string {
 
 // Edit a customer's profile: name, email, and (for a registered account) username, password and
 // user groups, plus any custom user fields. Guests only get name + email.
-export function CustomerEditModal({ customer, onClose, onSaved }: {
+export function CustomerEditModal({ customer, onClose, onSaved, onDeleted }: {
 	customer: CustomerDetail;
 	onClose: () => void;
 	onSaved: (updated: CustomerDetail) => void;
+	onDeleted?: () => void;
 }) {
 	const { client } = useStores();
 	const t = useT();
@@ -46,6 +47,19 @@ export function CustomerEditModal({ customer, onClose, onSaved }: {
 		try {
 			const patch = buildProfilePatch(customer, { name, email, username, password, groups, custom });
 			onSaved(await client.updateCustomer(customer.id, patch));
+		} catch (e) {
+			setErr(tError(t, codeOf(e)));
+			setBusy(false);
+		}
+	}
+
+	async function remove() {
+		if (!client || busy || !onDeleted) return;
+		setErr('');
+		setBusy(true);
+		try {
+			await client.deleteCustomer(customer.id);
+			onDeleted();
 		} catch (e) {
 			setErr(tError(t, codeOf(e)));
 			setBusy(false);
@@ -99,6 +113,10 @@ export function CustomerEditModal({ customer, onClose, onSaved }: {
 
 				{err && <div className="hk-error-note">{err}</div>}
 				<Button variant="pri" block disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button>
+				{onDeleted && (
+					<DeleteButton block disabled={busy} label={t('customers.deleteCustomer')}
+						confirmMessage={t('customers.deleteConfirm')} onConfirm={() => void remove()} />
+				)}
 			</div>
 		</Modal>
 	);

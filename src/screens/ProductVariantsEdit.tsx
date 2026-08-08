@@ -4,7 +4,7 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import type { ProductDetail, ProductMeta, ProductCharacteristic, ProductVariant } from '../core';
-import { Screen, Spinner, Icon, Money, Button } from '../ui';
+import { Screen, Spinner, Icon, Money, Button, DeleteButton } from '../ui';
 
 // Variants management: the option set (characteristics + values) plus a listing of
 // variants. Editing a variant opens its own edit screen; adding one creates a blank
@@ -93,7 +93,6 @@ export function ProductVariantsEdit() {
 
 	async function del(variantId: number) {
 		if (!client || !product || busy) return;
-		if (!window.confirm(t('product.deleteVariantConfirm'))) return;
 		setBusy(true); setErr('');
 		try {
 			const kept = product.variants.filter((v) => v.id !== variantId).map((v) => ({
@@ -160,7 +159,8 @@ export function ProductVariantsEdit() {
 									<span className="hk-row-sub hk-mono">{v.code}{v.quantity >= 0 ? ` · ${v.quantity}` : ''}</span>
 								</button>
 								{v.price != null && <span className="hk-row-rt"><Money value={v.price} currency={meta?.currencies[0]?.id} /></span>}
-								<button type="button" className="hk-iconbtn hk-danger" disabled={busy} onClick={() => void del(v.id)} aria-label={t('common.delete')}><Icon name="trash" size={18} /></button>
+								<DeleteButton mode="icon" disabled={busy} label={t('common.delete')}
+										confirmMessage={t('product.deleteVariantConfirm')} onConfirm={() => void del(v.id)} />
 							</div>
 						))}
 					</div>

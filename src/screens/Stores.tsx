@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useI18n, LOCALES } from '../i18n';
-import { Screen, Button, Icon } from '../ui';
+import { Screen, Button, Icon, DeleteButton } from '../ui';
 import { hostOf } from '../app/utils';
 
 export function Stores() {
@@ -36,13 +36,9 @@ export function Stores() {
 					</div>
 					<div className="hk-row-rt">
 						{active?.id === s.id && <span className="hk-status hk-status--ok">{t('stores.active')}</span>}
-						<Button
-							variant="danger"
-							size="sm"
-							onClick={() => { if (window.confirm(t('stores.removeConfirm', { name: s.name }))) void remove(s.id); }}
-						>
-							{t('stores.remove')}
-						</Button>
+						<DeleteButton size="sm" label={t('stores.remove')}
+							confirmMessage={t('stores.removeConfirm', { name: s.name })}
+							onConfirm={() => void remove(s.id)} />
 					</div>
 				</div>
 			))}

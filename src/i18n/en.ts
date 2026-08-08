@@ -260,6 +260,13 @@ export const en: Messages = {
 	'error.unauthorized': 'This device is no longer authorised. Pair it again.',
 	'error.invalid_code': 'This pairing code is invalid or has expired.',
 	'error.not_found': 'Not found.',
+	'error.has_orders': 'This customer has orders and cannot be deleted. Delete their orders first.',
+	'error.code_taken': 'That coupon code is already in use.',
+	'error.email_taken': 'That email address is already in use.',
+	'error.username_taken': 'That username is already in use.',
+	'error.invalid_email': 'That email address is not valid.',
+	'error.forbidden_group': 'You are not allowed to assign that user group.',
+	'error.forbidden_target': 'You are not allowed to edit this customer.',
 
 	'status.created': 'Created',
 	'status.confirmed': 'Confirmed',
@@ -381,4 +388,9 @@ export const en: Messages = {
 	'discount.errCode': 'A coupon code is required.',
 	'discount.errValue': 'Enter a value greater than zero.',
 	'discount.errPercent': 'A percentage cannot exceed 100.',
+	'category.deleteCategory': 'Delete category',
+	'customers.deleteCustomer': 'Delete customer',
+	'customers.deleteConfirm': 'Delete this customer? This cannot be undone. Customers with orders cannot be deleted.',
+	'customers.deleteAddressConfirm': 'Delete this address?',
+	'product.deletePriceConfirm': 'Delete this price?',
 };

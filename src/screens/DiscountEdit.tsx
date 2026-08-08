@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import type { Discount, DiscountInput, DiscountType } from '../core';
-import { Screen, Spinner, Field, Button, Icon } from '../ui';
+import { Screen, Spinner, Field, Button, Icon, DeleteButton } from '../ui';
 import { validateDiscount } from '../app/discounts';
 
 function codeOf(e: unknown): string {
@@ -44,7 +44,6 @@ export function DiscountEdit() {
 	const [perUser, setPerUser] = useState('');
 	const [busy, setBusy] = useState(false);
 	const [err, setErr] = useState('');
-	const [confirmDelete, setConfirmDelete] = useState(false);
 
 	useEffect(() => {
 		if (!client || !editing) return;
@@ -91,7 +90,6 @@ export function DiscountEdit() {
 
 	async function remove() {
 		if (!client || busy || !editing) return;
-		setConfirmDelete(false);
 		setBusy(true);
 		try {
 			await client.deleteDiscount(Number(id));
@@ -158,19 +156,10 @@ export function DiscountEdit() {
 					</div>
 
 					{err && <div className="hk-error-note">{err}</div>}
-					{editing && (confirmDelete ? (
-						<div className="hk-card hk-card--pad" style={{ display: 'grid', gap: 'var(--hk-s2)' }}>
-							<span className="hk-row-sub">{t('discount.confirmDelete')}</span>
-							<div style={{ display: 'flex', gap: 'var(--hk-s2)' }}>
-								<Button variant="danger" disabled={busy} onClick={() => void remove()}>{t('common.delete')}</Button>
-								<Button disabled={busy} onClick={() => setConfirmDelete(false)}>{t('common.cancel')}</Button>
-							</div>
-						</div>
-					) : (
-						<Button variant="danger" block disabled={busy} onClick={() => setConfirmDelete(true)}>
-							<Icon name="trash" size={16} /> {t('discount.delete')}
-						</Button>
-					))}
+					{editing && (
+						<DeleteButton block disabled={busy} label={t('discount.delete')}
+							confirmMessage={t('discount.confirmDelete')} onConfirm={() => void remove()} />
+					)}
 				</div>
 			)}
 		</Screen>
