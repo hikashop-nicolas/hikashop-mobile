@@ -460,6 +460,17 @@ export interface DiscountInput {
 	tax_included?: boolean;
 }
 
+// A scanned barcode resolved to a product. A variant resolves to its parent, the screen that
+// can act on it, with variant_id kept so the app can point at the right row.
+export interface BarcodeMatch {
+	id: number;
+	variant_id: number;
+	name: string;
+	code: string;
+	gtin: string;
+	quantity: number;
+}
+
 // A HikaShop user for restricting a price to specific customers.
 export interface UserItem {
 	id: number;

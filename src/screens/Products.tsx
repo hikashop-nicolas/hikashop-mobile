@@ -5,7 +5,8 @@ import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { ProductSummary, Paginated, ProductMeta } from '../core';
-import { Screen, Search, Money, Spinner, Icon, TreeSelect, NewButton } from '../ui';
+import { Screen, Search, Money, Spinner, Icon, TreeSelect, NewButton, Button } from '../ui';
+import { ScanProductModal } from './ScanProductModal';
 
 export function Products() {
 	const { client, active, cache } = useStores();
@@ -15,6 +16,7 @@ export function Products() {
 	const [categoryId, setCategoryId] = useState(0);
 	const [showFilter, setShowFilter] = useState(false);
 	const [creating, setCreating] = useState(false);
+	const [scanning, setScanning] = useState(false);
 	const storeId = active?.id ?? '';
 	const filterKey = `${ordersFilterKey('', search)}|c${categoryId}`;
 
@@ -60,7 +62,10 @@ export function Products() {
 	return (
 		<Screen
 			title={t('products.title')}
-			right={<NewButton disabled={creating} onClick={() => void create()} />}
+			right={<>
+				<Button size="sm" onClick={() => setScanning(true)}><Icon name="scan" size={16} /> {t('scan.action')}</Button>
+				<NewButton disabled={creating} onClick={() => void create()} />
+			</>}
 		>
 			<Search value={search} onChange={setSearch} placeholder={t('products.search')} />
 			<div className="hk-filter-bar">
@@ -103,6 +108,12 @@ export function Products() {
 					))}
 					<div className="hk-muted" style={{ textAlign: 'center', padding: 'var(--hk-s2)' }}>{t('products.countOf', { shown: items.length, total })}</div>
 				</div>
+			)}
+			{scanning && (
+				<ScanProductModal
+					onClose={() => setScanning(false)}
+					onOpen={(pid) => { setScanning(false); nav(`/products/${pid}`); }}
+				/>
 			)}
 		</Screen>
 	);

@@ -5,7 +5,7 @@ import type {
 	PairResult, SiteInfo, Settings, ZoneItem, UserItem, OrderSummary, OrderDetail, OrderAddress, OrderAddressForm, OrderItem, OrderFees, OrderProductPrecompute, Coupon, OrderStatusDef, DashboardStats, Paginated, OrderStatusResult,
 	ProductSummary, ProductDetail, ProductMeta, ProductPrice, ProductImage, ProductFile, ProductCharacteristic, ProductVariant,
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
-	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup, Discount, DiscountInput, DiscountType,
+	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup, Discount, DiscountInput, DiscountType, BarcodeMatch,
 } from './models';
 import type { LowStockItem } from './notify-settings';
 
@@ -354,6 +354,12 @@ export class ApiClient {
 			start: Number(meta?.start ?? 0),
 			limit: Number(meta?.limit ?? 0),
 		};
+	}
+
+	// Resolve a scanned barcode (GTIN or SKU) to a single product (read scope). Throws a
+	// not_found ApiError when nothing matches, which the caller shows as "unknown barcode".
+	async lookupBarcode(barcode: string): Promise<BarcodeMatch> {
+		return (await this.request<BarcodeMatch>('GET', 'products/lookup', { query: { barcode } })).data;
 	}
 
 	// Sellable items at or below a stock threshold, lowest first (read scope), for stock alerts.

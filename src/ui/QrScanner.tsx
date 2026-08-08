@@ -24,11 +24,23 @@ export function isQrScanSupported(): boolean {
 	return !!detectorCtor() && !!navigator.mediaDevices?.getUserMedia;
 }
 
-export function QrScanner({ onResult, onClose }: { onResult: (text: string) => void; onClose: () => void }) {
+// The retail barcode symbologies worth scanning, plus qr_code for device pairing. The caller
+// picks: pairing wants qr_code only, stock lookup wants the product barcodes.
+export const QR_FORMATS = ['qr_code'];
+export const BARCODE_FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'itf'];
+
+export function QrScanner({ onResult, onClose, formats = QR_FORMATS, title }: {
+	onResult: (text: string) => void;
+	onClose: () => void;
+	formats?: string[];
+	title?: string;
+}) {
 	const t = useT();
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const onResultRef = useRef(onResult);
 	onResultRef.current = onResult;
+	// Fixed for the life of a scan session, so the camera effect need not restart on a re-render.
+	const formatsRef = useRef(formats);
 	const [errorKey, setErrorKey] = useState('');
 
 	useEffect(() => {
@@ -40,7 +52,7 @@ export function QrScanner({ onResult, onClose }: { onResult: (text: string) => v
 		let stream: MediaStream | null = null;
 		let raf = 0;
 		let stopped = false;
-		const detector = new Ctor({ formats: ['qr_code'] });
+		const detector = new Ctor({ formats: formatsRef.current });
 
 		const stop = () => {
 			stopped = true;
@@ -92,7 +104,7 @@ export function QrScanner({ onResult, onClose }: { onResult: (text: string) => v
 			{errorKey ? (
 				<div className="hk-error-note">{t(errorKey)}</div>
 			) : (
-				<p className="hk-muted hk-scan-hint">{t('scan.hint')}</p>
+				<p className="hk-muted hk-scan-hint">{title ?? t('scan.hint')}</p>
 			)}
 			<Button block onClick={onClose}>{t('common.cancel')}</Button>
 		</div>
