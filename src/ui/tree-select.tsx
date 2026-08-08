@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { JSX } from 'react';
 import { Icon } from './icons';
 
 // A flat node with a parent link; the component builds the tree from these.

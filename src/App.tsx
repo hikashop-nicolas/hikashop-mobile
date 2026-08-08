@@ -96,7 +96,7 @@ function CurrencyGate({ children }: { children: React.ReactNode }) {
 		let alive = true;
 		void (async () => {
 			const cached = await cache.getProductMeta(active.id);
-			if (alive && cached?.value) setCurrencies(cached.value.currencies ?? []);
+			if (alive && cached?.data) setCurrencies(cached.data.currencies ?? []);
 			try {
 				const m = await client.getProductMeta();
 				if (!alive) return;

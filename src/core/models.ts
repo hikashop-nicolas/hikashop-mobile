@@ -548,6 +548,8 @@ export interface Settings {
 	product_contact: boolean;
 	product_waitlist: boolean;
 	price_with_tax: boolean;
+	// Prices float by zone: HikaShop then stores only the incl-tax amount.
+	floating_tax_prices: boolean;
 	show_original_price: boolean;
 }
 

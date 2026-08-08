@@ -96,7 +96,6 @@ export function ProductPricesEdit() {
 	}
 	function remove(i: number) {
 		setRows((r) => (r ? r.filter((_, idx) => idx !== i) : r));
-		setConfirmDel(null);
 	}
 	function removeRestriction(i: number, kind: 'users' | 'zones', id: number) {
 		update(i, kind === 'users'
