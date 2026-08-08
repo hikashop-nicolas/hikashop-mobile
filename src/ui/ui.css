@@ -323,3 +323,25 @@
 .hk-crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hk-s1); font-size: .82rem; margin-bottom: var(--hk-s2); }
 .hk-crumb-sep { color: var(--hk-faint); margin: 0 var(--hk-s1); }
 .hk-picker-list { max-height: 46vh; overflow-y: auto; }
+
+/* ---- charts ----------------------------------------------------------------
+   The SVG is stretched to the container, so every stroke sets non-scaling-stroke
+   and no text or round shape is drawn inside it. */
+.hk-chart { display: flex; flex-direction: column; gap: var(--hk-s2); }
+.hk-chart-svg { width: 100%; height: 160px; display: block; overflow: visible; }
+.hk-chart-line { stroke: var(--hk-accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.hk-chart-axis { stroke: var(--hk-line); stroke-width: 1; }
+.hk-chart-marker { stroke: var(--hk-accent); stroke-width: 2; stroke-dasharray: 3 3; opacity: .55; }
+.hk-chart-stop-top { stop-color: var(--hk-accent); stop-opacity: .28; }
+.hk-chart-stop-bottom { stop-color: var(--hk-accent); stop-opacity: 0; }
+.hk-chart-peak { font-size: .78rem; color: var(--hk-faint); font-variant-numeric: tabular-nums; }
+.hk-chart-x { display: flex; justify-content: space-between; font-size: .72rem; color: var(--hk-faint); font-variant-numeric: tabular-nums; }
+
+/* Ranked bars: the bar compares, the number tells you by how much. */
+.hk-barlist { display: flex; flex-direction: column; gap: var(--hk-s3); }
+.hk-bar-row { display: flex; flex-direction: column; gap: 5px; }
+.hk-bar-head { display: flex; align-items: baseline; gap: var(--hk-s3); }
+.hk-bar-label { flex: 1; min-width: 0; font-size: .88rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hk-bar-value { font-size: .8rem; color: var(--hk-muted); font-variant-numeric: tabular-nums; flex: none; }
+.hk-bar-track { height: 6px; border-radius: 999px; background: var(--hk-surface-2); overflow: hidden; }
+.hk-bar-fill { height: 100%; border-radius: 999px; background: var(--hk-accent); }

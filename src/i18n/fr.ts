@@ -481,4 +481,7 @@ export const fr: Messages = {
 	'unsaved.body': 'Ce formulaire contient des modifications non enregistrées. Le quitter les perdra.',
 	'unsaved.stay': 'Continuer la modification',
 	'unsaved.discard': 'Abandonner les modifications',
+	'dashboard.revenueOverTime': 'Chiffre d\'affaires',
+	'dashboard.peak': 'Maximum',
+	'dashboard.noRevenue': 'Aucun chiffre d\'affaires sur cette période.',
 };

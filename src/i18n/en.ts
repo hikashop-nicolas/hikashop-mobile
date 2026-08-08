@@ -483,4 +483,7 @@ export const en: Messages = {
 	'unsaved.body': 'This form has changes that have not been saved. Leaving it will lose them.',
 	'unsaved.stay': 'Keep editing',
 	'unsaved.discard': 'Discard changes',
+	'dashboard.revenueOverTime': 'Revenue',
+	'dashboard.peak': 'Peak',
+	'dashboard.noRevenue': 'No revenue in this period.',
 };

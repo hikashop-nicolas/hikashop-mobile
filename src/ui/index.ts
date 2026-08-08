@@ -11,3 +11,4 @@ export * from './QrScanner';
 export * from './icons';
 export * from './load-more';
 export * from './unsaved-prompt';
+export * from './chart';
