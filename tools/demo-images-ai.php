@@ -1,0 +1,147 @@
+<?php
+/**
+ * Product photographs from a local image model, through LocalAI's OpenAI-compatible endpoint.
+ *
+ * This is the optional half of the seeder's imagery. The drawn tiles in demo-images.php cost
+ * nothing and always work; these look like actual product shots, which is what you want when the
+ * screenshot is going somewhere people will see it.
+ *
+ * Two things make it practical rather than an overnight job:
+ *
+ *   One image per THING, not per product. "Cast Iron Skillet — 24 cm" and "Copper Skillet — 26 cm"
+ *   are the same photograph as far as a listing is concerned. That is 48 images for a 300-product
+ *   shop rather than 300: minutes instead of hours on a CPU.
+ *
+ *   Cached on disk by prompt. A second run costs nothing, and the cache can be kept between
+ *   machines if you want the same shop everywhere without regenerating.
+ *
+ * Anything that goes wrong -- no server, a slow model, an unexpected response -- falls back to the
+ * drawn tile. A fixture script must not fail because an optional service is not running.
+ */
+
+final class DemoImagesAi
+{
+	private string $endpoint;
+	private string $model;
+	private string $cacheDir;
+	private int $timeout;
+	private int $size;
+
+	public array $stats = ['generated' => 0, 'cached' => 0, 'failed' => 0];
+
+	public function __construct(string $baseUrl, string $model = '', string $cacheDir = '', int $timeout = 180, int $size = 768)
+	{
+		$this->endpoint = rtrim($baseUrl, '/').'/v1/images/generations';
+		$this->model = $model;
+		$this->cacheDir = $cacheDir !== '' ? rtrim($cacheDir, '/') : __DIR__.'/cache/images';
+		$this->timeout = $timeout;
+		$this->size = $size;
+		if (!is_dir($this->cacheDir)) @mkdir($this->cacheDir, 0775, true);
+	}
+
+	/** Is anything answering at all? Checked once so 48 requests do not each wait for a timeout. */
+	public function reachable(): bool
+	{
+		$base = preg_replace('#/v1/images/generations$#', '', $this->endpoint);
+		$ch = curl_init($base.'/v1/models');
+		curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 5, CURLOPT_FAILONERROR => false]);
+		curl_exec($ch);
+		$code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		return $code >= 200 && $code < 500 && $code !== 404;
+	}
+
+	/**
+	 * PNG bytes for one kind of product, or null if the model could not supply them.
+	 *
+	 * The prompt describes a catalogue photograph rather than a scene, because a listing wants the
+	 * object on a plain ground, and names what to avoid: a shop's own photographs do not have
+	 * captions, watermarks or hands in them.
+	 */
+	public function imageFor(string $department, string $thing): ?string
+	{
+		$prompt = sprintf(
+			'product photograph of a %s, %s, plain light background, soft studio lighting, centred, '
+			.'sharp focus, e-commerce catalogue photo|text, watermark, logo, people, hands, blurry, '
+			.'cluttered background, collage, frame, border',
+			strtolower($thing),
+			strtolower($department)
+		);
+
+		$cacheFile = $this->cacheDir.'/'.sha1($prompt.'|'.$this->model.'|'.$this->size).'.png';
+		if (is_file($cacheFile) && filesize($cacheFile) > 0) {
+			$this->stats['cached']++;
+			return file_get_contents($cacheFile);
+		}
+
+		$body = ['prompt' => $prompt, 'size' => $this->size.'x'.$this->size, 'n' => 1];
+		if ($this->model !== '') $body['model'] = $this->model;
+		// Ask for the bytes directly. LocalAI may answer with a URL instead, which is handled below.
+		$body['response_format'] = 'b64_json';
+
+		$ch = curl_init($this->endpoint);
+		curl_setopt_array($ch, [
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_POST => true,
+			CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+			CURLOPT_POSTFIELDS => json_encode($body),
+			CURLOPT_TIMEOUT => $this->timeout,
+		]);
+		$raw = curl_exec($ch);
+		$code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+		if ($raw === false || $code < 200 || $code >= 300) {
+			$this->stats['failed']++;
+			return null;
+		}
+
+		$json = json_decode((string)$raw, true);
+		$entry = $json['data'][0] ?? null;
+		if (!is_array($entry)) {
+			$this->stats['failed']++;
+			return null;
+		}
+
+		$bytes = null;
+		if (!empty($entry['b64_json'])) {
+			$bytes = base64_decode($entry['b64_json'], true) ?: null;
+		} elseif (!empty($entry['url'])) {
+			$bytes = $this->fetch($this->absolute($entry['url']));
+		}
+
+		if ($bytes === null || $bytes === '' || !$this->looksLikeImage($bytes)) {
+			$this->stats['failed']++;
+			return null;
+		}
+
+		@file_put_contents($cacheFile, $bytes);
+		$this->stats['generated']++;
+		return $bytes;
+	}
+
+	/** LocalAI answers with a path under its own host, so make it absolute against the endpoint. */
+	private function absolute(string $url): string
+	{
+		if (preg_match('#^https?://#i', $url)) return $url;
+		$base = preg_replace('#/v1/images/generations$#', '', $this->endpoint);
+		return $base.'/'.ltrim($url, '/');
+	}
+
+	private function fetch(string $url): ?string
+	{
+		$ch = curl_init($url);
+		curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => $this->timeout, CURLOPT_FOLLOWLOCATION => true]);
+		$data = curl_exec($ch);
+		$code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		return ($data !== false && $code >= 200 && $code < 300) ? $data : null;
+	}
+
+	/** A guard against writing an error page to disk as though it were a picture. */
+	private function looksLikeImage(string $bytes): bool
+	{
+		if (strlen($bytes) < 100) return false;
+		$png = "\x89PNG\r\n\x1a\n";
+		return str_starts_with($bytes, $png)
+			|| str_starts_with($bytes, "\xFF\xD8\xFF")            // jpeg
+			|| str_starts_with($bytes, 'RIFF');                    // webp
+	}
+}

@@ -61,9 +61,9 @@ function insertRow(mysqli $db, string $table, array $values): int {
 	return (int)$db->insert_id;
 }
 
-$opts = getopt('', ['site:', 'products::', 'customers::', 'orders::', 'clean', 'help']);
+$opts = getopt('', ['site:', 'products::', 'customers::', 'orders::', 'clean', 'no-images', 'ai-images::', 'ai-model::', 'help']);
 if (isset($opts['help']) || !isset($opts['site'])) {
-	fwrite(STDERR, "usage: php seed-demo-shop.php --site=/path/to/joomla [--products=300] [--customers=300] [--orders=300] [--clean]\n");
+	fwrite(STDERR, "usage: php seed-demo-shop.php --site=/path/to/joomla [--products=300] [--customers=300] [--orders=300] [--no-images] [--ai-images[=URL]] [--ai-model=NAME] [--clean]\n");
 	exit(isset($opts['help']) ? 0 : 1);
 }
 
@@ -95,6 +95,14 @@ if (isset($opts['clean'])) {
 	$db->query("DELETE FROM {$p}hikashop_order WHERE order_number LIKE '{$ORDER_PREFIX}%'");
 	$db->query("DELETE pc FROM {$p}hikashop_product_category pc JOIN {$p}hikashop_product pr ON pr.product_id = pc.product_id WHERE pr.product_code LIKE '{$PRODUCT_PREFIX}%'");
 	$db->query("DELETE pr2 FROM {$p}hikashop_price pr2 JOIN {$p}hikashop_product pr ON pr.product_id = pr2.price_product_id WHERE pr.product_code LIKE '{$PRODUCT_PREFIX}%'");
+	// The picture files as well as their rows, or a re-run leaves the old ones behind.
+	$res = $db->query("SELECT file_path FROM {$p}hikashop_file WHERE file_path LIKE 'demo-%'");
+	$uploadDir = $site.'/'.trim((string)($db->query("SELECT config_value FROM {$p}hikashop_config WHERE config_namekey = 'uploadfolder'")->fetch_row()[0] ?? 'images/com_hikashop/upload/'), '/').'/';
+	while ($f = $res->fetch_row()) {
+		$file = $uploadDir.$f[0];
+		if (is_file($file)) @unlink($file);
+	}
+	$db->query("DELETE FROM {$p}hikashop_file WHERE file_path LIKE 'demo-%'");
 	$db->query("DELETE FROM {$p}hikashop_product WHERE product_code LIKE '{$PRODUCT_PREFIX}%'");
 	$db->query("DELETE a FROM {$p}hikashop_address a JOIN {$p}hikashop_user u ON u.user_id = a.address_user_id WHERE u.user_email LIKE '%{$EMAIL_SUFFIX}'");
 	$db->query("DELETE FROM {$p}hikashop_user WHERE user_email LIKE '%{$EMAIL_SUFFIX}'");
@@ -103,6 +111,37 @@ if (isset($opts['clean'])) {
 }
 
 $catalogue = require __DIR__.'/demo-catalogue.php';
+require __DIR__.'/demo-images.php';
+
+// Where HikaShop keeps uploaded images, as the shop itself has it configured.
+$uploadFolder = trim((string)($db->query("SELECT config_value FROM {$p}hikashop_config WHERE config_namekey = 'uploadfolder'")->fetch_row()[0] ?? 'images/com_hikashop/upload/'), '/');
+$uploadDir = $site.'/'.$uploadFolder.'/';
+$wantImages = !isset($opts['no-images']);
+if ($wantImages && !is_dir($uploadDir)) {
+	fwrite(STDERR, "upload folder not found at $uploadDir; continuing without images\n");
+	$wantImages = false;
+}
+if ($wantImages && !extension_loaded('gd')) {
+	fwrite(STDERR, "no GD extension; continuing without images\n");
+	$wantImages = false;
+}
+$images = $wantImages ? new DemoImages() : null;
+
+// Optionally, photographs from a local image model instead of drawn tiles. One image per kind of
+// product rather than per product -- two skillets of different sizes are the same photograph as
+// far as a listing is concerned -- so a 300-product shop costs 48 generations, not 300.
+$ai = null;
+if ($wantImages && isset($opts['ai-images'])) {
+	require __DIR__.'/demo-images-ai.php';
+	$aiUrl = is_string($opts['ai-images']) && $opts['ai-images'] !== '' ? $opts['ai-images'] : 'http://localhost:8080';
+	$ai = new DemoImagesAi($aiUrl, is_string($opts['ai-model'] ?? null) ? $opts['ai-model'] : '');
+	if (!$ai->reachable()) {
+		fwrite(STDERR, "no image model answering at $aiUrl; drawing the tiles instead\n");
+		$ai = null;
+	} else {
+		echo "image model at $aiUrl\n";
+	}
+}
 
 $nProducts = (int)($opts['products'] ?? 300);
 $nCustomers = (int)($opts['customers'] ?? 300);
@@ -197,6 +236,7 @@ if (count($candidates) < $nProducts) {
 }
 
 $productIds = [];
+$imagesMade = 0;
 $now = time();
 for ($i = 0; $i < $nProducts; $i++) {
 	$seedFor('product', $i);
@@ -243,10 +283,47 @@ for ($i = 0; $i < $nProducts; $i++) {
 		]);
 		$catId = !empty($subIds[$c['dept']]) ? $pick($subIds[$c['dept']]) : $departmentIds[$c['dept']];
 		$db->query("INSERT IGNORE INTO {$p}hikashop_product_category (product_id, category_id) VALUES ($id, $catId)");
+
+		if ($images !== null) {
+			// The code already carries the DEMO- prefix that --clean matches on.
+			$fileName = strtolower($code).'.png';
+			// A photograph of this kind of product when a model can supply one, the drawn tile
+			// otherwise. The fallback matters: a fixture must not fail because an optional
+			// service is slow or missing.
+			$written = 0;
+			if ($ai !== null) {
+				$bytes = $ai->imageFor($c['dept'], $c['thing']);
+				if ($bytes !== null && @file_put_contents($uploadDir.$fileName, $bytes) !== false) {
+					$written = strlen($bytes);
+				}
+			}
+			if ($written === 0) {
+				$written = $images->write($uploadDir.$fileName, $c['dept'], $c['name']);
+			}
+			if ($written > 0) {
+				insertRow($db, $p.'hikashop_file', [
+					'file_name' => $c['name'],
+					'file_path' => $fileName,
+					'file_type' => 'product',
+					'file_ref_id' => $id,
+					'file_ordering' => 1,
+					'file_access' => 'all',
+				]);
+				$imagesMade++;
+			}
+		}
 	}
 	$productIds[] = ['id' => $id, 'name' => $c['name'], 'code' => $code, 'price' => $price];
 }
-echo "products: ".count($productIds)."\n";
+$imageNote = ' (no images)';
+if ($images !== null) {
+	$imageNote = " ($imagesMade images)";
+	if ($ai !== null) {
+		$imageNote = sprintf(' (%d images: %d generated, %d from cache, %d fell back to a drawn tile)',
+			$imagesMade, $ai->stats['generated'], $ai->stats['cached'], $ai->stats['failed']);
+	}
+}
+echo "products: ".count($productIds).$imageNote."\n";
 
 // ---------------------------------------------------------------------------- customers
 

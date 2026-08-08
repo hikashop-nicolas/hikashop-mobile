@@ -91,8 +91,8 @@ describe('Dashboard', () => {
 		cy.visitApp('/dashboard');
 		cy.contains('.hk-chip', 'Year').click();
 		// 52 weekly points rather than 365 daily ones: the path has to stay legible.
-		cy.get('.hk-chart-line', { timeout: 15000 }).invoke('attr', 'd').then((d) => {
-			const points = String(d).split(/[ML]/).length - 1;
+		cy.get('.hk-chart-line', { timeout: 15000 }).should(($el) => {
+			const points = String($el.attr('d')).split(/[ML]/).length - 1;
 			expect(points, 'weekly buckets, not daily').to.be.lessThan(80);
 			expect(points, 'still a real series').to.be.greaterThan(10);
 		});
@@ -103,8 +103,8 @@ describe('Dashboard', () => {
 		cy.contains('.hk-chip', 'Today').click();
 		// Labelled as times, and covering the day so far rather than one dot.
 		cy.get('.hk-chart-x span', { timeout: 15000 }).first().invoke('text').should('match', /^\d{1,2}[:h]/);
-		cy.get('.hk-chart-line').invoke('attr', 'd').then((d) => {
-			const points = String(d).split(/[ML]/).length - 1;
+		cy.get('.hk-chart-line').should(($el) => {
+			const points = String($el.attr('d')).split(/[ML]/).length - 1;
 			expect(points, 'an hour each').to.be.greaterThan(1);
 			expect(points, 'no more than a day of them').to.be.at.most(25);
 		});
@@ -132,8 +132,11 @@ describe('Dashboard', () => {
 		}).as('stats');
 		cy.visitApp('/dashboard');
 		cy.wait('@stats');
-		cy.get('.hk-chart-line').invoke('attr', 'd').then((d) => {
-			expect(String(d).split(/[ML]/).length - 1, 'the zero day is drawn').to.equal(3);
+		// should(), not then(): the response arriving is not the same moment as the chart being
+		// redrawn from it, and then() reads the DOM once instead of retrying.
+		cy.get('.hk-chart-line').should(($el) => {
+			const points = String($el.attr('d')).split(/[ML]/).length - 1;
+			expect(points, 'the zero day is drawn').to.equal(3);
 		});
 	});
 });

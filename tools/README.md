@@ -38,6 +38,37 @@ What it aims for, and why:
 Addresses use invented street names: this data ends up in screenshots, so nothing in it should
 point at a real person.
 
+## Product images
+
+By default the seeder draws a tile per product: a gradient in the department's colours with a
+composition seeded from the product's name. Instant, offline, no licence to honour, and nothing
+added to the repo. It is honestly a placeholder, which is better than a stock photo of a beach
+against a cast iron skillet.
+
+For screenshots that go somewhere people will see them, `--ai-images` fetches real product
+photographs from a local image model through LocalAI's OpenAI-compatible endpoint:
+
+```sh
+local-ai run flux.1-dev-ggml                     # or any image model in its gallery
+php tools/seed-demo-shop.php --site=... --ai-images=http://localhost:8081
+php tools/seed-demo-shop.php --site=... --ai-images=http://localhost:8081 --ai-model=flux.1-dev-ggml
+```
+
+Two things make that practical rather than an overnight job:
+
+- **One image per kind of product, not per product.** "Cast Iron Skillet — 24 cm" and "Copper
+  Skillet — 26 cm" are the same photograph as far as a listing is concerned, so a 300-product shop
+  needs 48 images. At roughly 20 seconds each on a CPU that is about a quarter of an hour, against
+  nearly two hours for one per product.
+- **Cached on disk by prompt**, under `tools/cache/images` (git-ignored). A second run costs
+  nothing, and the cache can be copied between machines.
+
+Anything that goes wrong falls back to the drawn tile: no server, a timeout, an unexpected
+response. A fixture must not fail because an optional service is not running.
+
+Note LocalAI defaults to port 8080, which is where the local Joomla stack already listens — run it
+elsewhere and pass the URL.
+
 ### No faker dependency
 
 The obvious candidate (`xefi/faker-php`) generates person names and Latin lorem, not product

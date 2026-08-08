@@ -34,3 +34,6 @@ cypress/downloads/
 *.jks
 *.p12
 keystore.b64
+
+# Generated product photographs, cached by prompt.
+tools/cache/
