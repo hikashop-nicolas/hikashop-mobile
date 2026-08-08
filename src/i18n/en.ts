@@ -474,4 +474,7 @@ export const en: Messages = {
 	'categories.noMatch': 'No category matches.',
 	'categories.expand': 'Show sub-categories',
 	'categories.collapse': 'Hide sub-categories',
+	'categories.choose': 'Choose',
+	'categories.allLevel': 'All',
+	'categories.openLevel': 'Open {name}',
 };

@@ -3,9 +3,8 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT } from '../i18n';
-import type { CategoryDetail, CategoryListItem, ProductMeta } from '../core';
+import type { CategoryDetail, ProductMeta } from '../core';
 import { Screen, Spinner, Icon } from '../ui';
-import type { TreeNode } from '../ui';
 import { CategoryEditor } from './CategoryEditor';
 
 // Full-screen host for the category editor, reached from the category listing
@@ -35,13 +34,6 @@ export function CategoryEdit() {
 		? (category.type === 'manufacturer' ? 'manufacturer' : 'product')
 		: (sp.get('type') === 'manufacturer' ? 'manufacturer' : 'product');
 
-	const { data: cats } = useCached<CategoryListItem[]>({
-		enabled: !!client && !!active,
-		read: () => cache.getCategories(storeId, kind),
-		fetch: () => client!.listAllCategories(kind),
-		write: async (c) => { await cache.putCategories(storeId, kind, c); },
-		deps: [storeId, kind],
-	});
 	const { data: meta } = useCached<ProductMeta>({
 		enabled: !!client && !!active,
 		read: () => cache.getProductMeta(storeId),
@@ -50,7 +42,6 @@ export function CategoryEdit() {
 		deps: [storeId],
 	});
 
-	const parentNodes: TreeNode[] = (cats ?? []).map((c) => ({ id: c.id, name: c.name, parent_id: c.parent_id }));
 
 	if (!loaded) {
 		return (
@@ -65,7 +56,6 @@ export function CategoryEdit() {
 			kind={kind}
 			category={category}
 			meta={meta ?? null}
-			parentNodes={parentNodes}
 			presentation="screen"
 			onClose={() => nav('/categories')}
 			onSaved={() => nav('/categories')}

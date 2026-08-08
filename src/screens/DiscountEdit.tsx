@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
-import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { Discount, DiscountInput, DiscountType, Access, CategoryListItem } from '../core';
-import { Screen, Spinner, Field, Button, Icon, DeleteButton, TreeSelect } from '../ui';
+import type { Discount, DiscountInput, DiscountType, Access } from '../core';
+import { Screen, Spinner, Field, Button, Icon, DeleteButton } from '../ui';
 import { validateDiscount } from '../app/discounts';
 import { IdChips } from './IdChips';
 import { AccessField } from './AccessField';
+import { CategoryPicker } from './CategoryPicker';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -76,13 +76,6 @@ export function DiscountEdit() {
 	const [showRestrictions, setShowRestrictions] = useState(false);
 
 	// Categories are a tree, so they get a tree picker rather than a search box.
-	const { data: categories } = useCached<CategoryListItem[]>({
-		enabled: !!client && !!active,
-		read: () => cache.getCategories(storeId, 'product'),
-		fetch: () => client!.listAllCategories('product'),
-		write: async (c) => { await cache.putCategories(storeId, 'product', c); },
-		deps: [storeId],
-	});
 	useEffect(() => {
 		if (!client || !editing) return;
 		let alive = true;
@@ -161,7 +154,6 @@ export function DiscountEdit() {
 		}
 	}
 
-	const catNodes = (categories ?? []).map((c) => ({ id: c.id, name: c.name, parent_id: c.parent_id }));
 
 	return (
 		<Screen
@@ -289,7 +281,7 @@ export function DiscountEdit() {
 								/>
 
 								<Field label={t('discount.categories')}>
-									<TreeSelect nodes={catNodes} selected={categoryIds} onChange={setCategoryIds}
+									<CategoryPicker type="product" selected={categoryIds} onChange={setCategoryIds}
 										searchPlaceholder={t('product.searchCategories')} emptyLabel={t('product.noCategories')} />
 								</Field>
 								<label className="hk-check">
@@ -298,7 +290,7 @@ export function DiscountEdit() {
 								</label>
 
 								<Field label={t('discount.excludedCategories')}>
-									<TreeSelect nodes={catNodes} selected={excludeCategoryIds} onChange={setExcludeCategoryIds}
+									<CategoryPicker type="product" selected={excludeCategoryIds} onChange={setExcludeCategoryIds}
 										searchPlaceholder={t('product.searchCategories')} emptyLabel={t('product.noCategories')} />
 								</Field>
 								<label className="hk-check">

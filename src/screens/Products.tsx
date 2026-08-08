@@ -1,14 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { usePaged } from '../app/use-paged';
-import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
-import type { ProductSummary, ProductMeta } from '../core';
-import { Screen, Search, Money, Spinner, Icon, TreeSelect, NewButton, Button, LoadMore } from '../ui';
+import type { ProductSummary } from '../core';
+import { Screen, Search, Money, Spinner, Icon, NewButton, Button, LoadMore } from '../ui';
 import { ScanProductModal } from './ScanProductModal';
 import { ListingFields } from './ListingFields';
+import { CategoryPicker } from './CategoryPicker';
 
 // Rows per request. The connector caps a page at 100.
 const PAGE = 30;
@@ -37,14 +37,17 @@ export function Products() {
 		}
 	}
 
-	const { data: meta } = useCached<ProductMeta>({
-		enabled: !!client && !!active,
-		read: () => cache.getProductMeta(storeId),
-		fetch: () => client!.getProductMeta(),
-		write: async (m) => { await cache.putProductMeta(storeId, m); },
-		deps: [storeId],
-	});
-	const activeCategory = meta?.categories.find((c) => c.id === categoryId);
+	// The name of the category being filtered on, looked up by id rather than found in a copy of
+	// the whole tree.
+	const [activeCategoryName, setActiveCategoryName] = useState('');
+	useEffect(() => {
+		if (!client || !categoryId) { setActiveCategoryName(''); return; }
+		let alive = true;
+		void client.listCategories({ type: 'product', ids: [categoryId] })
+			.then((page) => { if (alive) setActiveCategoryName(page.items[0]?.name ?? ''); })
+			.catch(() => { if (alive) setActiveCategoryName(''); });
+		return () => { alive = false; };
+	}, [client, categoryId]);
 
 	const { items, total, fields, loading, error, hasMore, loadingMore, moreError, loadMore } = usePaged<ProductSummary>({
 		enabled: !!client && !!active,
@@ -74,7 +77,7 @@ export function Products() {
 			<Search value={search} onChange={setSearch} placeholder={t('products.search')} />
 			<div className="hk-filter-bar">
 				<button type="button" className={`hk-chip${categoryId ? ' hk-on' : ''}`} onClick={() => setShowFilter((v) => !v)}>
-					{activeCategory ? activeCategory.name : t('products.filterByCategory')}
+					{activeCategoryName || t('products.filterByCategory')}
 					<Icon name="chevron" size={14} className={showFilter ? 'hk-rot90' : ''} />
 				</button>
 				{categoryId > 0 && (
@@ -85,7 +88,7 @@ export function Products() {
 			</div>
 			{showFilter && (
 				<div style={{ marginBottom: 'var(--hk-s3)' }}>
-					<TreeSelect nodes={meta?.categories ?? []} selected={categoryId ? [categoryId] : []} multiple={false}
+					<CategoryPicker type="product" selected={categoryId ? [categoryId] : []} multiple={false}
 						onChange={(ids) => { setCategoryId(ids[0] ?? 0); setShowFilter(false); }}
 						searchPlaceholder={t('product.searchCategories')} emptyLabel={t('product.noCategories')} />
 				</div>

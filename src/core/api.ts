@@ -460,6 +460,7 @@ export class ApiClient {
 		start?: number;
 		limit?: number;
 		all?: boolean; // every category of the type, flat, rather than one level
+		ids?: number[]; // resolve a stored selection back to names
 	} = {}): Promise<Paginated<CategoryListItem>> {
 		const query: Query = {
 			type: opts.type ?? 'product',
@@ -468,6 +469,7 @@ export class ApiClient {
 			start: opts.start,
 			limit: opts.limit,
 			all: opts.all ? 1 : undefined,
+			ids: opts.ids?.length ? opts.ids.join(',') : undefined,
 		};
 		const { data, meta } = await this.request<CategoryListItem[]>('GET', 'categories', { query });
 		return {

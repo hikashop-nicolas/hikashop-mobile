@@ -11,6 +11,7 @@ import { CategoryEditor } from './CategoryEditor';
 import { ProductMediaSection } from './ProductMediaSection';
 import { RelatedProducts } from './RelatedProducts';
 import { AccessField, ACCESS_ALL, accessSummary, toAccess } from './AccessField';
+import { CategoryPicker } from './CategoryPicker';
 
 // Everything the form edits as a scalar. Access is structured, so it has its own state.
 type Form = Record<string, string | boolean>;
@@ -104,9 +105,6 @@ export function ProductEdit() {
 	}
 
 	// Local copies of the pickable trees so a freshly created node shows up at once.
-	const [catNodes, setCatNodes] = useState<TreeNode[]>([]);
-	const [brandNodes, setBrandNodes] = useState<TreeNode[]>([]);
-	useEffect(() => { if (meta) { setCatNodes(meta.categories); setBrandNodes(meta.manufacturers); } }, [meta]);
 
 	// Which create modal is open (a category or a manufacturer), if any.
 	const [editorKind, setEditorKind] = useState<'product' | 'manufacturer' | null>(null);
@@ -114,13 +112,13 @@ export function ProductEdit() {
 	const [busy, setBusy] = useState(false);
 	const [saveErr, setSaveErr] = useState('');
 
+	// A category created from here is selected straight away. The picker resolves its name by id,
+	// so there is no local copy of the tree to keep in step any more.
 	function onCategoryCreated(node: TreeNode) {
-		setCatNodes((ns) => [...ns, node]);
 		setCats((c) => (c.includes(node.id) ? c : [...c, node.id]));
 		setEditorKind(null);
 	}
 	function onBrandCreated(node: TreeNode) {
-		setBrandNodes((ns) => [...ns, node]);
 		setManufacturerId(node.id);
 		setEditorKind(null);
 	}
@@ -273,12 +271,12 @@ export function ProductEdit() {
 					<div className="hk-card hk-card--pad hk-form">
 						<span className="hk-muted">{t('product.organization')}</span>
 						<Field label={t('product.categories')}>
-							<TreeSelect nodes={catNodes} selected={cats} onChange={setCats}
+							<CategoryPicker type="product" selected={cats} onChange={setCats}
 								searchPlaceholder={t('product.searchCategories')} emptyLabel={t('product.noCategories')}
 								onAddRequest={() => setEditorKind('product')} addLabel={t('product.addCategory')} />
 						</Field>
 						<Field label={t('product.manufacturer')}>
-							<TreeSelect nodes={brandNodes} selected={manufacturerId ? [manufacturerId] : []}
+							<CategoryPicker type="manufacturer" selected={manufacturerId ? [manufacturerId] : []}
 								onChange={(ids) => setManufacturerId(ids[0] ?? 0)} multiple={false}
 								searchPlaceholder={t('product.searchBrands')} emptyLabel={t('product.noBrands')}
 								onAddRequest={() => setEditorKind('manufacturer')} addLabel={t('product.addBrand')} />
@@ -373,7 +371,6 @@ export function ProductEdit() {
 				<CategoryEditor
 					kind={editorKind}
 					meta={meta}
-					parentNodes={editorKind === 'manufacturer' ? brandNodes : catNodes}
 					onClose={() => setEditorKind(null)}
 					onSaved={editorKind === 'manufacturer' ? onBrandCreated : onCategoryCreated}
 				/>

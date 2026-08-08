@@ -472,4 +472,7 @@ export const fr: Messages = {
 	'categories.noMatch': 'Aucune catégorie ne correspond.',
 	'categories.expand': 'Afficher les sous-catégories',
 	'categories.collapse': 'Masquer les sous-catégories',
+	'categories.choose': 'Choisir',
+	'categories.allLevel': 'Toutes',
+	'categories.openLevel': 'Ouvrir {name}',
 };

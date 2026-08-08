@@ -415,8 +415,6 @@ export interface Currency {
 export interface ProductMeta {
 	currencies: Currency[];
 	tax_categories: { id: number; name: string; parent_id: number }[];
-	manufacturers: { id: number; name: string; parent_id: number }[];
-	categories: { id: number; name: string; parent_id: number }[];
 	characteristics: ProductCharacteristic[];
 	weight_units: string[];
 	dimension_units: string[];

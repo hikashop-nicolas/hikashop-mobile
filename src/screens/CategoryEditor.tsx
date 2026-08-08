@@ -3,9 +3,10 @@ import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl, WRITABLE_FIELD_TYPES } from '../core';
 import type { ProductMeta, ProductField, CategoryDetail, FieldFile, Access } from '../core';
-import { Modal, Screen, Field, Button, Icon, TreeSelect, RichText, CustomFieldInput, DeleteButton } from '../ui';
+import { Modal, Screen, Field, Button, Icon, RichText, CustomFieldInput, DeleteButton } from '../ui';
 import type { TreeNode } from '../ui';
 import { AccessField, toAccess } from './AccessField';
+import { CategoryPicker } from './CategoryPicker';
 
 type Kind = 'product' | 'manufacturer';
 
@@ -13,11 +14,10 @@ type Kind = 'product' | 'manufacturer';
 // categories): name, parent, description, image, published and category custom fields.
 // Presents as a modal (inline create from the product editor) or a full screen
 // (from the category management listing).
-export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onSaved, onDelete, presentation = 'modal' }: {
+export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelete, presentation = 'modal' }: {
 	kind: Kind;
 	category?: CategoryDetail | null;
 	meta: ProductMeta | null;
-	parentNodes: TreeNode[];
 	onClose: () => void;
 	onSaved: (node: TreeNode) => void;
 	onDelete?: () => void | Promise<void>;
@@ -51,7 +51,6 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 		setCustom((c) => ({ ...c, [namekey]: next.map((f) => f.path).join('|') }));
 	}
 	// Exclude the category itself (and later, ideally its subtree) from parent choices.
-	const parents = useMemo(() => (editing ? parentNodes.filter((n) => n.id !== category!.id) : parentNodes), [parentNodes, editing, category]);
 
 	async function pickImage(files: FileList | null) {
 		const file = files?.[0];
@@ -105,7 +104,8 @@ export function CategoryEditor({ kind, category, meta, parentNodes, onClose, onS
 				<Field label={t('category.name')}><input className="hk-input" autoFocus value={name} onChange={(e) => setName(e.target.value)} /></Field>
 
 				<Field label={t('category.parent')}>
-					<TreeSelect nodes={parents} selected={parent} onChange={setParent} multiple={false}
+					<CategoryPicker type={brand ? 'manufacturer' : 'product'} selected={parent} onChange={setParent} multiple={false}
+						excludeId={editing ? category!.id : undefined}
 						searchPlaceholder={brand ? t('product.searchBrands') : t('product.searchCategories')}
 						emptyLabel={brand ? t('product.noBrands') : t('product.noCategories')} />
 				</Field>

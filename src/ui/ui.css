@@ -318,3 +318,8 @@
 .hk-disclose svg { transition: transform .12s ease; }
 .hk-disclose-spacer { width: 28px; flex: none; }
 .hk-branch { display: block; }
+
+/* Category picker: the trail of where you are in the tree, and the level being shown. */
+.hk-crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hk-s1); font-size: .82rem; margin-bottom: var(--hk-s2); }
+.hk-crumb-sep { color: var(--hk-faint); margin: 0 var(--hk-s1); }
+.hk-picker-list { max-height: 46vh; overflow-y: auto; }
