@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { usePaged } from '../app/use-paged';
+import { useSticky } from '../app/use-sticky';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { Discount, DiscountType } from '../core';
@@ -16,9 +16,9 @@ export function Discounts() {
 	const t = useT();
 	const changed = useDataChanged();
 	const nav = useNavigate();
-	const [search, setSearch] = useState('');
-	const [type, setType] = useState<DiscountType | ''>('');
 	const storeId = active?.id ?? '';
+	const [search, setSearch] = useSticky(`discounts.search.${storeId}`, '');
+	const [type, setType] = useSticky<DiscountType | ''>(`discounts.type.${storeId}`, '');
 	const filterKey = ordersFilterKey(type, search);
 
 	const { items, total, loading, error, hasMore, loadingMore, moreError, loadMore } = usePaged<Discount>({

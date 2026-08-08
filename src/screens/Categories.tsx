@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { usePaged } from '../app/use-paged';
+import { useSticky } from '../app/use-sticky';
 import { useT, tError } from '../i18n';
 import type { CategoryListItem } from '../core';
 import { Screen, Spinner, NewButton, Search, Icon, LoadMore } from '../ui';
@@ -36,8 +37,8 @@ export function Categories() {
 	const changed = useDataChanged();
 	const nav = useNavigate();
 	const storeId = active?.id ?? '';
-	const [kind, setKind] = useState<Kind>('product');
-	const [search, setSearch] = useState('');
+	const [kind, setKind] = useSticky<Kind>(`categories.kind.${storeId}`, 'product');
+	const [search, setSearch] = useSticky(`categories.search.${storeId}`, '');
 	const [branches, setBranches] = useState<Record<number, Branch>>({});
 
 	const searching = search.trim() !== '';

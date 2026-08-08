@@ -4,6 +4,7 @@ import { StoreRegistry, WebKeyValueStore, IdbKeyValueStore, ApiClient, CacheRepo
 import type { Store, NotifySettings } from '../core';
 import { notifier } from './notifier';
 import { SecureKeyValueStore } from './secure-store';
+import { hostOf } from './utils';
 
 // One registry for the whole app: store metadata in the data namespace, tokens in the secrets one.
 // Tokens are store-admin credentials, so on a native build they live in the platform keystore;
@@ -126,11 +127,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 		void client.getSite().then(async (site) => {
 			if (!alive) return;
 			const patch = {
+				// A shop that has since been renamed, or was paired before the connector reported
+				// its name at all. Its address remains the fallback.
+				name: site.site_name?.trim() || hostOf(store.baseUrl),
 				logo: site.logo ?? '',
 				role: site.operator?.role ?? store.role,
 				capabilities: site.capabilities,
 			};
-			const same = patch.logo === (store.logo ?? '')
+			const same = patch.name === store.name
+				&& patch.logo === (store.logo ?? '')
 				&& patch.role === store.role
 				&& JSON.stringify(patch.capabilities) === JSON.stringify(store.capabilities);
 			if (same) return;

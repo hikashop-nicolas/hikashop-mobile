@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { usePaged } from '../app/use-paged';
+import { useSticky } from '../app/use-sticky';
 import { useI18n, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { OrderSummary } from '../core';
@@ -21,10 +22,11 @@ export function Orders() {
 	const { t, locale } = useI18n();
 	const { statuses, statusLabel } = useStatuses();
 	const nav = useNavigate();
-	const [status, setStatus] = useState('');
-	const [search, setSearch] = useState('');
 	const [creating, setCreating] = useState(false);
 	const storeId = active?.id ?? '';
+	// Kept while you step away to another tab, per store, the way the backend keeps its own.
+	const [status, setStatus] = useSticky(`orders.status.${storeId}`, '');
+	const [search, setSearch] = useSticky(`orders.search.${storeId}`, '');
 	const filterKey = ordersFilterKey(status, search);
 
 	const { items, total, fields, loading, error, hasMore, loadingMore, moreError, loadMore } = usePaged<OrderSummary>({

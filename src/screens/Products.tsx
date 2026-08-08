@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { usePaged } from '../app/use-paged';
+import { useSticky } from '../app/use-sticky';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { ProductSummary } from '../core';
@@ -25,13 +26,14 @@ export function Products() {
 	const t = useT();
 	const changed = useDataChanged();
 	const nav = useNavigate();
-	const [search, setSearch] = useState('');
-	const [categoryId, setCategoryId] = useState(0);
 	const [showFilter, setShowFilter] = useState(false);
 	const [creating, setCreating] = useState(false);
 	const [createErr, setCreateErr] = useState('');
 	const [scanning, setScanning] = useState(false);
 	const storeId = active?.id ?? '';
+	// Kept while you step away to another tab, per store: a category id means nothing elsewhere.
+	const [search, setSearch] = useSticky(`products.search.${storeId}`, '');
+	const [categoryId, setCategoryId] = useSticky(`products.category.${storeId}`, 0);
 	const filterKey = `${ordersFilterKey('', search)}|c${categoryId}`;
 
 	async function create() {

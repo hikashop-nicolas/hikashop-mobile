@@ -10,7 +10,11 @@ export interface PairResult {
 
 export interface SiteInfo {
 	app: string;
-	api_version: number;
+	// Semver: minor for added fields and endpoints, major for a break. A connector older than the
+	// string form reports the number 1.
+	api_version: string | number;
+	// What the site calls itself (Joomla's sitename, the blog name on WordPress). May be empty.
+	site_name?: string;
 	hikashop_version: string | null;
 	cms: { name: string; version: string | null };
 	edition: string;

@@ -5,9 +5,15 @@ export function normalizeUrl(input: string): string {
 	return s.replace(/\/+$/, '');
 }
 
+// How a store is named and identified in the app. The host alone is not enough: two shops can
+// live in folders of one domain (a staging copy beside the live one is the common case), and
+// naming them both "example.com" makes the store list and the app bar useless for telling them
+// apart. The path comes along whenever there is one.
 export function hostOf(url: string): string {
 	try {
-		return new URL(url).host;
+		const u = new URL(url);
+		const path = u.pathname.replace(/\/+$/, '');
+		return u.host + path;
 	} catch {
 		return url;
 	}

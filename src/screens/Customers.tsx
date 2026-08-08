@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { usePaged } from '../app/use-paged';
+import { useSticky } from '../app/use-sticky';
 import { useI18n, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { CustomerSummary } from '../core';
@@ -18,9 +19,9 @@ export function Customers() {
 	const changed = useDataChanged();
 	const { t, locale } = useI18n();
 	const nav = useNavigate();
-	const [search, setSearch] = useState('');
 	const [creating, setCreating] = useState(false);
 	const storeId = active?.id ?? '';
+	const [search, setSearch] = useSticky(`customers.search.${storeId}`, '');
 	const filterKey = ordersFilterKey('', search);
 
 	const { items, total, loading, error, hasMore, loadingMore, moreError, loadMore } = usePaged<CustomerSummary>({

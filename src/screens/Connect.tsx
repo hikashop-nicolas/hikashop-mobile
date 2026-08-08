@@ -28,7 +28,9 @@ export function Connect() {
 			const res = await ApiClient.pair(base, rawCode, deviceName(), 'pwa');
 			const site = await new ApiClient(base, res.token).getSite();
 			await registry.add(
-				{ name: hostOf(base), baseUrl: base, role: site.operator?.role ?? 'staff', logo: site.logo ?? '', capabilities: site.capabilities },
+				// The shop's own name where it has one; its address is the fallback and stays on
+				// show in the store list either way.
+				{ name: site.site_name?.trim() || hostOf(base), baseUrl: base, role: site.operator?.role ?? 'staff', logo: site.logo ?? '', capabilities: site.capabilities },
 				res.token,
 			);
 			await refresh();
