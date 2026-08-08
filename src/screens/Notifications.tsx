@@ -71,7 +71,8 @@ export function Notifications() {
 					<input type="checkbox" checked={s.sound} onChange={(e) => { setNotifySettings({ ...s, sound: e.target.checked }); if (e.target.checked) void playChime(); }} />
 					<span>{t('notifications.playSound')}</span>
 				</label>
-				<Button size="sm" onClick={() => void playChime()}>{t('notifications.testSound')}</Button>
+				{/* alignSelf keeps it button-sized: hk-form is a column flex, which stretches children. */}
+				<Button size="sm" style={{ alignSelf: 'flex-start' }} onClick={() => void playChime()}>{t('notifications.testSound')}</Button>
 				<span className="hk-row-sub">{t('notifications.foregroundOnly')}</span>
 			</div>
 		</Screen>
