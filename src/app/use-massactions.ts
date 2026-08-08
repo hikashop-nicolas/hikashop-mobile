@@ -19,7 +19,6 @@ export function useMassActions(table: string, resetKey: string) {
 	const { client, active } = useStores();
 	const changed = useDataChanged();
 	const [actions, setActions] = useState<MassAction[]>([]);
-	const [picking, setPicking] = useState(false);
 	const [chosen, setChosen] = useState<Set<number>>(new Set());
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState('');
@@ -39,7 +38,7 @@ export function useMassActions(table: string, resetKey: string) {
 
 	// A different query is a different set of rows; a selection made against the old one means
 	// nothing against the new.
-	useEffect(() => { setChosen(new Set()); setPicking(false); setReport(null); setError(''); }, [resetKey]);
+	useEffect(() => { setChosen(new Set()); setReport(null); setError(''); }, [resetKey]);
 
 	const toggle = useCallback((id: number) => {
 		setChosen((c) => {
@@ -49,16 +48,17 @@ export function useMassActions(table: string, resetKey: string) {
 		});
 	}, []);
 
-	const clear = useCallback(() => { setChosen(new Set()); setPicking(false); setReport(null); }, []);
+	const clear = useCallback(() => { setChosen(new Set()); setReport(null); }, []);
 
 	const run = useCallback(async (action: MassAction) => {
 		if (!client || busy || chosen.size === 0) return;
 		setBusy(true); setError(''); setReport(null);
 		try {
 			const res = await client.runMassAction(action.id, [...chosen]);
-			setReport(res.report.length ? res.report : []);
+			// Only what the shop actually said. Most actions say nothing, and the listing
+			// reloading underneath is the answer.
+			setReport(res.report.length ? res.report : null);
 			setChosen(new Set());
-			setPicking(false);
 			// The shop decided what changed and the app has no idea what, so the listing is
 			// reloaded rather than patched.
 			if (SCOPE[table]) changed.bump(SCOPE[table]);
@@ -74,6 +74,6 @@ export function useMassActions(table: string, resetKey: string) {
 	return {
 		// Only worth offering when the shop actually has some.
 		available: actions.length > 0,
-		actions, picking, setPicking, chosen, toggle, clear, run, busy, error, report, setReport,
+		actions, chosen, toggle, clear, run, busy, error, report, setReport,
 	};
 }

@@ -33,9 +33,10 @@ describe('Split layout', () => {
 		// Both panes, and the list keeps its place.
 		cy.get('.hk-split-list').should('be.visible');
 		cy.get('.hk-split-detail').should('be.visible');
-		// The row whose detail is open is the marked one, and only it.
+		// The row whose detail is open is the marked one, and only it. The mark sits on the row's
+		// link, which is a child of the row now that the row can also hold a selection tick.
 		cy.get('.hk-split-list .hk-row--on').should('have.length', 1);
-		cy.get('.hk-row').first().should('have.class', 'hk-row--on');
+		cy.get('.hk-split-list .hk-row').first().find('.hk-row--on').should('exist');
 	});
 
 	it('keeps a long value from running under the right-hand column', () => {
@@ -127,7 +128,7 @@ describe('Split layout', () => {
 		const name = () => cy.get('.hk-split-detail input.hk-input').first();
 		// The form is showing the row that is marked open, rather than one still on its way out.
 		const settled = (i: number) => {
-			cy.get('.hk-split-list .hk-row').eq(i).should('have.class', 'hk-row--on');
+			cy.get('.hk-split-list .hk-row').eq(i).find('.hk-row--on').should('exist');
 			cy.get('.hk-split-list .hk-row').eq(i).find('.hk-row-title').invoke('text').then((title) => {
 				name().should(($el) => expect(title).to.contain(String($el.val())));
 			});
@@ -147,7 +148,7 @@ describe('Split layout', () => {
 		cy.get('.hk-modal').should('be.visible');
 		cy.contains('.hk-modal button', /Keep editing/i).click();
 		cy.get('.hk-modal').should('not.exist');
-		cy.get('.hk-split-list .hk-row').eq(5).should('have.class', 'hk-row--on');
+		cy.get('.hk-split-list .hk-row').eq(5).find('.hk-row--on').should('exist');
 		name().should(($el) => expect(String($el.val())).to.match(/X$/));
 
 		// Discarding moves on to the row that was clicked, on the record it belongs to.

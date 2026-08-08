@@ -388,7 +388,10 @@
 @media (min-width: 1100px) {
 	/* The highlight needs room around the text to read as a block rather than as a stripe behind
 	   it, and the pull-back keeps the row's content aligned with every other row. */
-	.hk-split-list .hk-row--on { background: var(--hk-accent-soft); border-radius: var(--hk-r2); padding-inline: var(--hk-s3); margin-inline: calc(var(--hk-s3) * -1); }
+	.hk-split-list .hk-row--on,
+	.hk-split-list .hk-row:has(.hk-row--on) { background: var(--hk-accent-soft); border-radius: var(--hk-r2); padding-inline: var(--hk-s3); margin-inline: calc(var(--hk-s3) * -1); }
+	/* The inner link sits inside the already-highlighted row; it must not repeat the box. */
+	.hk-split-list .hk-row .hk-rowmain.hk-row--on { background: none; padding-inline: 0; margin-inline: 0; }
 	.hk-split-list .hk-row--on .hk-row-title { color: var(--hk-accent); }
 }
 
@@ -441,6 +444,7 @@
 .hk-massbar-head { display: flex; align-items: center; gap: var(--hk-s2); }
 .hk-massbar-acts { display: flex; flex-wrap: wrap; gap: var(--hk-s2); }
 .hk-massbar-report { display: flex; flex-direction: column; gap: var(--hk-s1); align-items: flex-start; padding-top: var(--hk-s2); border-top: 1px solid var(--hk-line); }
-.hk-row--pick { cursor: pointer; }
-.hk-row--pick input { width: 18px; height: 18px; flex: none; pointer-events: none; }
-.hk-row--pick.hk-on { background: var(--hk-accent-soft); border-radius: var(--hk-r2); }
+.hk-pickbox { width: 18px; height: 18px; flex: none; cursor: pointer; }
+/* The row's content, now a link beside the tick rather than the row itself. */
+.hk-rowmain { display: flex; align-items: center; gap: var(--hk-s3); flex: 1; min-width: 0; text-decoration: none; color: inherit; }
+.hk-row--picked { background: var(--hk-accent-soft); border-radius: var(--hk-r2); }

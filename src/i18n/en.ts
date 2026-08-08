@@ -500,9 +500,8 @@ export const en: Messages = {
 	'common.close': 'Close',
 	'category.imageBrowse': 'Choose from the media library',
 	'category.imageUpload': 'Upload an image',
-	'mass.select': 'Select',
+	'mass.clear': 'Clear',
 	'mass.selected.one': '{count} selected',
 	'mass.selected.other': '{count} selected',
-	'mass.done': 'Done',
 	'mass.restricted': 'Some of these do more than your account is allowed to run; those steps will be skipped.',
 };

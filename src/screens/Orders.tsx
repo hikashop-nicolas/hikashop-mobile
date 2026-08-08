@@ -6,14 +6,14 @@ import { useSticky } from '../app/use-sticky';
 import { useI18n, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { OrderSummary } from '../core';
-import { Screen, Search, StatusChip, Money, Spinner, NewButton, LoadMore, Button, Icon } from '../ui';
+import { Screen, Search, StatusChip, Money, Spinner, NewButton, LoadMore } from '../ui';
 import { fmtDate } from '../app/utils';
 import { NewOrderModal } from './NewOrderModal';
 import { useStatuses } from '../app/statuses';
 import { ListingFields } from './ListingFields';
 import { useDataChanged } from '../app/data-changed';
 import { useMassActions } from '../app/use-massactions';
-import { MassActionBar } from './MassActionBar';
+import { MassActionBar, PickBox } from './MassActionBar';
 
 // Rows per request. The connector caps a page at 100.
 const PAGE = 30;
@@ -47,12 +47,7 @@ export function Orders() {
 		<Screen
 			scrollResetKey={`${status}|${search}`}
 			title={t('orders.title')}
-			right={<>
-				{mass.available && !mass.picking && (
-					<Button size="sm" onClick={() => mass.setPicking(true)}><Icon name="check" size={16} /> {t('mass.select')}</Button>
-				)}
-				<NewButton onClick={() => setCreating(true)} />
-			</>}
+			right={<NewButton onClick={() => setCreating(true)} />}
 		>
 			<Search value={search} onChange={setSearch} placeholder={t('orders.search')} />
 			{/* A chip per status is fine for a shop with four of them and fills the screen for a
@@ -66,7 +61,7 @@ export function Orders() {
 					))}
 				</select>
 			</div>
-			{mass.picking && <MassActionBar state={mass} />}
+			<MassActionBar state={mass} />
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>
 			) : error ? (
@@ -75,19 +70,10 @@ export function Orders() {
 				<div className="hk-empty">{t('orders.none')}</div>
 			) : (
 				<div>
-					{/* While picking, a row ticks rather than opens: opening one would lose what
-					    has been picked so far. */}
-					{items.map((o) => (mass.picking ? (
-						<div key={o.id} className={`hk-row hk-row--pick${mass.chosen.has(o.id) ? ' hk-on' : ''}`} onClick={() => mass.toggle(o.id)}>
-							<input type="checkbox" checked={mass.chosen.has(o.id)} readOnly aria-label={`#${o.number}`} />
-							<div className="hk-row-grow">
-								<span className="hk-row-title">#{o.number} · {o.customer.name || o.customer.email || t('common.guest')}</span>
-								<span className="hk-row-sub">{fmtDate(o.created, locale)}</span>
-							</div>
-							<div className="hk-row-rt"><StatusChip status={o.status} /><Money value={o.total} currency={o.currency_id} /></div>
-						</div>
-					) : (
-						<NavLink key={o.id} to={`/orders/${o.id}`} className={({ isActive }) => `hk-row${isActive ? ' hk-row--on' : ''}`}>
+					{items.map((o) => (
+						<div key={o.id} className={`hk-row${mass.chosen.has(o.id) ? ' hk-row--picked' : ''}`}>
+							{mass.available && <PickBox id={o.id} state={mass} label={`#${o.number}`} />}
+							<NavLink to={`/orders/${o.id}`} className={({ isActive }) => `hk-rowmain${isActive ? ' hk-row--on' : ''}`}>
 							<div className="hk-avatar">{(o.customer.name || o.customer.email || '?').charAt(0).toUpperCase()}</div>
 							<div className="hk-row-grow">
 								<span className="hk-row-title">#{o.number} · {o.customer.name || o.customer.email || t('common.guest')}</span>
@@ -95,8 +81,9 @@ export function Orders() {
 								<ListingFields fields={fields} values={o.custom_fields} />
 							</div>
 							<div className="hk-row-rt"><StatusChip status={o.status} /><Money value={o.total} currency={o.currency_id} /></div>
-						</NavLink>
-					)))}
+							</NavLink>
+						</div>
+					))}
 					<LoadMore shown={items.length} total={total} hasMore={hasMore} loading={loadingMore} error={moreError} onLoad={loadMore} />
 				</div>
 			)}
