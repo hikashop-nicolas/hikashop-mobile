@@ -91,6 +91,10 @@ export interface OrderFee {
 	tax: number;
 	tax_namekeys: string[];
 	method?: string;
+	// What the merchant calls that method, from the shop's own plugins. Falls back to the stored
+	// slug when the plugin is gone, and is empty for an order shipped from several warehouses,
+	// which is on no single method.
+	method_name?: string;
 	code?: string;
 }
 
@@ -199,6 +203,24 @@ export interface DashboardStats {
 	series_granularity?: 'hour' | 'day' | 'week';
 	revenue_series: { date: string; revenue: number }[];
 	top_products: { name: string; quantity: number }[];
+}
+
+// A bulk operation the merchant built in the shop's backend and flagged onto a listing. The app
+// does not know what any of them do: it supplies the selection and reports what came back.
+export interface MassAction {
+	id: number;
+	name: string;
+	description: string;
+	table: string;
+	// True when it holds a step this operator is not allowed to run (PHP, SQL, an HTTP call), so
+	// running it would quietly do less than its name promises.
+	restricted: boolean;
+}
+
+export interface MassActionResult {
+	ok: boolean;
+	count: number;
+	report: string[];
 }
 
 export interface Paginated<T> {

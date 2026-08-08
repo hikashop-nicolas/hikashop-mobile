@@ -8,6 +8,7 @@ import type {
 	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup, Discount, DiscountInput, DiscountType, BarcodeMatch,
 	Access,
 	ProductField,
+	MassAction, MassActionResult,
 } from './models';
 import type { LowStockItem } from './notify-settings';
 
@@ -123,6 +124,16 @@ export class ApiClient {
 			body: { code, device_name: deviceName, platform },
 		});
 		return data;
+	}
+
+	// The shop's own bulk operations for a listing (read scope), and running one over a
+	// selection (write). The app never learns what they do; the shop does the work.
+	async getMassActions(table: string): Promise<MassAction[]> {
+		return (await this.request<MassAction[]>('GET', 'massactions', { query: { table } })).data || [];
+	}
+
+	async runMassAction(id: number, ids: number[]): Promise<MassActionResult> {
+		return (await this.request<MassActionResult>('POST', `massactions/${id}`, { body: { ids } })).data;
 	}
 
 	async getSite(): Promise<SiteInfo> {

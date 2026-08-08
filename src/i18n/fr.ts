@@ -498,4 +498,9 @@ export const fr: Messages = {
 	'common.close': 'Fermer',
 	'category.imageBrowse': 'Choisir dans la médiathèque',
 	'category.imageUpload': 'Envoyer une image',
+	'mass.select': 'Sélectionner',
+	'mass.selected.one': '{count} sélectionné',
+	'mass.selected.other': '{count} sélectionnés',
+	'mass.done': 'Terminé',
+	'mass.restricted': 'Certaines vont plus loin que ce que votre compte peut exécuter ; ces étapes seront ignorées.',
 };

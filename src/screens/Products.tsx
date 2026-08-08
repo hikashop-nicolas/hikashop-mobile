@@ -3,6 +3,8 @@ import { useNavigate, NavLink } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { usePaged } from '../app/use-paged';
 import { useSticky } from '../app/use-sticky';
+import { useMassActions } from '../app/use-massactions';
+import { MassActionBar } from './MassActionBar';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { ProductSummary } from '../core';
@@ -77,6 +79,9 @@ export function Products() {
 	});
 
 
+	// The shop's own bulk operations over a picked set of rows.
+	const mass = useMassActions('product', filterKey);
+
 	function stockLabel(p: ProductSummary): string {
 		if (p.has_variants) return '';
 		if (p.quantity < 0) return t('product.unlimited');
@@ -88,6 +93,9 @@ export function Products() {
 			scrollResetKey={`${categoryId}|${search}`}
 			title={t('products.title')}
 			right={<>
+				{mass.available && !mass.picking && (
+					<Button size="sm" onClick={() => mass.setPicking(true)}><Icon name="check" size={16} /> {t('mass.select')}</Button>
+				)}
 				<Button size="sm" onClick={() => setScanning(true)}><Icon name="scan" size={16} /> {t('scan.action')}</Button>
 				<NewButton disabled={creating} onClick={() => void create()} />
 			</>}
@@ -105,6 +113,7 @@ export function Products() {
 				)}
 			</div>
 			{createErr && <div className="hk-error-note">{createErr}</div>}
+			{mass.picking && <MassActionBar state={mass} />}
 			{showFilter && (
 				<div style={{ marginBottom: 'var(--hk-s3)' }}>
 					<CategoryPicker type="product" selected={categoryId ? [categoryId] : []} multiple={false}
@@ -120,7 +129,18 @@ export function Products() {
 				<div className="hk-empty">{t('products.none')}</div>
 			) : (
 				<div>
-					{items.map((p) => (
+					{items.map((p) => (mass.picking ? (
+						<div key={p.id} className={`hk-row hk-row--pick${mass.chosen.has(p.id) ? ' hk-on' : ''}`} onClick={() => mass.toggle(p.id)}>
+							<input type="checkbox" checked={mass.chosen.has(p.id)} readOnly aria-label={p.name} />
+							{p.image
+								? <img className="hk-avatar-img" src={p.image} alt="" loading="lazy" />
+								: <div className="hk-avatar">{(p.name || '?').charAt(0).toUpperCase()}</div>}
+							<div className="hk-row-grow">
+								<span className="hk-row-title">{p.name}</span>
+								<span className="hk-row-sub">{p.code} · {stockLabel(p)}</span>
+							</div>
+						</div>
+					) : (
 						<NavLink key={p.id} to={`/products/${p.id}`} className={({ isActive }) => `hk-row${isActive ? ' hk-row--on' : ''}`}>
 							{p.image
 								? <img className="hk-avatar-img" src={p.image} alt="" loading="lazy" />
@@ -132,7 +152,7 @@ export function Products() {
 							</div>
 							<div className="hk-row-rt">{p.price !== null && <Money value={p.price} currency={p.currency_id} />}</div>
 						</NavLink>
-					))}
+					)))}
 					<LoadMore shown={items.length} total={total} hasMore={hasMore} loading={loadingMore} error={moreError} onLoad={loadMore} />
 				</div>
 			)}

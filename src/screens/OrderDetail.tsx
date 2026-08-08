@@ -196,8 +196,9 @@ export function OrderDetail() {
 							<span className="hk-muted hk-row-grow">{t('order.feesAndMethods')}</span>
 							<Button variant="pri" size="sm" onClick={() => nav(`/orders/${orderId}/fees`)}><Icon name="edit" size={15} /> {t('order.adjustFees')}</Button>
 						</div>
-						{order.payment_method && <InfoRow label={t('order.payment')} value={order.payment_method} />}
-						{order.shipping_method && <InfoRow label={t('order.shippingMethod')} value={order.shipping_method} />}
+						{/* The merchant's name for the method, with the stored slug as the fallback. */}
+						{order.payment_method && <InfoRow label={t('order.payment')} value={order.fees.payment.method_name || order.payment_method} />}
+						{order.shipping_method && <InfoRow label={t('order.shippingMethod')} value={order.fees.shipping.method_name || order.shipping_method} />}
 						{order.invoice_number && (
 							<InfoRow
 								label={t('order.invoice')}
