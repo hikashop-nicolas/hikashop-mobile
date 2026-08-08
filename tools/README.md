@@ -99,6 +99,22 @@ Two things make that practical rather than an overnight job:
 Anything that goes wrong falls back to the drawn tile: no server, a timeout, an unexpected
 response. A fixture must not fail because an optional service is not running.
 
+### What the output actually looks like
+
+Tried against LocalAI's all-in-one CPU image, which ships Stable Diffusion 1.5 quantised:
+
+- **The results are usable.** A chelsea boot and a frying pan both came back as credible catalogue
+  photographs on a plain ground.
+- **The prompt has to be short.** The first version named the department, the angle and a style
+  phrase, and produced an extreme close-up of a texture rather than the object. Subject first,
+  ground second, a short negative list. That is what is written above.
+- **Colour names are approximate.** "Tan" came back orange. Good enough for a variant to look
+  different from its siblings, not good enough to match a swatch.
+- **On a CPU it is 10-13 minutes per image.** One per kind of product is a long evening; one per
+  product and variant is not worth attempting. Generate on a machine with a GPU, or against a
+  hosted endpoint, and copy `tools/cache/images` over: the cache is keyed by prompt, so images
+  made anywhere are picked up.
+
 Note LocalAI defaults to port 8080, which is where the local Joomla stack already listens — run it
 elsewhere and pass the URL.
 

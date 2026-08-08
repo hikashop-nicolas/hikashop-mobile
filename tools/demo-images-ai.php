@@ -61,19 +61,20 @@ final class DemoImagesAi
 	 */
 	public function imageFor(string $department, string $thing, ?string $colour = null, string $view = 'front'): ?string
 	{
-		// The colour goes in the prompt, so a variant's photograph is of that colour rather than
-		// of the same object twice; the view varies a second image of the same product.
+		// Kept short and concrete. A long prompt naming the department, the angle and a style
+		// phrase made Stable Diffusion 1.5 produce an extreme close-up of a texture rather than
+		// the object -- the first thing tried here came back as a blurry orange blob. Subject
+		// first, ground second, and a short negative list reads far better.
 		$subject = strtolower($thing);
 		if ($colour !== null && $colour !== '') $subject = strtolower($colour).' '.$subject;
-		$angle = $view === 'front' ? 'straight-on product shot' : $view.' of the product';
+		$article = in_array(substr($subject, 0, 1), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a';
 
 		$prompt = sprintf(
-			'product photograph of a %s, %s, %s, %s|text, watermark, logo, people, hands, blurry, '
-			.'cluttered background, collage, frame, border',
+			'%s %s on a plain white background, studio product photo%s|blurry, extreme close-up, '
+			.'cropped, text, watermark, logo, people, hands, cluttered background',
+			$article,
 			$subject,
-			strtolower($department),
-			$angle,
-			$this->style
+			$view === 'front' ? '' : ', '.$view
 		);
 
 		$cacheFile = $this->cacheDir.'/'.sha1($prompt.'|'.$this->model.'|'.$this->size).'.png';
