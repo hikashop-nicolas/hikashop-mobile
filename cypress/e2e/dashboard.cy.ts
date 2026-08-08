@@ -97,4 +97,43 @@ describe('Dashboard', () => {
 			expect(points, 'still a real series').to.be.greaterThan(10);
 		});
 	});
+
+	it('plots today hour by hour, not as a single point', () => {
+		cy.visitApp('/dashboard');
+		cy.contains('.hk-chip', 'Today').click();
+		// Labelled as times, and covering the day so far rather than one dot.
+		cy.get('.hk-chart-x span', { timeout: 15000 }).first().invoke('text').should('match', /^\d{1,2}[:h]/);
+		cy.get('.hk-chart-line').invoke('attr', 'd').then((d) => {
+			const points = String(d).split(/[ML]/).length - 1;
+			expect(points, 'an hour each').to.be.greaterThan(1);
+			expect(points, 'no more than a day of them').to.be.at.most(25);
+		});
+	});
+
+	it('covers the whole range, including the quiet parts', () => {
+		// A day with no orders has to be a zero in the line, not a missing point: leaving it out
+		// joins the line across it and hides that nothing happened.
+		cy.intercept({ method: 'GET', url: /stats\/dashboard/ }, {
+			statusCode: 200,
+			body: {
+				data: {
+					range: 'week', currency_id: 1, series_granularity: 'day',
+					totals: { revenue: 30, orders: 2, average_order: 15, customers: 2 },
+					previous: { revenue: 10, orders: 1, average_order: 10, customers: 1 },
+					revenue_series: [
+						{ date: '2026-08-01', revenue: 10 },
+						{ date: '2026-08-02', revenue: 0 },
+						{ date: '2026-08-03', revenue: 20 },
+					],
+					top_products: [],
+				},
+				meta: null,
+			},
+		}).as('stats');
+		cy.visitApp('/dashboard');
+		cy.wait('@stats');
+		cy.get('.hk-chart-line').invoke('attr', 'd').then((d) => {
+			expect(String(d).split(/[ML]/).length - 1, 'the zero day is drawn').to.equal(3);
+		});
+	});
 });

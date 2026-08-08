@@ -5,11 +5,15 @@ import { useT, tError, useI18n } from '../i18n';
 import type { DashboardStats } from '../core';
 import { Screen, StatCard, Spinner, Money, AreaChart, BarList } from '../ui';
 
-// The series comes back as YYYY-MM-DD; the axis only has room for day and month.
-function shortDate(iso: string, locale: string): string {
-	const d = new Date(`${iso}T00:00:00`);
-	if (Number.isNaN(d.getTime())) return iso;
-	return d.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short' });
+// A point is labelled by what it covers: an hour of today, a day, or the week it starts. The
+// axis only has room for the short form of any of them.
+function pointLabel(value: string, granularity: 'hour' | 'day' | 'week', locale: string): string {
+	const tag = locale === 'fr' ? 'fr-FR' : 'en-GB';
+	// 'YYYY-MM-DD HH:00' for an hour, 'YYYY-MM-DD' otherwise. Both parse with a T separator.
+	const d = new Date(value.includes(' ') ? value.replace(' ', 'T') : `${value}T00:00:00`);
+	if (Number.isNaN(d.getTime())) return value;
+	if (granularity === 'hour') return d.toLocaleTimeString(tag, { hour: '2-digit', minute: '2-digit' });
+	return d.toLocaleDateString(tag, { day: 'numeric', month: 'short' });
 }
 
 // A figure and its counterpart from the period before, when the shop sent one.
@@ -79,7 +83,7 @@ export function Dashboard() {
 					<div className="hk-card hk-card--pad">
 						<span className="hk-muted">{t('dashboard.revenueOverTime')}</span>
 						<AreaChart
-							points={data.revenue_series.map((s) => ({ label: shortDate(s.date, locale), value: s.revenue }))}
+							points={data.revenue_series.map((s) => ({ label: pointLabel(s.date, data.series_granularity ?? 'day', locale), value: s.revenue }))}
 							peak={data.revenue_series.length > 0 ? (
 								<>
 									{t('dashboard.peak')}{' '}

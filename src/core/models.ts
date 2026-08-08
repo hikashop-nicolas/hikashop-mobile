@@ -155,6 +155,8 @@ export interface DashboardStats {
 	totals: { revenue: number; orders: number; average_order: number; customers: number };
 	// The same figures for the period immediately before, of the same length.
 	previous?: { revenue: number; orders: number; average_order: number; customers: number };
+	// How the series is bucketed, which decides how a point is labelled.
+	series_granularity?: 'hour' | 'day' | 'week';
 	revenue_series: { date: string; revenue: number }[];
 	top_products: { name: string; quantity: number }[];
 }
