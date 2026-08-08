@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useI18n, LOCALES } from '../i18n';
-import { Screen, Button, Icon, DeleteButton } from '../ui';
+import { Screen, Button, Icon, DeleteButton, StoreLogo } from '../ui';
 import { hostOf } from '../app/utils';
 import { useTheme } from '../app/theme';
 import type { ThemeChoice } from '../app/theme';
@@ -16,7 +16,8 @@ export function Stores() {
 		<Screen title={t('stores.title')}>
 			{stores.map((s) => (
 				<div key={s.id} className="hk-row">
-					<div className="hk-avatar">{s.name.charAt(0).toUpperCase()}</div>
+					<StoreLogo src={s.logo} className="hk-logo-avatar"
+						fallback={<div className="hk-avatar">{s.name.charAt(0).toUpperCase()}</div>} />
 					<div
 						className="hk-row-grow"
 						style={{ cursor: 'pointer' }}

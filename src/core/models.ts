@@ -14,6 +14,8 @@ export interface SiteInfo {
 	hikashop_version: string | null;
 	cms: { name: string; version: string | null };
 	edition: string;
+	// The shop's logo (HikaShop config > Main > Logo), absolute; '' when the merchant set none.
+	logo?: string;
 	currency: { default: number };
 	price_with_tax: boolean;
 	operator: { id: number; name: string; role: string };
@@ -362,6 +364,8 @@ export interface CategoryListItem {
 	name: string;
 	parent_id: number;
 	published: boolean;
+	// Public url of the category's image, '' when it has none.
+	image?: string;
 	// Whether this one can be opened. The tree is fetched a level at a time, so the app cannot
 	// tell from the rows it holds whether a category has children.
 	has_children?: boolean;
@@ -394,8 +398,11 @@ export interface CategoryInput {
 	meta_description?: string;
 	published?: boolean;
 	access?: Access;
+	// Either uploaded bytes (image, base64) or the path of a file already in the shop's upload
+	// folder picked in the media browser (image_path). Both replace the current image.
 	image?: string;
 	image_name?: string;
+	image_path?: string;
 	custom_fields?: Record<string, string>;
 }
 
@@ -648,6 +655,8 @@ export interface Store {
 	name: string;
 	baseUrl: string;
 	role: string;
+	// The shop's logo, re-read from the site once per app start (see StoreProvider).
+	logo?: string;
 	capabilities?: SiteInfo['capabilities'];
 	createdAt: number;
 }

@@ -131,6 +131,9 @@ export function Categories() {
 							<Icon name="chevron" size={16} className={isOpen ? 'hk-disclose-open' : ''} />
 						</button>
 					) : <span className="hk-disclose-spacer" />}
+					{c.image
+						? <img className="hk-avatar-img" src={c.image} alt="" loading="lazy" />
+						: <div className="hk-avatar">{(c.name || '?').charAt(0).toUpperCase()}</div>}
 					<button type="button" className="hk-row-grow hk-row-btn" onClick={() => nav(`/categories/${c.id}/edit`)}>
 						<span className="hk-row-title">
 							{c.name}

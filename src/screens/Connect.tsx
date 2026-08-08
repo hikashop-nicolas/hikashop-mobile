@@ -28,7 +28,7 @@ export function Connect() {
 			const res = await ApiClient.pair(base, rawCode, deviceName(), 'pwa');
 			const site = await new ApiClient(base, res.token).getSite();
 			await registry.add(
-				{ name: hostOf(base), baseUrl: base, role: site.operator?.role ?? 'staff', capabilities: site.capabilities },
+				{ name: hostOf(base), baseUrl: base, role: site.operator?.role ?? 'staff', logo: site.logo ?? '', capabilities: site.capabilities },
 				res.token,
 			);
 			await refresh();

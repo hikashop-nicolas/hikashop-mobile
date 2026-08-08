@@ -3,7 +3,7 @@ import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError, useI18n } from '../i18n';
 import type { DashboardStats } from '../core';
-import { Screen, StatCard, Spinner, Money, AreaChart, BarList } from '../ui';
+import { Screen, StatCard, Spinner, Money, AreaChart, BarList, StoreLogo } from '../ui';
 
 // A point is labelled by what it covers: an hour of today, a day, or the week it starts. The
 // axis only has room for the short form of any of them.
@@ -45,7 +45,12 @@ export function Dashboard() {
 	});
 
 	return (
-		<Screen title={active?.name ?? t('tabs.dashboard')}>
+		<Screen title={
+			<span className="hk-title-wrap">
+				<StoreLogo src={active?.logo} />
+				<span>{active?.name ?? t('tabs.dashboard')}</span>
+			</span>
+		}>
 			<div className="hk-chiprow" style={{ display: 'flex', gap: 'var(--hk-s2)', flexWrap: 'wrap' }}>
 				{RANGES.map(([k, labelKey]) => (
 					<button key={k} className={`hk-chip${range === k ? ' hk-on' : ''}`} onClick={() => setRange(k)}>{t(labelKey)}</button>

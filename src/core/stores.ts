@@ -48,6 +48,17 @@ export class StoreRegistry {
 		return full;
 	}
 
+	// Update the parts of a store record the site itself owns (its logo, the operator's role,
+	// what it can do), which pairing captured once and can have changed since.
+	async update(id: string, patch: Partial<Omit<Store, 'id' | 'createdAt'>>): Promise<Store | null> {
+		const stores = await this.list();
+		const at = stores.findIndex((s) => s.id === id);
+		if (at < 0) return null;
+		stores[at] = { ...stores[at], ...patch };
+		await this.save(stores);
+		return stores[at];
+	}
+
 	async remove(id: string): Promise<void> {
 		const stores = (await this.list()).filter((s) => s.id !== id);
 		await this.save(stores);

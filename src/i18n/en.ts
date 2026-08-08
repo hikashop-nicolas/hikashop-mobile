@@ -487,4 +487,13 @@ export const en: Messages = {
 	'dashboard.peak': 'Peak',
 	'dashboard.noRevenue': 'No revenue in this period.',
 	'dashboard.deltaNew': 'new',
+
+	// Looking at an image full screen, rather than as a thumbnail.
+	'media.viewImage': 'View image',
+	'media.previousImage': 'Previous image',
+	'media.nextImage': 'Next image',
+	'media.imageOf': '{shown} of {total}',
+	'common.close': 'Close',
+	'category.imageBrowse': 'Choose from the media library',
+	'category.imageUpload': 'Upload an image',
 };

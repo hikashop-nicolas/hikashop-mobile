@@ -485,4 +485,13 @@ export const fr: Messages = {
 	'dashboard.peak': 'Maximum',
 	'dashboard.noRevenue': 'Aucun chiffre d\'affaires sur cette période.',
 	'dashboard.deltaNew': 'nouveau',
+
+	// Regarder une image en plein écran, plutôt qu'en vignette.
+	'media.viewImage': 'Voir l\'image',
+	'media.previousImage': 'Image précédente',
+	'media.nextImage': 'Image suivante',
+	'media.imageOf': '{shown} sur {total}',
+	'common.close': 'Fermer',
+	'category.imageBrowse': 'Choisir dans la médiathèque',
+	'category.imageUpload': 'Envoyer une image',
 };

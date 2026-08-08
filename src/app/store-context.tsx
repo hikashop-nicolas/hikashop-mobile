@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { StoreRegistry, WebKeyValueStore, IdbKeyValueStore, ApiClient, CacheRepository, parseNotifySettings } from '../core';
 import type { Store, NotifySettings } from '../core';
@@ -112,6 +112,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		void refresh();
 	}, [refresh]);
+
+	// Pairing reads /site once and the record then never changes, so a shop that since set a logo,
+	// promoted the operator or installed HikaMarket would keep showing the app what was true the
+	// day it was paired. Re-read it once per store per app start, and only write when something
+	// actually differs so this does not turn into a refresh loop.
+	const synced = useRef<Set<string>>(new Set());
+	useEffect(() => {
+		if (!client || !active || synced.current.has(active.id)) return;
+		const store = active;
+		synced.current.add(store.id);
+		let alive = true;
+		void client.getSite().then(async (site) => {
+			if (!alive) return;
+			const patch = {
+				logo: site.logo ?? '',
+				role: site.operator?.role ?? store.role,
+				capabilities: site.capabilities,
+			};
+			const same = patch.logo === (store.logo ?? '')
+				&& patch.role === store.role
+				&& JSON.stringify(patch.capabilities) === JSON.stringify(store.capabilities);
+			if (same) return;
+			await registry.update(store.id, patch);
+			await refresh();
+		}).catch(() => { /* offline, or an old connector: keep what pairing captured */ });
+		return () => { alive = false; };
+	}, [client, active, refresh]);
 
 	const setActive = useCallback(async (id: string) => {
 		await registry.setActive(id);

@@ -3,10 +3,11 @@ import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl, WRITABLE_FIELD_TYPES } from '../core';
 import type { ProductMeta, ProductField, CategoryDetail, FieldFile, Access } from '../core';
-import { Modal, Screen, Field, Button, Icon, RichText, CustomFieldInput, DeleteButton } from '../ui';
+import { Modal, Screen, Field, Button, Icon, RichText, CustomFieldInput, DeleteButton, ImageViewer } from '../ui';
 import type { TreeNode } from '../ui';
 import { AccessField, toAccess } from './AccessField';
 import { CategoryPicker } from './CategoryPicker';
+import { MediaBrowser } from './MediaBrowser';
 
 type Kind = 'product' | 'manufacturer';
 
@@ -34,7 +35,11 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 	const [published, setPublished] = useState(category?.published ?? true);
 	const [access, setAccess] = useState<Access>(toAccess(category?.access));
 	const [existingImage] = useState(category?.image ?? '');
-	const [image, setImage] = useState<{ data: string; name: string; preview: string } | null>(null);
+	// A replacement image, from the device (data) or from the shop's media library (path).
+	// Whichever was chosen last is the one that gets saved.
+	const [image, setImage] = useState<{ name: string; preview: string; data?: string; path?: string } | null>(null);
+	const [browsing, setBrowsing] = useState(false);
+	const [viewing, setViewing] = useState(false);
 	const [custom, setCustom] = useState<Record<string, string>>(() => {
 		const c: Record<string, string> = {};
 		for (const [k, v] of Object.entries(category?.custom_fields ?? {})) c[k] = v ?? '';
@@ -59,6 +64,12 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 		setImage({ data, name: file.name, preview: data });
 	}
 
+	// Chosen in the media library: nothing is uploaded, the category just points at the file.
+	async function pickFromLibrary(path: string, name: string, url: string) {
+		setImage({ path, name, preview: url });
+		setBrowsing(false);
+	}
+
 	function writableCustom(): Record<string, string> {
 		const out: Record<string, string> = {};
 		for (const f of fields) if (isWritable(f) && f.namekey in custom) out[f.namekey] = custom[f.namekey] ?? '';
@@ -79,6 +90,7 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 				access,
 				image: image?.data,
 				image_name: image?.name,
+				image_path: image?.path,
 				custom_fields: writableCustom(),
 			};
 			let saved: { id: number; name: string; parent_id: number };
@@ -112,16 +124,24 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 
 				<Field label={t('category.description')}><RichText value={description} onChange={setDescription} /></Field>
 
+				{/* Two ways to an image, the same two a product has: send one from the device, or
+				    take one already on the site. */}
 				<Field label={t('category.image')}>
 					<input ref={imgInput} type="file" accept="image/*" hidden onChange={(e) => void pickImage(e.target.files)} />
-					{preview ? (
-						<div className="hk-cat-img">
-							<img src={preview} alt="" />
-							<button type="button" className="hk-media-del" onClick={() => imgInput.current?.click()} aria-label={t('category.image')}><Icon name="plus" size={13} /></button>
+					<div className="hk-cat-imgrow">
+						{preview ? (
+							<div className="hk-cat-img">
+								<img src={preview} alt="" />
+								<button type="button" className="hk-media-view" onClick={() => setViewing(true)} aria-label={t('media.viewImage')}><Icon name="eye" size={13} /></button>
+							</div>
+						) : (
+							<button type="button" className="hk-media-add hk-cat-imgadd" onClick={() => imgInput.current?.click()}><Icon name="plus" size={20} /></button>
+						)}
+						<div className="hk-cat-imgacts">
+							<Button size="sm" onClick={() => imgInput.current?.click()}>{t('category.imageUpload')}</Button>
+							<Button size="sm" onClick={() => setBrowsing(true)}>{t('media.browse')}</Button>
 						</div>
-					) : (
-						<button type="button" className="hk-media-add hk-cat-imgadd" onClick={() => imgInput.current?.click()}><Icon name="plus" size={20} /></button>
-					)}
+					</div>
 				</Field>
 
 				<AccessField label={t('product.access')} value={access} onChange={setAccess} />
@@ -141,6 +161,11 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 				{editing && onDelete && (
 					<DeleteButton block disabled={busy} label={t('category.deleteCategory')}
 						confirmMessage={t('category.deleteConfirm')} onConfirm={onDelete} />
+				)}
+
+				{browsing && <MediaBrowser kind="images" onClose={() => setBrowsing(false)} onPick={pickFromLibrary} />}
+				{viewing && preview && (
+					<ImageViewer images={[{ url: preview, label: image?.name ?? name }]} onClose={() => setViewing(false)} />
 				)}
 			</div>
 	);

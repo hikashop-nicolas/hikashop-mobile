@@ -8,7 +8,7 @@ import { ThemeProvider } from './app/theme';
 import { composeProviders } from './app/compose-providers';
 import { useOrderPoll } from './app/use-order-poll';
 import { I18nProvider, useT } from './i18n';
-import { TabBar, Spinner, Icon, CurrencyProvider } from './ui';
+import { TabBar, Spinner, Icon, CurrencyProvider, StoreLogo } from './ui';
 import type { TabDef, IconName } from './ui';
 import type { Currency } from './core';
 import { Connect } from './screens/Connect';
@@ -75,7 +75,8 @@ function SideNav() {
 			{/* The active store, tappable to switch: everything you view and create targets it.
 			    The chevron only appears when there is more than one store to switch between. */}
 			<button className="hk-store-switch" onClick={() => nav('/stores')} title={t('stores.title')}>
-				<Icon name="store" size={20} />
+				{/* The shop's own logo where it has one, otherwise the generic store mark. */}
+				<StoreLogo src={store?.logo} className="hk-store-switch-logo" fallback={<Icon name="store" size={20} />} />
 				<span className="hk-store-switch-text">
 					<span className="hk-store-switch-eyebrow">HikaShop</span>
 					<span className="hk-store-switch-name">{store?.name || '…'}</span>

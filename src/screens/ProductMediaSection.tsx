@@ -3,7 +3,7 @@ import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl } from '../core';
 import type { ProductImage, ProductFile } from '../core';
-import { Icon, Spinner, Button } from '../ui';
+import { Icon, Spinner, Button, ImageViewer } from '../ui';
 import { FileOptionsModal } from './FileOptionsModal';
 import { MediaBrowser } from './MediaBrowser';
 import { accessSummary } from './AccessField';
@@ -24,6 +24,7 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 	const [dragOver, setDragOver] = useState<'images' | 'files' | null>(null);
 	const [browsing, setBrowsing] = useState<'images' | 'files' | null>(null);
 	const [editing, setEditing] = useState<{ file: ProductFile; kind: 'images' | 'files' } | null>(null);
+	const [viewing, setViewing] = useState<number | null>(null);
 	const imgInput = useRef<HTMLInputElement>(null);
 	const fileInput = useRef<HTMLInputElement>(null);
 
@@ -107,6 +108,7 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 							<img src={img.url} alt={img.description || ''} loading="lazy" />
 							<button className="hk-media-del" disabled={busy} aria-label={t('common.delete')} onClick={() => void del('images', img.id)}><Icon name="close" size={13} /></button>
 							<button className="hk-media-edit" disabled={busy} aria-label={t('media.editImage')} onClick={() => setEditing({ file: img as ProductFile, kind: 'images' })}><Icon name="edit" size={13} /></button>
+							<button className="hk-media-view" aria-label={t('media.viewImage')} onClick={() => setViewing(i)}><Icon name="eye" size={13} /></button>
 							{images.length > 1 && (
 								<div className="hk-media-move">
 									<button disabled={busy || i === 0} aria-label={t('product.moveEarlier')} onClick={() => void moveImage(i, -1)}><Icon name="chevron" size={14} className="hk-rot180" /></button>
@@ -143,6 +145,13 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 				{busy && <div className="hk-center-col"><Spinner /></div>}
 				{err && <div className="hk-error-note">{err}</div>}
 			</div>
+
+			{viewing !== null && (
+				<ImageViewer
+					images={images.map((i) => ({ url: i.url, label: i.name || i.description || '' }))}
+					start={viewing}
+					onClose={() => setViewing(null)} />
+			)}
 
 			{browsing && <MediaBrowser kind={browsing} onClose={() => setBrowsing(null)} onPick={(path, name) => attachFromBrowser(browsing, path, name)} />}
 			{editing && <FileOptionsModal productId={productId} file={editing.file} kind={editing.kind} onClose={() => setEditing(null)} onSaved={onFileEdited} />}

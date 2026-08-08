@@ -144,6 +144,9 @@
 	.hk-store-switch-eyebrow { font-size: .66rem; text-transform: uppercase; letter-spacing: .07em; color: var(--hk-faint); }
 	.hk-store-switch-name { font-weight: 700; font-size: 1.02rem; letter-spacing: -.01em; color: var(--hk-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.hk-store-switch-chevron { color: var(--hk-faint); flex: none; }
+	/* A shop logo is usually wider than it is tall, so it gets a landscape slot rather than
+	   the square one the generic icon sits in. */
+	.hk-store-switch-logo { height: 24px; width: auto; max-width: 52px; object-fit: contain; flex: none; display: block; }
 	.hk-navitem { display: flex; align-items: center; gap: var(--hk-s3); padding: 10px 12px; border-radius: var(--hk-r2); border: none; background: none; color: var(--hk-muted); font: inherit; font-weight: 600; cursor: pointer; text-align: left; width: 100%; }
 	.hk-navitem:hover { background: var(--hk-surface-2); color: var(--hk-ink); }
 	.hk-navitem.hk-on { background: var(--hk-accent-soft); color: var(--hk-accent); }
@@ -204,6 +207,24 @@
 .hk-cat-img { position: relative; width: 96px; height: 96px; border-radius: var(--hk-r2); overflow: hidden; border: 1px solid var(--hk-line); }
 .hk-cat-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hk-cat-imgadd { width: 96px; height: 96px; aspect-ratio: unset; }
+.hk-cat-imgrow { display: flex; align-items: flex-start; gap: var(--hk-s3); flex-wrap: wrap; }
+.hk-cat-imgacts { display: flex; flex-direction: column; gap: var(--hk-s2); }
+
+/* Full-screen image: the picture on a dark ground, with its own controls over it. */
+.hk-viewer { position: fixed; inset: 0; z-index: 200; background: rgba(8, 11, 15, .92); display: grid; place-items: center; padding: var(--hk-s4); }
+.hk-viewer-img { max-width: 100%; max-height: calc(100vh - 8rem); object-fit: contain; border-radius: var(--hk-r2); }
+.hk-viewer-close { position: absolute; top: calc(var(--hk-s3) + env(safe-area-inset-top, 0)); right: var(--hk-s3); width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,.14); color: #fff; cursor: pointer; display: grid; place-items: center; }
+.hk-viewer-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(255,255,255,.14); color: #fff; cursor: pointer; display: grid; place-items: center; }
+.hk-viewer-prev { left: var(--hk-s3); }
+.hk-viewer-next { right: var(--hk-s3); }
+.hk-viewer-foot { position: absolute; left: 0; right: 0; bottom: calc(var(--hk-s4) + env(safe-area-inset-bottom, 0)); display: flex; justify-content: center; align-items: baseline; gap: var(--hk-s3); padding-inline: 4rem; color: rgba(255,255,255,.85); font-size: .85rem; }
+.hk-viewer-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hk-viewer-count { color: rgba(255,255,255,.6); font-variant-numeric: tabular-nums; flex: none; }
+
+/* The shop's own logo, beside its name in the app bar and in the store list. */
+.hk-logo { height: 1.5rem; max-width: 7rem; object-fit: contain; display: block; flex: none; }
+.hk-appbar .hk-title-wrap { display: flex; align-items: center; gap: var(--hk-s2); min-width: 0; }
+.hk-logo-avatar { width: 3rem; height: 2rem; border-radius: var(--hk-r1); object-fit: contain; padding: 2px; background: var(--hk-surface-2); flex: none; border: 1px solid var(--hk-line); }
 
 .hk-row-btn { border: none; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 0; display: flex; flex-direction: column; }
 /* The same reset for a button that *is* a row: hk-row already lays it out horizontally,
@@ -225,9 +246,11 @@
 .hk-rte-area ul, .hk-rte-area ol { padding-left: 1.4em; margin: .3em 0; }
 .hk-rte-area a { color: var(--hk-accent); }
 
-.hk-media-move { position: absolute; bottom: 4px; left: 4px; display: flex; gap: 2px; }
+/* Reordering sits bottom right so the bottom left corner belongs to the view affordance. */
+.hk-media-move { position: absolute; bottom: 4px; right: 4px; display: flex; gap: 2px; }
 .hk-media-move button { width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(0,0,0,.6); color: #fff; cursor: pointer; display: grid; place-items: center; padding: 0; }
 .hk-media-move button:disabled { opacity: .35; cursor: default; }
+.hk-media-view { position: absolute; bottom: 4px; left: 4px; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(0,0,0,.6); color: #fff; cursor: pointer; display: grid; place-items: center; padding: 0; }
 .hk-rot180 { transform: rotate(180deg); }
 
 /* Media edit affordance + drag-drop + media browser */

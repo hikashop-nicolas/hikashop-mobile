@@ -1,4 +1,5 @@
-import type { ButtonHTMLAttributes, CSSProperties } from 'react';
+import { useState } from 'react';
+import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
 import { useT } from '../i18n';
 import { useStatuses } from '../app/statuses';
 import { Icon } from './icons';
@@ -32,6 +33,19 @@ export function NewButton({ onClick, disabled, label }: { onClick: () => void; d
 			<Icon name="plus" size={16} /> {label ?? t('common.new')}
 		</Button>
 	);
+}
+
+// The shop's logo, as HikaShop's configuration gives it. That setting is a free-text URL, so it
+// can perfectly well point at nothing; rather than leave a broken-image glyph in the app bar,
+// a logo that fails to load simply is not there.
+export function StoreLogo({ src, className = 'hk-logo', fallback = null }: {
+	src?: string;
+	className?: string;
+	fallback?: ReactNode;
+}) {
+	const [failed, setFailed] = useState(false);
+	if (!src || failed) return <>{fallback}</>;
+	return <img className={className} src={src} alt="" onError={() => setFailed(true)} />;
 }
 
 export function Spinner() {

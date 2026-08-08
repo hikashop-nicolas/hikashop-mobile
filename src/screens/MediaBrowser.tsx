@@ -10,7 +10,9 @@ import { Modal, Button, Spinner, Icon } from '../ui';
 export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 	kind?: 'images' | 'files';
 	onClose: () => void;
-	onPick: (path: string, name: string) => Promise<void>;
+	// The url comes along so a caller that only shows the choice (rather than attaching it
+	// straight away) can preview it without asking the shop where the file ended up.
+	onPick: (path: string, name: string, url: string) => Promise<void>;
 }) {
 	const { client } = useStores();
 	const t = useT();
@@ -18,7 +20,7 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 	const [folder, setFolder] = useState('');
 	const [loading, setLoading] = useState(true);
 	const [err, setErr] = useState('');
-	const [selected, setSelected] = useState<{ path: string; name: string } | null>(null);
+	const [selected, setSelected] = useState<{ path: string; name: string; url: string } | null>(null);
 	const [busy, setBusy] = useState(false);
 	const isFiles = kind === 'files';
 
@@ -43,7 +45,7 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 		if (!selected || busy) return;
 		setBusy(true); setErr('');
 		try {
-			await onPick(selected.path, selected.name);
+			await onPick(selected.path, selected.name, selected.url);
 		} catch (e) {
 			setErr(tError(t, codeOf(e)));
 			setBusy(false);
@@ -83,7 +85,7 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 					) : isFiles ? (
 						<div>
 							{items.map((f) => (
-								<button key={f.path} type="button" className={`hk-row hk-row--btn hk-mb-file${selected?.path === f.path ? ' hk-on' : ''}`} onClick={() => setSelected({ path: f.path, name: f.name })}>
+								<button key={f.path} type="button" className={`hk-row hk-row--btn hk-mb-file${selected?.path === f.path ? ' hk-on' : ''}`} onClick={() => setSelected({ path: f.path, name: f.name, url: f.url })}>
 									<span className="hk-row-title">{f.name}</span>
 								</button>
 							))}
@@ -91,7 +93,7 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 					) : (
 						<div className="hk-media-grid">
 							{items.map((img) => (
-								<button key={img.path} type="button" className={`hk-media-cell hk-mb-cell${selected?.path === img.path ? ' hk-on' : ''}`} onClick={() => setSelected({ path: img.path, name: img.name })} title={img.name}>
+								<button key={img.path} type="button" className={`hk-media-cell hk-mb-cell${selected?.path === img.path ? ' hk-on' : ''}`} onClick={() => setSelected({ path: img.path, name: img.name, url: img.url })} title={img.name}>
 									<img src={img.url} alt={img.name} loading="lazy" />
 								</button>
 							))}

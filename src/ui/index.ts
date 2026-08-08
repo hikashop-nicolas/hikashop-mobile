@@ -9,6 +9,7 @@ export * from './tree-select';
 export * from './layout';
 export * from './QrScanner';
 export * from './icons';
+export * from './image-viewer';
 export * from './load-more';
 export * from './unsaved-prompt';
 export * from './chart';
