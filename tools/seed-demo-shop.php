@@ -61,6 +61,20 @@ function insertRow(mysqli $db, string $table, array $values): int {
 	return (int)$db->insert_id;
 }
 
+/**
+ * An API key, from the environment or from what set-api-key.php stored.
+ *
+ * Never a command-line option: that puts it in the shell history and in what ps shows other
+ * processes. The environment wins so CI can supply one without a file on disk.
+ */
+function apiKey(string $env, string $name): string
+{
+	$fromEnv = (string)(getenv($env) ?: '');
+	if ($fromEnv !== '') return $fromEnv;
+	$file = __DIR__.'/.keys/'.$name;
+	return is_readable($file) ? trim((string)file_get_contents($file)) : '';
+}
+
 $opts = getopt('', ['site:', 'products::', 'customers::', 'orders::', 'clean', 'no-images', 'ai-images::', 'ai-model::', 'stock-images', 'theme::', 'help']);
 if (isset($opts['help']) || !isset($opts['site'])) {
 	fwrite(STDERR, "usage: php seed-demo-shop.php --site=/path/to/joomla [--products=300] [--customers=300] [--orders=300] [--theme=NAME] [--no-images] [--ai-images[=URL]] [--ai-model=NAME] [--stock-images] [--clean]\n");
@@ -168,7 +182,7 @@ if ($wantImages && isset($opts['ai-images'])) {
 	$aiUrl = is_string($opts['ai-images']) && $opts['ai-images'] !== '' ? $opts['ai-images'] : 'http://localhost:8080';
 	// A hosted endpoint needs a key. It is read from the environment rather than taken as a flag,
 	// so it stays out of the shell history and out of anything that logs the command line.
-	$aiKey = (string)(getenv('DEMO_IMAGE_API_KEY') ?: '');
+	$aiKey = apiKey('DEMO_IMAGE_API_KEY', 'image');
 	$ai = new DemoImagesAi($aiUrl, is_string($opts['ai-model'] ?? null) ? $opts['ai-model'] : '', '', 180, 768, $catalogue['imagery']['style'] ?? '', $aiKey);
 	if (!$ai->reachable()) {
 		fwrite(STDERR, "no image model answering at $aiUrl; drawing the tiles instead\n");
@@ -183,9 +197,9 @@ if ($wantImages && isset($opts['ai-images'])) {
 $stock = null;
 if ($wantImages && isset($opts['stock-images'])) {
 	require __DIR__.'/demo-images-stock.php';
-	$stockKey = (string)(getenv('PEXELS_API_KEY') ?: '');
+	$stockKey = apiKey('PEXELS_API_KEY', 'pexels');
 	if ($stockKey === '') {
-		fwrite(STDERR, "no PEXELS_API_KEY in the environment; skipping stock photographs\n");
+		fwrite(STDERR, "no Pexels key; run: php tools/set-api-key.php pexels\n");
 	} else {
 		$stock = new DemoImagesStock($stockKey);
 		if (!$stock->reachable()) {

@@ -37,3 +37,6 @@ keystore.b64
 
 # Generated product photographs, cached by prompt.
 tools/cache/
+
+# API keys, stored by tools/set-api-key.php. Never committed.
+tools/.keys/
