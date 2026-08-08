@@ -29,6 +29,7 @@ export interface OrderSummary {
 	total: number;
 	currency_id: number;
 	customer: { name: string | null; email: string | null };
+	custom_fields?: Record<string, string>;
 }
 
 export interface OrderItem {
@@ -159,6 +160,9 @@ export interface Paginated<T> {
 	total: number;
 	start: number;
 	limit: number;
+	// The custom fields the merchant chose to show in this listing, if any. A phone row is
+	// narrow, so this is its own setting rather than the backend listing one.
+	fields?: ProductField[];
 }
 
 export interface OrderStatusResult {
@@ -178,6 +182,7 @@ export interface ProductSummary {
 	image: string; // thumbnail URL ('' if none)
 	price: number | null;
 	currency_id: number;
+	custom_fields?: Record<string, string>;
 }
 
 export interface ProductPrice {

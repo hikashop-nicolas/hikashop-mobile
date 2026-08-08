@@ -267,3 +267,7 @@
 
 .hk-chip-row { display: flex; flex-wrap: wrap; gap: var(--hk-s2); align-items: center; }
 .hk-chip-row .hk-chip { gap: var(--hk-s1); }
+/* Merchant-chosen custom fields under a listing row. Wraps rather than truncating, since the
+   merchant picked these deliberately, but stays visually secondary to the row's own subtitle. */
+.hk-row-fields { display: flex; flex-wrap: wrap; gap: var(--hk-s1) var(--hk-s3); }
+.hk-row-field-label { color: var(--hk-faint); }

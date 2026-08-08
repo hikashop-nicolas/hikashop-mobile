@@ -7,6 +7,7 @@ import { ordersFilterKey } from '../core';
 import type { ProductSummary, Paginated, ProductMeta } from '../core';
 import { Screen, Search, Money, Spinner, Icon, TreeSelect, NewButton, Button } from '../ui';
 import { ScanProductModal } from './ScanProductModal';
+import { ListingFields } from './ListingFields';
 
 export function Products() {
 	const { client, active, cache } = useStores();
@@ -102,6 +103,7 @@ export function Products() {
 							<div className="hk-row-grow">
 								<span className="hk-row-title">{p.name}{!p.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}</span>
 								<span className="hk-row-sub">{p.code} · {stockLabel(p)}</span>
+								<ListingFields fields={data?.fields} values={p.custom_fields} />
 							</div>
 							<div className="hk-row-rt">{p.price !== null && <Money value={p.price} currency={p.currency_id} />}</div>
 						</Link>

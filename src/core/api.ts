@@ -7,6 +7,7 @@ import type {
 	CategoryInput, CategoryListItem, CategoryDetail, MediaListing, FieldFile,
 	CustomerSummary, CustomerDetail, CustomerAddressForm, UserGroup, Discount, DiscountInput, DiscountType, BarcodeMatch,
 	Access,
+	ProductField,
 } from './models';
 import type { LowStockItem } from './notify-settings';
 
@@ -255,6 +256,7 @@ export class ApiClient {
 			total: Number(meta?.total ?? 0),
 			start: Number(meta?.start ?? 0),
 			limit: Number(meta?.limit ?? 0),
+			fields: (meta?.fields as ProductField[] | undefined) ?? [],
 		};
 	}
 
@@ -354,6 +356,7 @@ export class ApiClient {
 			total: Number(meta?.total ?? 0),
 			start: Number(meta?.start ?? 0),
 			limit: Number(meta?.limit ?? 0),
+			fields: (meta?.fields as ProductField[] | undefined) ?? [],
 		};
 	}
 

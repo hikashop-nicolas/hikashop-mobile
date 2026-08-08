@@ -9,6 +9,7 @@ import { Screen, Search, StatusChip, Money, Spinner, NewButton } from '../ui';
 import { fmtDate } from '../app/utils';
 import { NewOrderModal } from './NewOrderModal';
 import { useStatuses } from '../app/statuses';
+import { ListingFields } from './ListingFields';
 
 export function Orders() {
 	const { client, active, cache } = useStores();
@@ -63,6 +64,7 @@ export function Orders() {
 							<div className="hk-row-grow">
 								<span className="hk-row-title">#{o.number} · {o.customer.name || o.customer.email || t('common.guest')}</span>
 								<span className="hk-row-sub">{fmtDate(o.created, locale)}</span>
+								<ListingFields fields={data?.fields} values={o.custom_fields} />
 							</div>
 							<div className="hk-row-rt"><StatusChip status={o.status} /><Money value={o.total} currency={o.currency_id} /></div>
 						</Link>
