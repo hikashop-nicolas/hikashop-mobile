@@ -451,8 +451,46 @@ export class ApiClient {
 	}
 
 	// Category management (read/write scope).
-	async listCategories(type: 'product' | 'manufacturer' = 'product'): Promise<CategoryListItem[]> {
-		return (await this.request<CategoryListItem[]>('GET', 'categories', { query: { type } })).data;
+	// One level of the category tree. Without a parent this is the top level; `search` instead
+	// looks through the whole tree and returns each match with its ancestors.
+	async listCategories(opts: {
+		type?: 'product' | 'manufacturer';
+		parent_id?: number;
+		search?: string;
+		start?: number;
+		limit?: number;
+		all?: boolean; // every category of the type, flat, rather than one level
+	} = {}): Promise<Paginated<CategoryListItem>> {
+		const query: Query = {
+			type: opts.type ?? 'product',
+			parent_id: opts.parent_id,
+			search: opts.search,
+			start: opts.start,
+			limit: opts.limit,
+			all: opts.all ? 1 : undefined,
+		};
+		const { data, meta } = await this.request<CategoryListItem[]>('GET', 'categories', { query });
+		return {
+			items: data || [],
+			total: Number(meta?.total ?? 0),
+			start: Number(meta?.start ?? 0),
+			limit: Number(meta?.limit ?? 0),
+		};
+	}
+
+	// The whole tree, for the pickers that render one (a product's categories, a discount's).
+	// It pages through rather than asking for everything at once, so the server never builds an
+	// unbounded response. A picker still holds every category in memory, which is the next thing
+	// to address for a shop with thousands of them.
+	async listAllCategories(type: 'product' | 'manufacturer' = 'product'): Promise<CategoryListItem[]> {
+		const all: CategoryListItem[] = [];
+		for (let start = 0; start < 20000; ) {
+			const page = await this.listCategories({ type, start, limit: 200, all: true });
+			all.push(...page.items);
+			if (page.items.length === 0 || all.length >= page.total) break;
+			start += page.items.length;
+		}
+		return all;
 	}
 
 	async getCategory(id: number): Promise<CategoryDetail> {

@@ -468,4 +468,8 @@ export const fr: Messages = {
 	'list.loadMore': 'Charger plus',
 	'list.loadMoreFailed': 'Impossible de charger la suite. Touchez pour réessayer.',
 	'list.countOf': '{shown} sur {total}',
+	'categories.search': 'Rechercher une catégorie',
+	'categories.noMatch': 'Aucune catégorie ne correspond.',
+	'categories.expand': 'Afficher les sous-catégories',
+	'categories.collapse': 'Masquer les sous-catégories',
 };

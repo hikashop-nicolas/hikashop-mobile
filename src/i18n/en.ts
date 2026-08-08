@@ -470,4 +470,8 @@ export const en: Messages = {
 	'list.loadMore': 'Load more',
 	'list.loadMoreFailed': 'Could not load more. Tap to try again.',
 	'list.countOf': '{shown} of {total}',
+	'categories.search': 'Search categories',
+	'categories.noMatch': 'No category matches.',
+	'categories.expand': 'Show sub-categories',
+	'categories.collapse': 'Hide sub-categories',
 };

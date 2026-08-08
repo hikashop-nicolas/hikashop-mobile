@@ -356,6 +356,11 @@ export interface CategoryListItem {
 	name: string;
 	parent_id: number;
 	published: boolean;
+	// Whether this one can be opened. The tree is fetched a level at a time, so the app cannot
+	// tell from the rows it holds whether a category has children.
+	has_children?: boolean;
+	// On a search result: the ancestors, outermost first, so a match can be shown in context.
+	path?: { id: number; name: string }[];
 }
 
 // Full category for the editor.

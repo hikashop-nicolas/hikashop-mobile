@@ -311,3 +311,10 @@
 /* Foot of a listing: the way to load the next page, and how much of it is loaded. */
 .hk-listfoot { display: flex; flex-direction: column; align-items: center; gap: var(--hk-s2); padding: var(--hk-s4) var(--hk-s2); }
 .hk-listfoot .hk-muted { font-size: .78rem; color: var(--hk-faint); }
+
+/* Category tree: a disclosure control per row, and the branch it opens. */
+.hk-disclose { min-width: 28px; min-height: 28px; padding: 0; flex: none; }
+.hk-disclose-open { transform: rotate(90deg); }
+.hk-disclose svg { transition: transform .12s ease; }
+.hk-disclose-spacer { width: 28px; flex: none; }
+.hk-branch { display: block; }

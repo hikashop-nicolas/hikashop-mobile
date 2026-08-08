@@ -38,7 +38,7 @@ export function CategoryEdit() {
 	const { data: cats } = useCached<CategoryListItem[]>({
 		enabled: !!client && !!active,
 		read: () => cache.getCategories(storeId, kind),
-		fetch: () => client!.listCategories(kind),
+		fetch: () => client!.listAllCategories(kind),
 		write: async (c) => { await cache.putCategories(storeId, kind, c); },
 		deps: [storeId, kind],
 	});

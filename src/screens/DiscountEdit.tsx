@@ -79,7 +79,7 @@ export function DiscountEdit() {
 	const { data: categories } = useCached<CategoryListItem[]>({
 		enabled: !!client && !!active,
 		read: () => cache.getCategories(storeId, 'product'),
-		fetch: () => client!.listCategories('product'),
+		fetch: () => client!.listAllCategories('product'),
 		write: async (c) => { await cache.putCategories(storeId, 'product', c); },
 		deps: [storeId],
 	});
