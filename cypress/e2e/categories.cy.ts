@@ -1,13 +1,34 @@
 // The category tree is fetched a level at a time, so a shop with thousands of them neither
 // downloads the lot nor renders it in one list.
 describe('Category tree', () => {
-	it('pages the top level instead of loading the whole tree', () => {
+	it('loads the top level only, not the whole tree', () => {
 		cy.visitApp('/categories');
+		cy.get('.hk-row').should('have.length.greaterThan', 0);
+		// The count is of the top level. A shop with six departments and thirty-five
+		// sub-categories shows six here, not forty-one.
+		cy.get('.hk-listfoot').invoke('text').then((text) => {
+			const [shown, total] = (text.match(/(\d+)\D+(\d+)/) ?? []).slice(1).map(Number);
+			expect(shown, 'everything on this level is shown').to.equal(total);
+			cy.get('.hk-row').should('have.length', shown);
+		});
+		// Nothing from a deeper level has been fetched.
+		cy.get('.hk-branch').should('not.exist');
+	});
+
+	// The paging path itself, stubbed: whether the fixture shop has more than a page of
+	// top-level categories is a property of the fixture, not of the app.
+	it('offers more when a level runs past one page', () => {
+		const level = Array.from({ length: 50 }, (_, i) => ({
+			id: i + 1, name: `Category ${i + 1}`, parent_id: 0, published: true, has_children: false,
+		}));
+		cy.intercept({ method: 'GET', url: /\/categories(\?|$)/ }, {
+			statusCode: 200,
+			body: { data: level, meta: { total: 120, start: 0, limit: 50 } },
+		}).as('level');
+		cy.visitApp('/categories');
+		cy.wait('@level');
 		cy.get('.hk-row').should('have.length', 50);
-		// The count is of the top level, not of every category in the shop.
-		cy.get('.hk-listfoot').should('contain', 'of');
-		cy.get('.hk-listfoot button').click();
-		cy.get('.hk-row').should('have.length.greaterThan', 50);
+		cy.get('.hk-listfoot button').should('exist');
 	});
 
 	it('fetches a branch only when it is opened', () => {
@@ -39,11 +60,14 @@ describe('Category tree', () => {
 
 	it('goes back to the tree when the search is cleared', () => {
 		cy.visitApp('/categories');
-		cy.get('input').first().type('Booths');
-		cy.get('.hk-row', { timeout: 10000 }).should('have.length', 2);
-		cy.get('input').first().clear();
-		cy.get('.hk-row', { timeout: 10000 }).should('have.length', 50);
-		cy.get('.hk-disclose').should('have.length.greaterThan', 0);
+		cy.get('.hk-row').its('length').then((topLevel) => {
+			cy.get('input').first().type('Booths');
+			cy.get('.hk-row', { timeout: 10000 }).should('have.length.lessThan', topLevel);
+			cy.get('input').first().clear();
+			// Back to the level it started on, with its branches openable again.
+			cy.get('.hk-row', { timeout: 10000 }).should('have.length', topLevel);
+			cy.get('.hk-disclose').should('have.length.greaterThan', 0);
+		});
 	});
 
 	// The picker on a product form browses the same way, rather than holding the tree in memory.

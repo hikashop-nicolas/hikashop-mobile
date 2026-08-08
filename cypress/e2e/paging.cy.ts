@@ -38,7 +38,7 @@ describe('Listing pagination', () => {
 		cy.get('.hk-listfoot button').click();
 		cy.get('.hk-row').should('have.length', 60);
 		// A search is a different list: it must not keep the rows of the previous one.
-		cy.get('input').first().type('Vol test product 01');
+		cy.get('input').first().type('DEMO-011');
 		cy.get('.hk-row', { timeout: 10000 }).should('have.length.lessThan', 60);
 	});
 
@@ -46,7 +46,7 @@ describe('Listing pagination', () => {
 	it('pages through the results of a search', () => {
 		cy.visitApp('/products');
 		cy.get('.hk-row').should('have.length', 30);
-		cy.get('input').first().type('Vol test product 1');
+		cy.get('input').first().type('DEMO-01');
 
 		// The count is the search's count, not the shop's.
 		cy.get('.hk-listfoot', { timeout: 10000 }).should('contain', '100');
@@ -55,7 +55,8 @@ describe('Listing pagination', () => {
 		cy.get('.hk-listfoot button').click();
 		cy.get('.hk-row').should('have.length', 60);
 		// Still only matching rows.
-		cy.get('.hk-row-title').each(($el) => expect($el.text()).to.contain('Vol test product 1'));
+		// Every row still belongs to the search: the codes are shown under the name.
+		cy.get('.hk-row-sub').each(($el) => expect($el.text()).to.contain('DEMO-01'));
 	});
 
 	it('returns to the first page of everything when the search is cleared', () => {
@@ -65,7 +66,7 @@ describe('Listing pagination', () => {
 			const shopTotal = full.match(/(\d+)\s*$/)?.[1];
 			expect(shopTotal, 'shop total').to.be.a('string');
 
-			cy.get('input').first().type('Vol test product 1');
+			cy.get('input').first().type('DEMO-01');
 			cy.get('.hk-listfoot', { timeout: 10000 }).should('contain', '100');
 			cy.get('.hk-listfoot button').click();
 			cy.get('.hk-row').should('have.length', 60);
@@ -84,7 +85,7 @@ describe('Listing pagination', () => {
 		cy.get('.hk-listfoot').scrollIntoView();
 		cy.get('.hk-body').first().its('0.scrollTop').should('be.greaterThan', 0);
 
-		cy.get('input').first().type('Vol test product 5');
+		cy.get('input').first().type('DEMO-02');
 		cy.get('.hk-row', { timeout: 10000 }).should('have.length.lessThan', 60);
 		cy.get('.hk-body').first().its('0.scrollTop').should('equal', 0);
 	});
@@ -99,21 +100,25 @@ describe('Listing freshness', () => {
 	it('shows an edit made beside it', () => {
 		cy.viewport(1400, 900);
 		cy.visitApp('/products');
-		cy.contains('.hk-row', 'Vol test product 002').click();
-		cy.hash().should('match', /#\/products\/\d+/);
+		// Whichever product is first: the test is about the list following an edit, not about a
+		// particular product, and the demo catalogue can be re-themed.
+		cy.get('.hk-row').first().find('.hk-row-title').invoke('text').then((original) => {
+			cy.get('.hk-row').first().click();
+			cy.hash().should('match', /#\/products\/\d+/);
 
-		// Change the name and save; the row must follow.
-		const suffix = ` Z${Date.now() % 1000}`;
-		cy.get('.hk-split-detail input.hk-input').first().type(suffix);
-		cy.contains('.hk-split-detail button', /Save/i).click();
-		// Saving returns to the list, so the split collapses and the row stands on its own.
-		cy.contains('.hk-row', suffix.trim(), { timeout: 10000 }).should('exist');
+			// Change the name and save; the row must follow.
+			const suffix = ` Z${Date.now() % 1000}`;
+			cy.get('.hk-split-detail input.hk-input').first().type(suffix);
+			cy.contains('.hk-split-detail button', /Save/i).click();
+			// Saving returns to the list, so the split collapses and the row stands on its own.
+			cy.contains('.hk-row', suffix.trim(), { timeout: 10000 }).should('exist');
 
-		// Put it back so the fixture shop stays as it was.
-		cy.contains('.hk-row', suffix.trim()).click();
-		cy.get('.hk-split-detail input.hk-input').first().clear().type('Vol test product 002');
-		cy.contains('.hk-split-detail button', /Save/i).click();
-		cy.contains('.hk-row', 'Vol test product 002', { timeout: 10000 }).should('exist');
+			// Put it back so the fixture shop stays as it was.
+			cy.contains('.hk-row', suffix.trim()).click();
+			cy.get('.hk-split-detail input.hk-input').first().clear().type(original.trim());
+			cy.contains('.hk-split-detail button', /Save/i).click();
+			cy.contains('.hk-row', original.trim(), { timeout: 10000 }).should('exist');
+		});
 	});
 
 	// The listing stays mounted beside the product it opens, so a flag left set by the create
