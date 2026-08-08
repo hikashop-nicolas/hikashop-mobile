@@ -478,7 +478,7 @@ export const fr: Messages = {
 
 	// Leaving a form that has changes which have not been saved.
 	'unsaved.title': 'Modifications non enregistrées',
-	'unsaved.body': 'Ce formulaire contient des modifications non enregistrées. En ouvrir un autre les perdra.',
+	'unsaved.body': 'Ce formulaire contient des modifications non enregistrées. Le quitter les perdra.',
 	'unsaved.stay': 'Continuer la modification',
 	'unsaved.discard': 'Abandonner les modifications',
 };

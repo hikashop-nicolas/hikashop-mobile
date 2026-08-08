@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
@@ -9,6 +9,8 @@ import { Screen, Spinner, Icon, Field, Button, DeleteButton } from '../ui';
 import { SearchPicker } from './SearchPicker';
 import type { PickItem } from './SearchPicker';
 import { AccessField, ACCESS_ALL, toAccess } from './AccessField';
+import { useDataChanged } from '../app/data-changed';
+import { useUnsavedChanges, useConfirmLeave } from '../app/unsaved';
 
 // A row keeps the tax-exclusive value (what HikaShop stores) and preserves the
 // users/zone restrictions so an edit never wipes them.
@@ -27,6 +29,8 @@ export function ProductPricesEdit() {
 	const { id } = useParams();
 	const nav = useNavigate();
 	const { client, active, cache } = useStores();
+	const confirmLeave = useConfirmLeave();
+	const changed = useDataChanged();
 	const t = useT();
 	const storeId = active?.id ?? '';
 	const productId = Number(id);
@@ -54,7 +58,22 @@ export function ProductPricesEdit() {
 	});
 
 	const [rows, setRows] = useState<Row[] | null>(null);
-	useEffect(() => { if (product && !rows) setRows(product.prices.map(toRow)); }, [product, rows]);
+	// Which product these rows belong to. Keying on "have any rows been built" kept the previous
+	// product's prices when moving straight from one to another. See ProductEdit.
+	const rowsFor = useRef<number | null>(null);
+	const [baseline, setBaseline] = useState('');
+	useEffect(() => {
+		if (product && rowsFor.current !== product.id) {
+			rowsFor.current = product.id;
+			const built = product.prices.map(toRow);
+			setRows(built);
+			setBaseline(JSON.stringify(built));
+		}
+	}, [product]);
+
+	// What the form holds now, against what it was loaded with, so leaving it can ask first.
+	const signature = JSON.stringify(rows ?? []);
+	useUnsavedChanges(rows !== null && baseline !== '' && signature !== baseline);
 
 	// Resolve the ids used in the loaded restrictions to display names.
 	const [userNames, setUserNames] = useState<Record<number, string>>({});
@@ -129,6 +148,8 @@ export function ProductPricesEdit() {
 				}));
 			const updated = await client.setProductPrices(productId, prices);
 			if (product) await cache.putProduct(storeId, productId, { ...product, prices: updated });
+			changed.bump('products');
+			setBaseline(signature);
 			nav(`/products/${id}`);
 		} catch (e) {
 			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -141,7 +162,7 @@ export function ProductPricesEdit() {
 	return (
 		<Screen
 			title={t('product.editPrices')}
-			left={<button className="hk-iconbtn" onClick={() => nav(`/products/${id}`)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
+			left={<button className="hk-iconbtn" onClick={() => confirmLeave(() => nav(`/products/${id}`))} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
 			right={rows ? <Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button> : undefined}
 		>
 			{loading || !rows ? (

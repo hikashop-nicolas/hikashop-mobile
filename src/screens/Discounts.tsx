@@ -6,6 +6,7 @@ import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { Discount, DiscountType } from '../core';
 import { Screen, Search, Money, Spinner, NewButton, LoadMore } from '../ui';
+import { useDataChanged } from '../app/data-changed';
 
 // Rows per request. The connector caps a page at 100.
 const PAGE = 30;
@@ -13,6 +14,7 @@ const PAGE = 30;
 export function Discounts() {
 	const { client, active, cache } = useStores();
 	const t = useT();
+	const changed = useDataChanged();
 	const nav = useNavigate();
 	const [search, setSearch] = useState('');
 	const [type, setType] = useState<DiscountType | ''>('');
@@ -24,7 +26,7 @@ export function Discounts() {
 		read: () => cache.getDiscounts(storeId, filterKey),
 		fetch: (start) => client!.getDiscounts({ search: search || undefined, type: type || undefined, limit: PAGE, start }),
 		write: async (p) => { await cache.putDiscounts(storeId, filterKey, p); },
-		deps: [storeId, search, type],
+		deps: [storeId, search, type, changed.version('discounts')],
 		debounceMs: search ? 300 : 0,
 	});
 

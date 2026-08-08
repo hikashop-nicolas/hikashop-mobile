@@ -10,12 +10,14 @@ import { fmtDate } from '../app/utils';
 import { NewOrderModal } from './NewOrderModal';
 import { useStatuses } from '../app/statuses';
 import { ListingFields } from './ListingFields';
+import { useDataChanged } from '../app/data-changed';
 
 // Rows per request. The connector caps a page at 100.
 const PAGE = 30;
 
 export function Orders() {
 	const { client, active, cache } = useStores();
+	const changed = useDataChanged();
 	const { t, locale } = useI18n();
 	const { statuses, statusLabel } = useStatuses();
 	const nav = useNavigate();
@@ -30,7 +32,7 @@ export function Orders() {
 		read: () => cache.getOrders(storeId, filterKey),
 		fetch: (start) => client!.getOrders({ status: status || undefined, search: search || undefined, limit: PAGE, start }),
 		write: async (p) => { await cache.putOrders(storeId, filterKey, p); },
-		deps: [storeId, status, search],
+		deps: [storeId, status, search, changed.version('orders')],
 		debounceMs: search ? 300 : 0,
 	});
 

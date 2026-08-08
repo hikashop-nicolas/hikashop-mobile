@@ -89,3 +89,44 @@ describe('Listing pagination', () => {
 		cy.get('.hk-body').first().its('0.scrollTop').should('equal', 0);
 	});
 });
+
+// A record edited in the detail pane changes how its row reads, and the list is still on screen.
+describe('Listing freshness', () => {
+	it('shows an edit made beside it', () => {
+		cy.viewport(1400, 900);
+		cy.visitApp('/products');
+		cy.contains('.hk-row', 'Vol test product 002').click();
+		cy.hash().should('match', /#\/products\/\d+/);
+
+		// Change the name and save; the row must follow.
+		const suffix = ` Z${Date.now() % 1000}`;
+		cy.get('.hk-split-detail input.hk-input').first().type(suffix);
+		cy.contains('.hk-split-detail button', /Save/i).click();
+		// Saving returns to the list, so the split collapses and the row stands on its own.
+		cy.contains('.hk-row', suffix.trim(), { timeout: 10000 }).should('exist');
+
+		// Put it back so the fixture shop stays as it was.
+		cy.contains('.hk-row', suffix.trim()).click();
+		cy.get('.hk-split-detail input.hk-input').first().clear().type('Vol test product 002');
+		cy.contains('.hk-split-detail button', /Save/i).click();
+		cy.contains('.hk-row', 'Vol test product 002', { timeout: 10000 }).should('exist');
+	});
+
+	it('creates a product while another one is open', () => {
+		cy.viewport(1400, 900);
+		cy.visitApp('/products');
+		cy.get('.hk-row').eq(2).click();
+		cy.hash().should('match', /#\/products\/\d+/);
+
+		cy.contains('.hk-split-list button', /New/i).click();
+		// It opens the product it just created, rather than silently doing nothing.
+		cy.hash({ timeout: 10000 }).should('match', /#\/products\/\d+/);
+		cy.get('.hk-split-list .hk-error-note').should('not.exist');
+		cy.get('.hk-split-detail input.hk-input').first().invoke('val').then((name) => {
+			// Clean up after ourselves.
+			cy.contains('.hk-split-detail button', /Delete product/i).click();
+			cy.contains('button', /^Delete$/).click();
+			cy.contains('.hk-row', String(name)).should('not.exist');
+		});
+	});
+});

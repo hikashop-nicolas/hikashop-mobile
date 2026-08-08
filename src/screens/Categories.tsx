@@ -5,6 +5,7 @@ import { usePaged } from '../app/use-paged';
 import { useT, tError } from '../i18n';
 import type { CategoryListItem } from '../core';
 import { Screen, Spinner, NewButton, Search, Icon, LoadMore } from '../ui';
+import { useDataChanged } from '../app/data-changed';
 
 type Kind = 'product' | 'manufacturer';
 
@@ -32,6 +33,7 @@ interface Branch {
 export function Categories() {
 	const { client, active, cache } = useStores();
 	const t = useT();
+	const changed = useDataChanged();
 	const nav = useNavigate();
 	const storeId = active?.id ?? '';
 	const [kind, setKind] = useState<Kind>('product');
@@ -65,7 +67,7 @@ export function Categories() {
 			limit: PAGE,
 		}),
 		write: async (page) => { if (!searching) await cache.putCategories(storeId, kind, page.items); },
-		deps: [storeId, kind, search.trim()],
+		deps: [storeId, kind, search.trim(), changed.version('categories')],
 		debounceMs: searching ? 300 : 0,
 	});
 

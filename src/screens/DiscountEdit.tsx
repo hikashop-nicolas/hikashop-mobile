@@ -8,7 +8,7 @@ import { validateDiscount } from '../app/discounts';
 import { IdChips } from './IdChips';
 import { AccessField } from './AccessField';
 import { CategoryPicker } from './CategoryPicker';
-import { useUnsavedChanges } from '../app/unsaved';
+import { useUnsavedChanges, useConfirmLeave } from '../app/unsaved';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -35,6 +35,7 @@ export function DiscountEdit() {
 	const { id } = useParams();
 	const nav = useNavigate();
 	const { client, active, cache } = useStores();
+	const confirmLeave = useConfirmLeave();
 	const t = useT();
 	const storeId = active?.id ?? '';
 	const editing = !!id;
@@ -168,7 +169,7 @@ export function DiscountEdit() {
 	return (
 		<Screen
 			title={editing ? code || t('discount.edit') : t('discounts.newDiscount')}
-			left={<button className="hk-iconbtn" onClick={() => nav('/discounts')} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
+			left={<button className="hk-iconbtn" onClick={() => confirmLeave(() => nav('/discounts'))} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
 			right={<Button variant="pri" size="sm" disabled={busy || !loaded} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button>}
 		>
 			{!loaded ? (

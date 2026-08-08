@@ -31,6 +31,8 @@ import { Stores } from './screens/Stores';
 import { Notifications } from './screens/Notifications';
 import { SplitView } from './ui/split';
 import { UnsavedProvider } from './app/unsaved';
+import { DataChangedProvider } from './app/data-changed';
+import { UnsavedPrompt } from './ui/unsaved-prompt';
 
 const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
 	{ key: 'dashboard', icon: 'dashboard', labelKey: 'tabs.dashboard' },
@@ -132,6 +134,7 @@ function Shell() {
 	}
 	return (
 		<div className="hk-app">
+			<UnsavedPrompt />
 			{active && <SideNav />}
 			<div className="hk-main">
 				<CurrencyGate>
@@ -194,6 +197,7 @@ const AppProviders = composeProviders([
 	HikaDictProvider,
 	StatusesProvider,
 	UnsavedProvider,
+	DataChangedProvider,
 ]);
 
 export default function App() {

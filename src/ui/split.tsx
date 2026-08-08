@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react';
 import { useOutlet, useNavigate } from 'react-router-dom';
 import type { MouseEvent, ReactNode } from 'react';
 import { useUnsaved } from '../app/unsaved';
-import { useT } from '../i18n';
-import { Modal } from './layout';
-import { Button } from './atoms';
 
 // Both panes fit side by side from here up. Kept in step with the same value in ui.css.
 const SPLIT_QUERY = '(min-width: 1100px)';
@@ -42,9 +39,6 @@ export function SplitView({ list }: { list: ReactNode }) {
 	const split = useIsSplit();
 	const unsaved = useUnsaved();
 	const nav = useNavigate();
-	const t = useT();
-	// Where a click in the list wanted to go, held while we ask about unsaved changes.
-	const [pending, setPending] = useState<string | null>(null);
 
 	// Opening another row replaces what is in the detail pane, so it has to ask first when that
 	// would throw away edits. Caught on the way down, before the link acts on it.
@@ -57,7 +51,7 @@ export function SplitView({ list }: { list: ReactNode }) {
 		if (!to.startsWith('/')) return; // an outside link is not ours to intercept
 		e.preventDefault();
 		e.stopPropagation();
-		setPending(to);
+		unsaved.ask(() => { unsaved.setDirty(false); nav(to); });
 	}
 
 	if (!outlet) return <>{list}</>;
@@ -67,23 +61,6 @@ export function SplitView({ list }: { list: ReactNode }) {
 		<div className="hk-split">
 			<div className="hk-split-list" onClickCapture={onListClick}>{list}</div>
 			<div className="hk-split-detail">{outlet}</div>
-			{pending && (
-				<Modal
-					title={t('unsaved.title')}
-					onClose={() => setPending(null)}
-					footer={<>
-						<Button onClick={() => setPending(null)}>{t('unsaved.stay')}</Button>
-						<Button variant="danger" onClick={() => {
-							unsaved.setDirty(false);
-							const to = pending;
-							setPending(null);
-							nav(to);
-						}}>{t('unsaved.discard')}</Button>
-					</>}
-				>
-					<p>{t('unsaved.body')}</p>
-				</Modal>
-			)}
 		</div>
 	);
 }

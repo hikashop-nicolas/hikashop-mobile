@@ -8,12 +8,14 @@ import type { CustomerSummary } from '../core';
 import { Screen, Search, Spinner, NewButton, LoadMore } from '../ui';
 import { fmtDate } from '../app/utils';
 import { NewCustomerModal } from './NewCustomerModal';
+import { useDataChanged } from '../app/data-changed';
 
 // Rows per request. The connector caps a page at 100.
 const PAGE = 30;
 
 export function Customers() {
 	const { client, active, cache } = useStores();
+	const changed = useDataChanged();
 	const { t, locale } = useI18n();
 	const nav = useNavigate();
 	const [search, setSearch] = useState('');
@@ -26,7 +28,7 @@ export function Customers() {
 		read: () => cache.getCustomers(storeId, filterKey),
 		fetch: (start) => client!.getCustomers({ search: search || undefined, limit: PAGE, start }),
 		write: async (p) => { await cache.putCustomers(storeId, filterKey, p); },
-		deps: [storeId, search],
+		deps: [storeId, search, changed.version('customers')],
 		debounceMs: search ? 300 : 0,
 	});
 

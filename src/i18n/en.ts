@@ -480,7 +480,7 @@ export const en: Messages = {
 
 	// Leaving a form that has changes which have not been saved.
 	'unsaved.title': 'Unsaved changes',
-	'unsaved.body': 'This form has changes that have not been saved. Opening another one will lose them.',
+	'unsaved.body': 'This form has changes that have not been saved. Leaving it will lose them.',
 	'unsaved.stay': 'Keep editing',
 	'unsaved.discard': 'Discard changes',
 };

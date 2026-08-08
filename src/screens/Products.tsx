@@ -9,18 +9,27 @@ import { Screen, Search, Money, Spinner, Icon, NewButton, Button, LoadMore } fro
 import { ScanProductModal } from './ScanProductModal';
 import { ListingFields } from './ListingFields';
 import { CategoryPicker } from './CategoryPicker';
+import { useDataChanged } from '../app/data-changed';
 
 // Rows per request. The connector caps a page at 100.
 const PAGE = 30;
 
+function codeOf(e: unknown): string {
+	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string')
+		? (e as { code: string }).code
+		: 'generic';
+}
+
 export function Products() {
 	const { client, active, cache } = useStores();
 	const t = useT();
+	const changed = useDataChanged();
 	const nav = useNavigate();
 	const [search, setSearch] = useState('');
 	const [categoryId, setCategoryId] = useState(0);
 	const [showFilter, setShowFilter] = useState(false);
 	const [creating, setCreating] = useState(false);
+	const [createErr, setCreateErr] = useState('');
 	const [scanning, setScanning] = useState(false);
 	const storeId = active?.id ?? '';
 	const filterKey = `${ordersFilterKey('', search)}|c${categoryId}`;
@@ -28,11 +37,15 @@ export function Products() {
 	async function create() {
 		if (!client || creating) return;
 		setCreating(true);
+		setCreateErr('');
 		try {
 			const p = await client.createProduct({ name: t('product.newProduct'), published: false });
-			await cache.putProduct(storeId, p.id, p);
-			nav(`/products/${p.id}/edit`);
-		} catch {
+			// Priming the cache is a convenience, not part of creating the product: a failure here
+			// must not swallow a product that now exists on the shop.
+			try { await cache.putProduct(storeId, p.id, p); } catch { /* it will be fetched */ }
+			nav(`/products/${p.id}`);
+		} catch (e) {
+			setCreateErr(tError(t, codeOf(e)));
 			setCreating(false);
 		}
 	}
@@ -54,7 +67,7 @@ export function Products() {
 		read: () => cache.getProducts(storeId, filterKey),
 		fetch: (start) => client!.getProducts({ search: search || undefined, category_id: categoryId || undefined, limit: PAGE, start }),
 		write: async (p) => { await cache.putProducts(storeId, filterKey, p); },
-		deps: [storeId, search, categoryId],
+		deps: [storeId, search, categoryId, changed.version('products')],
 		debounceMs: search ? 300 : 0,
 	});
 
@@ -86,6 +99,7 @@ export function Products() {
 					</button>
 				)}
 			</div>
+			{createErr && <div className="hk-error-note">{createErr}</div>}
 			{showFilter && (
 				<div style={{ marginBottom: 'var(--hk-s3)' }}>
 					<CategoryPicker type="product" selected={categoryId ? [categoryId] : []} multiple={false}

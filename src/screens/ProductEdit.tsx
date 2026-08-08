@@ -12,7 +12,8 @@ import { ProductMediaSection } from './ProductMediaSection';
 import { RelatedProducts } from './RelatedProducts';
 import { AccessField, ACCESS_ALL, accessSummary, toAccess } from './AccessField';
 import { CategoryPicker } from './CategoryPicker';
-import { useUnsavedChanges } from '../app/unsaved';
+import { useUnsavedChanges, useConfirmLeave } from '../app/unsaved';
+import { useDataChanged } from '../app/data-changed';
 
 // Everything the form edits as a scalar. Access is structured, so it has its own state.
 type Form = Record<string, string | boolean>;
@@ -40,6 +41,8 @@ export function ProductEdit() {
 	const { id } = useParams();
 	const nav = useNavigate();
 	const { client, active, cache } = useStores();
+	const confirmLeave = useConfirmLeave();
+	const changed = useDataChanged();
 	const t = useT();
 	const storeId = active?.id ?? '';
 	const productId = Number(id);
@@ -199,6 +202,7 @@ export function ProductEdit() {
 			const updated = await client.updateProduct(productId, body);
 			const categories = await client.setProductCategories(productId, cats);
 			await cache.putProduct(storeId, productId, { ...updated, categories });
+			changed.bump('products');
 			nav('/products');
 		} catch (e) {
 			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -214,6 +218,7 @@ export function ProductEdit() {
 		setBusy(true);
 		try {
 			await client.deleteProduct(productId);
+			changed.bump('products');
 			nav('/products');
 		} catch (e) {
 			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -228,7 +233,7 @@ export function ProductEdit() {
 	return (
 		<Screen
 			title={t('product.editTitle')}
-			left={<button className="hk-iconbtn" onClick={() => nav('/products')} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
+			left={<button className="hk-iconbtn" onClick={() => confirmLeave(() => nav('/products'))} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
 			right={form ? (
 				<Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button>
 			) : undefined}
