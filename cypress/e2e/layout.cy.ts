@@ -11,11 +11,11 @@ describe('Split layout', () => {
 		cy.get('.hk-split').should('not.exist');
 		cy.get('.hk-row').should('be.visible');
 
-		// Opening a row replaces the list rather than sitting beside it.
+		// Opening a row covers the list rather than sitting beside it.
 		cy.get('.hk-row').first().click();
 		cy.hash().should('match', /#\/orders\/\d+/);
-		// The detail replaces the list rather than sitting beside a hidden copy of it.
-		cy.get('.hk-split').should('not.exist');
+		// One pane on screen: the record is over the list, and there is no second column.
+		cy.get('.hk-detail-over').should('be.visible');
 		cy.get('.hk-split-list').should('not.exist');
 	});
 
@@ -24,7 +24,8 @@ describe('Split layout', () => {
 		cy.visitApp('/orders');
 		cy.get('.hk-row').should('have.length.greaterThan', 0);
 		// Nothing selected yet: the list has the whole width, with no pane held empty beside it.
-		cy.get('.hk-split').should('not.exist');
+		cy.get('.hk-split-detail').should('not.exist');
+		cy.get('.hk-split-list').invoke('outerWidth').should('be.greaterThan', WIDE.w - 400);
 		cy.get('.hk-row').should('be.visible');
 
 		cy.get('.hk-row').first().click();
@@ -61,7 +62,7 @@ describe('Split layout', () => {
 		cy.viewport(WIDE.w, WIDE.h);
 		for (const path of ['/products', '/customers', '/discounts']) {
 			cy.visitApp(path);
-			cy.get('.hk-split').should('not.exist');
+			cy.get('.hk-split-detail').should('not.exist');
 			cy.get('.hk-row').should('exist');
 		}
 	});
@@ -101,7 +102,8 @@ describe('Split layout', () => {
 		// Back means "close this", not "reopen the one before".
 		cy.get('.hk-split-detail .hk-appbar button').first().click();
 		cy.hash().should('match', /#\/orders$/);
-		cy.get('.hk-split').should('not.exist');
+		// The record slides away and is gone; the list has the width back.
+		cy.get('.hk-split-detail').should('not.exist');
 	});
 
 	it('loads the record you opened, not the one before it', () => {

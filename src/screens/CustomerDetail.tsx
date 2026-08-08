@@ -94,7 +94,7 @@ export function CustomerDetail() {
 						)}
 						{customer.type === 'guest' && (
 							<div style={{ marginTop: 'var(--hk-s3)' }}>
-								<Button variant="pri" size="sm" onClick={() => setCreatingAccount(true)}>{t('customers.createAccount')}</Button>
+								<Button variant="pri" size="sm" onClick={() => setCreatingAccount(true)}><Icon name="customers" size={15} /> {t('customers.createAccount')}</Button>
 							</div>
 						)}
 					</div>
@@ -216,7 +216,7 @@ function AddressBlock({ address, isDefault, canSetDefault, defaultLabel, setDefa
 				)}
 			</div>
 			<div className="hk-row-rt" style={{ flexDirection: 'row', gap: 'var(--hk-s2)' }}>
-				<Button variant="default" size="sm" disabled={busy} onClick={onEdit}>{editLabel}</Button>
+				<Button variant="default" size="sm" disabled={busy} onClick={onEdit}><Icon name="edit" size={15} /> {editLabel}</Button>
 				<DeleteButton mode="icon" disabled={busy} label={deleteLabel} confirmMessage={confirmLabel} onConfirm={onDelete} />
 			</div>
 		</div>

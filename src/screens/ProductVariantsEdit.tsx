@@ -129,7 +129,7 @@ export function ProductVariantsEdit() {
 								</div>
 								<div style={{ display: 'flex', gap: 'var(--hk-s2)' }}>
 									<input className="hk-input" placeholder={t('product.addValue')} value={newValue[o.id] ?? ''} onChange={(e) => setNewValue((m) => ({ ...m, [o.id]: e.target.value }))} onKeyDown={(e) => { if (e.key === 'Enter') void addValue(o.id); }} />
-									<Button size="sm" disabled={busy} onClick={() => void addValue(o.id)}>{t('common.add')}</Button>
+									<Button size="sm" disabled={busy} onClick={() => void addValue(o.id)}><Icon name="plus" size={15} /> {t('common.add')}</Button>
 								</div>
 							</div>
 						))}
@@ -139,12 +139,12 @@ export function ProductVariantsEdit() {
 									<option value="">{t('product.addExistingOption')}</option>
 									{availableOptions.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
 								</select>
-								<Button size="sm" disabled={busy || !pickOption} onClick={addExistingOption}>{t('common.add')}</Button>
+								<Button size="sm" disabled={busy || !pickOption} onClick={addExistingOption}><Icon name="plus" size={15} /> {t('common.add')}</Button>
 							</div>
 						)}
 						<div style={{ display: 'flex', gap: 'var(--hk-s2)', marginTop: 'var(--hk-s2)' }}>
 							<input className="hk-input" placeholder={t('product.newOption')} value={newOption} onChange={(e) => setNewOption(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') void addOption(); }} />
-							<Button size="sm" disabled={busy} onClick={() => void addOption()}>{t('product.addOption')}</Button>
+							<Button size="sm" disabled={busy} onClick={() => void addOption()}><Icon name="plus" size={15} /> {t('product.addOption')}</Button>
 						</div>
 					</div>
 

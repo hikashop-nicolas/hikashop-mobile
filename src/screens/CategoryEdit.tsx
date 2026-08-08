@@ -6,6 +6,7 @@ import { useT } from '../i18n';
 import type { CategoryDetail, ProductMeta } from '../core';
 import { Screen, Spinner, Icon } from '../ui';
 import { CategoryEditor } from './CategoryEditor';
+import { useDataChanged } from '../app/data-changed';
 
 // Full-screen host for the category editor, reached from the category listing
 // (create via /categories/new?type=..., edit via /categories/:id/edit).
@@ -15,6 +16,7 @@ export function CategoryEdit() {
 	const [sp] = useSearchParams();
 	const { client, active, cache } = useStores();
 	const t = useT();
+	const changed = useDataChanged();
 	const storeId = active?.id ?? '';
 	const editing = !!id;
 
@@ -58,8 +60,8 @@ export function CategoryEdit() {
 			meta={meta ?? null}
 			presentation="screen"
 			onClose={() => nav('/categories')}
-			onSaved={() => nav('/categories')}
-			onDelete={editing ? async () => { await client!.deleteCategory(Number(id)); nav('/categories'); } : undefined}
+			onSaved={() => { changed.bump('categories'); nav('/categories'); }}
+			onDelete={editing ? async () => { await client!.deleteCategory(Number(id)); changed.bump('categories'); nav('/categories'); } : undefined}
 		/>
 	);
 }

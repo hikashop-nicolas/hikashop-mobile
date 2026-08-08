@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import type { UserItem } from '../core';
-import { Modal, Search, Field, Button, Spinner } from '../ui';
+import { Modal, Search, Field, Button, Spinner, Icon } from '../ui';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -84,7 +84,7 @@ export function NewOrderModal({ onClose, onCreated }: { onClose: () => void; onC
 					<Field label={t('order.customerEmail')}>
 						<input className="hk-input" type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} />
 					</Field>
-					<Button variant="pri" block disabled={busy || !email.trim()} onClick={() => void create({ guest: { name: name.trim(), email: email.trim() } })}>
+					<Button variant="pri" block disabled={busy || !email.trim()} onClick={() => void create({ guest: { name: name.trim(), email: email.trim() } })}><Icon name="plus" size={16} /> 
 						{busy ? t('product.saving') : t('orders.createOrder')}
 					</Button>
 				</div>

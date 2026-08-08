@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { StoreProvider, useStores } from './app/store-context';
 import { VersionsProvider } from './app/versions';
@@ -54,6 +55,60 @@ function useVisibleTabs(): typeof TAB_DEFS {
 	const perms = active?.permissions;
 	if (!perms) return TAB_DEFS;
 	return TAB_DEFS.filter((d) => !d.acl || perms[d.acl]?.view !== false);
+}
+
+// How long a section takes to change places. Shorter than opening a record, which is a bigger
+// move: a tab change happens constantly and should not feel like waiting.
+const SECTION_MS = 300;
+
+function orderOf(section: string): number {
+	const at = TAB_DEFS.findIndex((d) => d.key === section);
+	return at < 0 ? 0 : at;
+}
+
+// Moving between sections is a change of place, so it looks like one: the section you leave slides
+// away and the one you arrive at comes from the other side, up or down depending on which way you
+// moved through the menu.
+//
+// Both are on screen at once, which is what makes it read as movement rather than a redraw. The
+// one leaving keeps its key, so React keeps its subtree: it slides away still holding the data it
+// had, rather than a second copy mounting and fetching everything again on the way out.
+function SectionTransition({ children }: { children: ReactNode }) {
+	const loc = useLocation();
+	const section = activeKey(loc.pathname);
+	const [current, setCurrent] = useState({ section, loc });
+	const [leaving, setLeaving] = useState<{ section: string; loc: typeof loc } | null>(null);
+	const [dir, setDir] = useState(1);
+
+	useEffect(() => {
+		// Staying in the same section (opening a record, changing a filter) is not a move.
+		if (section === current.section) {
+			if (loc !== current.loc) setCurrent({ section, loc });
+			return;
+		}
+		setDir(orderOf(section) > orderOf(current.section) ? 1 : -1);
+		setLeaving(current);
+		setCurrent({ section, loc });
+		const t = setTimeout(() => setLeaving(null), SECTION_MS);
+		return () => clearTimeout(t);
+		// Driven by the location alone; `current` is what it is compared against, and including
+		// it would re-run this on the very change it makes.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [loc]);
+
+	const style = { '--hk-dir': dir } as CSSProperties;
+	return (
+		<div className="hk-viewstack" style={style}>
+			{leaving && (
+				<div key={leaving.section} className="hk-view hk-view--leave" aria-hidden="true">
+					<Routes location={leaving.loc}>{children}</Routes>
+				</div>
+			)}
+			<div key={current.section} className={`hk-view${leaving ? ' hk-view--enter' : ''}`}>
+				<Routes location={current.loc}>{children}</Routes>
+			</div>
+		</div>
+	);
 }
 
 function activeKey(pathname: string): string {
@@ -152,7 +207,7 @@ function Shell() {
 			{active && <SideNav />}
 			<div className="hk-main">
 				<CurrencyGate>
-					<Routes>
+					<SectionTransition>
 						{!active ? (
 							<>
 								<Route path="/connect" element={<Connect />} />
@@ -192,7 +247,7 @@ function Shell() {
 								<Route path="*" element={<Navigate to="/dashboard" replace />} />
 							</>
 						)}
-					</Routes>
+					</SectionTransition>
 				</CurrencyGate>
 			</div>
 			{active && <BottomTabs />}

@@ -3,6 +3,7 @@ import { useUnsaved } from '../app/unsaved';
 import { useT } from '../i18n';
 import { Modal } from './layout';
 import { Button } from './atoms';
+import { Icon } from './icons';
 
 // The one "you have unsaved changes" dialog, mounted by the shell so everything that leaves a
 // form shares it: the list beside it in a split view, and the form's own back button. Registers
@@ -29,8 +30,8 @@ export function UnsavedPrompt() {
 			title={t('unsaved.title')}
 			onClose={() => setLeave(null)}
 			footer={<>
-				<Button onClick={() => setLeave(null)}>{t('unsaved.stay')}</Button>
-				<Button variant="danger" onClick={() => { const go = leave; setLeave(null); go(); }}>
+				<Button onClick={() => setLeave(null)}><Icon name="edit" size={16} /> {t('unsaved.stay')}</Button>
+				<Button variant="danger" onClick={() => { const go = leave; setLeave(null); go(); }}><Icon name="trash" size={16} /> 
 					{t('unsaved.discard')}
 				</Button>
 			</>}

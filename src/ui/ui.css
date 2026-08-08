@@ -317,18 +317,70 @@
 /* ---- split view: list + detail ---------------------------------------------
    Below the breakpoint this is a plain single pane: whichever of the two the URL
    points at fills the screen, exactly as before the split existed. */
-.hk-split { flex: 1; display: flex; min-height: 0; min-width: 0; }
+/* Nothing inside reaches past this now -- the record's slide is clipped by its own pane -- but
+   `clip` rather than `hidden` so it can never become a scroll container either. `hidden` did, and
+   while the list gave up its width the pane scrolled sideways and back, which is what looked like
+   the list arriving from the left. */
+.hk-split { flex: 1; display: flex; min-height: 0; min-width: 0; overflow: hidden; position: relative; }
 .hk-split-list, .hk-split-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
 
 /* Both panes at once once there is width for a readable list beside a form. Below this the
    detail needs the whole width, so a tablet in portrait stays single-pane. */
 @media (min-width: 1100px) {
-	.hk-split-list { flex: none; width: 380px; border-right: 1px solid var(--hk-line); }
+	/* The list holds the whole width until a record opens, and gives up what the record needs.
+	   An explicit width rather than a flex basis: a basis is a hint the row can still resolve
+	   against its other items, and while it animated the row placed the list away from its own
+	   left edge, which looked like the list arriving from the left. */
+	.hk-split-list { flex: 0 0 100%; border-right: 1px solid var(--hk-line); transition: flex-basis var(--hk-detail-ms) var(--hk-ease); }
+	.hk-split--open .hk-split-list { flex-basis: 380px; }
+	/* The record is placed rather than laid out, so it never adds to the row's width. In the row
+	   it would briefly make it wider than the screen, and a shell that centres itself answers
+	   that by sliding everything sideways -- the list appearing to come in from the left. */
+	.hk-split-detail { position: absolute; top: 0; right: 0; bottom: 0; width: calc(100% - 380px); overflow: clip; }
 	/* The shell centres content within 1140px, which is for a single pane; inside a split each
 	   pane sets its own padding or the two would be pushed apart by their own gutters. */
 	.hk-split .hk-appbar, .hk-split .hk-body { padding-inline: var(--hk-s4); }
 	/* The detail pane keeps a comfortable measure on a very wide screen. */
 	.hk-split-detail .hk-body { max-width: 900px; width: 100%; }
+}
+
+/* ---- movement ---------------------------------------------------------------
+   Two moves, and only two. A record opens from the right and leaves the same way. A section
+   arrives from below when you go down the menu, from above when you go back up. Everything else
+   in the app appears where it is. */
+:root { --hk-detail-ms: 500ms; --hk-section-ms: 300ms; --hk-ease: cubic-bezier(.22, .61, .36, 1); }
+
+/* What actually slides is the record's contents, clipped by the pane holding them: a pane that
+   slid itself would reach past its container and make that container scrollable sideways. */
+.hk-slide { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; }
+
+/* A record, over the list on a phone and beside it on a wide screen. */
+.hk-stack { position: relative; flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; }
+.hk-stack-under { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.hk-detail-over { position: absolute; inset: 0; z-index: 4; background: var(--hk-bg); display: flex; flex-direction: column; overflow: clip; }
+.hk-detail--in { animation: hk-detail-in var(--hk-detail-ms) var(--hk-ease) both; }
+/* On its way out it is a picture of where you were, not something to click: it must not stand
+   between you and the list coming back. */
+.hk-detail--out { animation: hk-detail-out var(--hk-detail-ms) var(--hk-ease) both; pointer-events: none; }
+@keyframes hk-detail-in { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes hk-detail-out { from { transform: none; } to { transform: translateX(100%); } }
+
+/* Sections. --hk-dir is +1 going down the menu and -1 going back up, so one pair of keyframes
+   covers both directions: what arrives comes from the side the one leaving departs towards. */
+.hk-viewstack { position: relative; flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+.hk-view { position: absolute; inset: 0; display: flex; flex-direction: column; min-width: 0; }
+/* Neither is a target while they are moving: the one leaving is on its way out, and the one
+   arriving is not where it will be. The arriving one is on top, so it is what you see land. */
+.hk-view--enter { animation: hk-view-enter var(--hk-section-ms) var(--hk-ease) both; pointer-events: none; z-index: 1; }
+.hk-view--leave { animation: hk-view-leave var(--hk-section-ms) var(--hk-ease) both; pointer-events: none; }
+@keyframes hk-view-enter { from { transform: translateY(calc(var(--hk-dir, 1) * 100%)); } to { transform: none; } }
+@keyframes hk-view-leave { from { transform: none; } to { transform: translateY(calc(var(--hk-dir, 1) * -100%)); } }
+
+/* Taken at their word: no movement, and nothing arrives from anywhere. */
+@media (prefers-reduced-motion: reduce) {
+	.hk-detail--in, .hk-detail--out, .hk-view--enter, .hk-view--leave { animation: none; }
+	.hk-view--leave { display: none; }
+	.hk-split-list { transition: none; }
 }
 
 /* The row whose detail is open. Only meaningful beside a detail pane, so it is scoped to the

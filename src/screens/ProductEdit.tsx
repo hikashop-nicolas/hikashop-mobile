@@ -328,7 +328,7 @@ export function ProductEdit() {
 
 					<div className="hk-card hk-card--pad">
 						<div className="hk-sect-head"><span className="hk-muted">{t('product.pricing')}</span>
-							<Button size="sm" onClick={() => nav(`/products/${productId}/prices`)}>{t('product.edit')}</Button></div>
+							<Button size="sm" onClick={() => nav(`/products/${productId}/prices`)}><Icon name="edit" size={15} /> {t('product.edit')}</Button></div>
 						{(fetched?.prices ?? []).length === 0 ? (
 							<div className="hk-empty">{t('product.noPrice')}</div>
 						) : fetched!.prices.map((p) => (
@@ -345,7 +345,7 @@ export function ProductEdit() {
 							<div className="hk-form-row">
 								<input className="hk-input" type="number" inputMode="numeric" value={stockInput} placeholder={t('product.unlimited')}
 									disabled={stockBusy} onChange={(e) => setStockInput(e.target.value)} />
-								<Button variant="pri" disabled={stockBusy} onClick={() => void saveStock()}>{stockBusy ? t('product.saving') : t('product.updateStock')}</Button>
+								<Button variant="pri" disabled={stockBusy} onClick={() => void saveStock()}><Icon name="check" size={16} /> {stockBusy ? t('product.saving') : t('product.updateStock')}</Button>
 							</div>
 						</div>
 					)}
@@ -357,7 +357,7 @@ export function ProductEdit() {
 
 					<div className="hk-card hk-card--pad">
 						<div className="hk-sect-head"><span className="hk-muted">{t('product.variants')}</span>
-							<Button size="sm" onClick={() => nav(`/products/${productId}/variants`)}>{t('product.edit')}</Button></div>
+							<Button size="sm" onClick={() => nav(`/products/${productId}/variants`)}><Icon name="edit" size={15} /> {t('product.edit')}</Button></div>
 						<div className="hk-row-sub">{t('product.variantsSummary', { options: fetched?.characteristics.length ?? 0, count: fetched?.variants.length ?? 0 })}</div>
 					</div>
 

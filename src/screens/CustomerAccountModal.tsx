@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useT, tError } from '../i18n';
 import { useStores } from '../app/store-context';
 import type { CustomerDetail } from '../core';
-import { Modal, Field, Button } from '../ui';
+import { Modal, Field, Button, Icon } from '../ui';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -46,7 +46,7 @@ export function CustomerAccountModal({ customer, onClose, onSaved }: {
 					<input className="hk-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
 				</Field>
 				{err && <div className="hk-error-note">{err}</div>}
-				<Button variant="pri" block disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('customers.createAccount')}</Button>
+				<Button variant="pri" block disabled={busy} onClick={() => void save()}><Icon name="customers" size={16} /> {busy ? t('product.saving') : t('customers.createAccount')}</Button>
 			</div>
 		</Modal>
 	);

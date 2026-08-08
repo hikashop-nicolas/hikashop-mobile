@@ -58,7 +58,7 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 		<Modal title={t('media.browseTitle')} onClose={onClose}
 			footer={<>
 				<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
-				<Button variant="pri" onClick={() => void attach()} disabled={busy || !selected}>{busy ? t('product.saving') : (isFiles ? t('media.useFile') : t('media.useImage'))}</Button>
+				<Button variant="pri" onClick={() => void attach()} disabled={busy || !selected}><Icon name="check" size={16} /> {busy ? t('product.saving') : (isFiles ? t('media.useFile') : t('media.useImage'))}</Button>
 			</>}
 		>
 			<div className="hk-mb">

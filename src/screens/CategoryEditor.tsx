@@ -138,8 +138,8 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 							<button type="button" className="hk-media-add hk-cat-imgadd" onClick={() => imgInput.current?.click()}><Icon name="plus" size={20} /></button>
 						)}
 						<div className="hk-cat-imgacts">
-							<Button size="sm" onClick={() => imgInput.current?.click()}>{t('category.imageUpload')}</Button>
-							<Button size="sm" onClick={() => setBrowsing(true)}>{t('media.browse')}</Button>
+							<Button size="sm" onClick={() => imgInput.current?.click()}><Icon name="upload" size={15} /> {t('category.imageUpload')}</Button>
+							<Button size="sm" onClick={() => setBrowsing(true)}><Icon name="image" size={15} /> {t('media.browse')}</Button>
 						</div>
 					</div>
 				</Field>

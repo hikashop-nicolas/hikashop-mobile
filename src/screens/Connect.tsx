@@ -86,7 +86,7 @@ export function Connect() {
 					</Field>
 					{err && <div className="hk-error-note">{err}</div>}
 					<Button variant={scanSupported ? 'default' : 'pri'} block disabled={busy} onClick={() => doPair(url, code)}>
-						{busy ? t('connect.pairing') : t('connect.pair')}
+						<Icon name="check" size={18} /> {busy ? t('connect.pairing') : t('connect.pair')}
 					</Button>
 				</>
 			)}

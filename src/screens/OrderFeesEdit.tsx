@@ -156,7 +156,7 @@ export function OrderFeesEdit() {
 								{type === 'discount' ? (
 									<div className="hk-card-head">
 										<span className="hk-muted hk-row-grow">{t(FEE_LABEL[type])}</span>
-										<Button size="sm" onClick={() => setCouponOpen(true)}>{t('order.coupon')}</Button>
+										<Button size="sm" onClick={() => setCouponOpen(true)}><Icon name="discount" size={15} /> {t('order.coupon')}</Button>
 									</div>
 								) : (
 									<span className="hk-muted">{t(FEE_LABEL[type])}</span>
@@ -222,7 +222,7 @@ export function OrderFeesEdit() {
 										);
 									})}
 									{row.rates.length < taxRates.length && (
-										<Button size="sm" style={{ marginTop: 'var(--hk-s2)', alignSelf: 'flex-start' }} onClick={() => addRate(type)}>{t('order.addTaxRate')}</Button>
+										<Button size="sm" style={{ marginTop: 'var(--hk-s2)', alignSelf: 'flex-start' }} onClick={() => addRate(type)}><Icon name="plus" size={15} /> {t('order.addTaxRate')}</Button>
 									)}
 								</Field>
 								{type === 'discount' && (

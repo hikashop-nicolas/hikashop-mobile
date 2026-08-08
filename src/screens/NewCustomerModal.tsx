@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useT, tError } from '../i18n';
 import { useStores } from '../app/store-context';
-import { Modal, Field, Button } from '../ui';
+import { Modal, Field, Button, Icon } from '../ui';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -44,7 +44,7 @@ export function NewCustomerModal({ onClose, onCreated }: {
 					<input className="hk-input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoCapitalize="off" autoCorrect="off" inputMode="email" />
 				</Field>
 				{err && <div className="hk-error-note">{err}</div>}
-				<Button variant="pri" block disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.create')}</Button>
+				<Button variant="pri" block disabled={busy} onClick={() => void save()}><Icon name="plus" size={16} /> {busy ? t('product.saving') : t('common.create')}</Button>
 			</div>
 		</Modal>
 	);

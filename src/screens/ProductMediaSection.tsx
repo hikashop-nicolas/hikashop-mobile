@@ -98,7 +98,7 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 		<>
 			<div className="hk-card hk-card--pad">
 				<div className="hk-sect-head"><span className="hk-muted">{t('product.images')}</span>
-					<Button size="sm" disabled={busy} onClick={() => setBrowsing('images')}>{t('media.browse')}</Button></div>
+					<Button size="sm" disabled={busy} onClick={() => setBrowsing('images')}><Icon name="image" size={15} /> {t('media.browse')}</Button></div>
 				<div className={`hk-media-grid hk-dropzone${dragOver === 'images' ? ' hk-dragover' : ''}`}
 					onDragOver={(e) => { e.preventDefault(); setDragOver('images'); }}
 					onDragLeave={() => setDragOver(null)}
@@ -125,7 +125,7 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 
 			<div className="hk-card hk-card--pad">
 				<div className="hk-sect-head"><span className="hk-muted">{t('product.files')}</span>
-					<Button size="sm" disabled={busy} onClick={() => setBrowsing('files')}>{t('media.browse')}</Button></div>
+					<Button size="sm" disabled={busy} onClick={() => setBrowsing('files')}><Icon name="image" size={15} /> {t('media.browse')}</Button></div>
 				<div className={`hk-dropzone hk-filedrop${dragOver === 'files' ? ' hk-dragover' : ''}`}
 					onDragOver={(e) => { e.preventDefault(); setDragOver('files'); }}
 					onDragLeave={() => setDragOver(null)}

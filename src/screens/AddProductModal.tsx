@@ -118,7 +118,7 @@ export function AddProductModal({ orderId, currencyId, taxRates, onClose, onAdde
 					<Money value={lineTotal} currency={currencyId} />
 				</div>
 				{err && <div className="hk-error-note">{err}</div>}
-				<Button variant="pri" block disabled={busy} onClick={() => void add()}>{busy ? t('product.saving') : t('order.addProduct')}</Button>
+				<Button variant="pri" block disabled={busy} onClick={() => void add()}><Icon name="plus" size={16} /> {busy ? t('product.saving') : t('order.addProduct')}</Button>
 			</div>
 		</Modal>
 	);

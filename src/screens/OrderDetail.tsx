@@ -328,7 +328,7 @@ function AddressCard({ label, address, editLabel, onEdit, override }: {
 		<div className="hk-card hk-card--pad">
 			<div className="hk-card-head">
 				<span className="hk-muted hk-row-grow">{label}</span>
-				{!overridden && <Button size="sm" onClick={onEdit}>{editLabel}</Button>}
+				{!overridden && <Button size="sm" onClick={onEdit}><Icon name="edit" size={15} /> {editLabel}</Button>}
 			</div>
 			{overridden ? (
 				<div className="hk-addr">{override.map((line, i) => <div key={i} className={i === 0 ? undefined : 'hk-row-sub'}>{line}</div>)}</div>

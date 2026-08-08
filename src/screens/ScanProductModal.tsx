@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import type { BarcodeMatch } from '../core';
-import { Modal, Field, Button, Spinner, QrScanner, BARCODE_FORMATS, isQrScanSupported } from '../ui';
+import { Modal, Field, Button, Spinner, QrScanner, BARCODE_FORMATS, isQrScanSupported, Icon } from '../ui';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -96,11 +96,11 @@ export function ScanProductModal({ onClose, onOpen }: {
 							value={stock} onChange={(e) => { setStock(e.target.value); setSaved(false); }} />
 					</Field>
 					{err && <div className="hk-error-note">{err}</div>}
-					<Button variant="pri" block disabled={busy} onClick={() => void saveStock()}>
+					<Button variant="pri" block disabled={busy} onClick={() => void saveStock()}><Icon name="check" size={16} /> 
 						{busy ? t('product.saving') : saved ? t('product.saved') : t('product.updateStock')}
 					</Button>
-					<Button block onClick={() => onOpen(match.id)}>{t('scan.openProduct')}</Button>
-					<Button block onClick={scanAnother}>{t('scan.scanAnother')}</Button>
+					<Button block onClick={() => onOpen(match.id)}><Icon name="products" size={16} /> {t('scan.openProduct')}</Button>
+					<Button block onClick={scanAnother}><Icon name="scan" size={16} /> {t('scan.scanAnother')}</Button>
 				</div>
 			) : (
 				<div className="hk-form">
@@ -112,11 +112,11 @@ export function ScanProductModal({ onClose, onOpen }: {
 					</Field>
 					{busy && <div className="hk-center-col"><Spinner /></div>}
 					{err && <div className="hk-error-note">{err}</div>}
-					<Button variant="pri" block disabled={busy || !code.trim()} onClick={() => void resolve(code)}>
+					<Button variant="pri" block disabled={busy || !code.trim()} onClick={() => void resolve(code)}><Icon name="search" size={16} /> 
 						{t('scan.find')}
 					</Button>
 					{isQrScanSupported() && (
-						<Button block onClick={() => { setErr(''); setScanning(true); }}>{t('scan.useCamera')}</Button>
+						<Button block onClick={() => { setErr(''); setScanning(true); }}><Icon name="scan" size={16} /> {t('scan.useCamera')}</Button>
 					)}
 				</div>
 			)}

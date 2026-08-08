@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import type { Coupon, OrderFees, OrderDetail } from '../core';
-import { Modal, Field, Button, Money, Spinner } from '../ui';
+import { Modal, Field, Button, Money, Spinner, Icon } from '../ui';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -70,13 +70,13 @@ export function ApplyCouponModal({ orderId, currentCode, currencyId, onClose, on
 				{currentCode && (
 					<div className="hk-row" style={{ alignItems: 'center' }}>
 						<div className="hk-row-grow"><span className="hk-row-title">{currentCode}</span><span className="hk-row-sub">{t('order.couponApplied')}</span></div>
-						<Button variant="danger" disabled={busy} onClick={() => void remove()}>{t('common.delete')}</Button>
+						<Button variant="danger" disabled={busy} onClick={() => void remove()}><Icon name="trash" size={16} /> {t('common.delete')}</Button>
 					</div>
 				)}
 				<Field label={t('order.couponCode')}>
 					<div className="hk-row" style={{ gap: 'var(--hk-s2)', alignItems: 'center' }}>
 						<input className="hk-input hk-row-grow" type="text" value={code} onChange={(e) => setCode(e.target.value)} placeholder={t('order.couponCode')} />
-						<Button variant="pri" disabled={busy || !code.trim()} onClick={() => void apply(code)}>{busy ? t('product.saving') : t('order.applyCoupon')}</Button>
+						<Button variant="pri" disabled={busy || !code.trim()} onClick={() => void apply(code)}><Icon name="check" size={16} /> {busy ? t('product.saving') : t('order.applyCoupon')}</Button>
 					</div>
 				</Field>
 				{err && <div className="hk-error-note">{err}</div>}

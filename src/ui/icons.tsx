@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 // A small, consistent line-icon set. All icons are drawn on a 24x24 grid, stroked with
 // currentColor so they inherit text colour, and share one stroke weight and round joins.
 
-export type IconName = 'dashboard' | 'orders' | 'store' | 'search' | 'plus' | 'back' | 'scan' | 'bell' | 'products' | 'chevron' | 'check' | 'close' | 'categories' | 'trash' | 'edit' | 'customers' | 'discount' | 'trendUp' | 'trendDown' | 'eye';
+export type IconName = 'dashboard' | 'orders' | 'store' | 'search' | 'plus' | 'back' | 'scan' | 'bell' | 'products' | 'chevron' | 'check' | 'close' | 'categories' | 'trash' | 'edit' | 'customers' | 'discount' | 'trendUp' | 'trendDown' | 'eye' | 'upload' | 'image' | 'play';
 
 const PATHS: Record<IconName, ReactNode> = {
 	discount: (
@@ -20,12 +20,13 @@ const PATHS: Record<IconName, ReactNode> = {
 			<path d="M17.6 20c0-2.3-1-4-2.6-4.7" />
 		</>
 	),
+	// A trend line: up, down, up, with the arrow head on the rise it ends on. The shop's takings
+	// over time is what the dashboard is, which four tiles said nothing about.
 	dashboard: (
 		<>
-			<rect x="3" y="3" width="7" height="7" rx="1.5" />
-			<rect x="14" y="3" width="7" height="7" rx="1.5" />
-			<rect x="3" y="14" width="7" height="7" rx="1.5" />
-			<rect x="14" y="14" width="7" height="7" rx="1.5" />
+			<path d="M3 20h18" />
+			<path d="M5 15.5l4.5-5 3.5 3.5L20 6" />
+			<path d="M15.5 6H20v4.5" />
 		</>
 	),
 	orders: (
@@ -99,6 +100,26 @@ const PATHS: Record<IconName, ReactNode> = {
 		</>
 	),
 	chevron: <path d="M9 6l6 6-6 6" />,
+	upload: (
+		<>
+			<path d="M12 16V4" />
+			<path d="M8 8l4-4 4 4" />
+			<path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
+		</>
+	),
+	image: (
+		<>
+			<rect x="3" y="4.5" width="18" height="15" rx="2" />
+			<circle cx="8.5" cy="10" r="1.6" />
+			<path d="M4 17l4.5-4.5 3.5 3.5 3-3L20 17" />
+		</>
+	),
+	play: (
+		<>
+			<circle cx="12" cy="12" r="9" />
+			<path d="M10 8.5l6 3.5-6 3.5z" />
+		</>
+	),
 	eye: (
 		<>
 			<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />

@@ -1,4 +1,9 @@
 // Smoke coverage for the discounts CRUD (both coupons and automatic discounts).
+
+// The record being edited, whichever side of the split breakpoint we are on. Fields are looked up
+// inside it: the listing stays on screen behind it and has a search box of its own.
+const RECORD = '.hk-detail-over, .hk-split-detail';
+
 describe('Discounts', () => {
 	it('lists discounts with its type filters', () => {
 		cy.visitApp('/discounts');
@@ -15,9 +20,9 @@ describe('Discounts', () => {
 		cy.hash().should('include', '/discounts/new');
 
 		// Coupon is the default type, so the code field is shown.
-		cy.get('input').first().type(code);
+		cy.get(RECORD).find('input').first().type(code);
 		cy.contains('.hk-seg', 'Percentage').click();
-		cy.get('input[type=number]').first().type('12');
+		cy.get(RECORD).find('input[type=number]').first().type('12');
 		cy.contains('button', 'Save').click();
 
 		cy.hash().should('match', /#\/discounts$/);
@@ -41,7 +46,7 @@ describe('Discounts', () => {
 		cy.contains('.hk-seg', 'Automatic').click();
 		cy.contains('.hk-label', 'Code').should('not.exist');
 		cy.contains('.hk-label', 'Reference').should('be.visible');
-		cy.get('input[type=number]').first().type('9');
+		cy.get(RECORD).find('input[type=number]').first().type('9');
 		cy.contains('button', 'Save').click();
 
 		cy.hash().should('match', /#\/discounts$/);

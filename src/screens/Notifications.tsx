@@ -37,7 +37,7 @@ export function Notifications() {
 								: notifyEnabled ? t('notifications.on') : t('notifications.off')}
 						</span>
 					</div>
-					<Button variant={notifyEnabled ? 'default' : 'pri'} size="sm" disabled={!notifySupported} onClick={() => void togglePermission()}>
+					<Button variant={notifyEnabled ? 'default' : 'pri'} size="sm" disabled={!notifySupported} onClick={() => void togglePermission()}><Icon name="bell" size={15} /> 
 						{notifyEnabled ? t('notifications.turnOff') : t('notifications.turnOn')}
 					</Button>
 				</div>
@@ -72,7 +72,7 @@ export function Notifications() {
 					<span>{t('notifications.playSound')}</span>
 				</label>
 				{/* alignSelf keeps it button-sized: hk-form is a column flex, which stretches children. */}
-				<Button size="sm" style={{ alignSelf: 'flex-start' }} onClick={() => void playChime()}>{t('notifications.testSound')}</Button>
+				<Button size="sm" style={{ alignSelf: 'flex-start' }} onClick={() => void playChime()}><Icon name="play" size={15} /> {t('notifications.testSound')}</Button>
 				<span className="hk-row-sub">{t('notifications.foregroundOnly')}</span>
 			</div>
 		</Screen>

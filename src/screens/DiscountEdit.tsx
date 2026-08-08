@@ -9,6 +9,7 @@ import { IdChips } from './IdChips';
 import { AccessField } from './AccessField';
 import { CategoryPicker } from './CategoryPicker';
 import { useUnsavedChanges, useConfirmLeave } from '../app/unsaved';
+import { useDataChanged } from '../app/data-changed';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -34,6 +35,7 @@ const show = (n: number) => (n ? String(n) : '');
 export function DiscountEdit() {
 	const { id } = useParams();
 	const nav = useNavigate();
+	const changed = useDataChanged();
 	const { client, active, cache } = useStores();
 	const confirmLeave = useConfirmLeave();
 	const t = useT();
@@ -146,6 +148,7 @@ export function DiscountEdit() {
 		try {
 			const saved: Discount = editing ? await client.updateDiscount(Number(id), input) : await client.createDiscount(input);
 			await cache.putDiscount(storeId, saved.id, saved);
+			changed.bump('discounts');
 			nav('/discounts');
 		} catch (e) {
 			setErr(tError(t, codeOf(e)));
@@ -158,6 +161,7 @@ export function DiscountEdit() {
 		setBusy(true);
 		try {
 			await client.deleteDiscount(Number(id));
+			changed.bump('discounts');
 			nav('/discounts');
 		} catch (e) {
 			setErr(tError(t, codeOf(e)));
@@ -244,7 +248,7 @@ export function DiscountEdit() {
 					<div className="hk-card hk-card--pad hk-form">
 						<div className="hk-card-head">
 							<span className="hk-muted hk-row-grow">{t('discount.restrictions')}</span>
-							<Button size="sm" onClick={() => setShowRestrictions((v) => !v)}>
+							<Button size="sm" onClick={() => setShowRestrictions((v) => !v)}><Icon name="chevron" size={14} className={showRestrictions ? 'hk-rot90' : ''} /> 
 								{showRestrictions ? t('discount.hide') : t('discount.show')}
 							</Button>
 						</div>
