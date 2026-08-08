@@ -91,14 +91,24 @@ export interface OrderFees {
 	payment: OrderFee;
 }
 
+// One shipment of an order that ships from several warehouses. `key` is the warehouse; price and
+// tax are that shipment's own, both tax-included, as the backend edits them.
+export interface OrderShippingGroup {
+	key: string;
+	current: string;
+	price: number;
+	tax: number;
+}
+
 // The methods an order can be moved to, as the shop's own plugins enumerate them. `current` and
 // each option's `value` pair the method with its id ("manual_3"); '_' means none is set.
 export interface OrderMethodChoice {
 	current: string;
-	// An order shipped from several warehouses holds one method per shipment, which a single
-	// choice cannot express: the picker steps aside rather than flattening them.
+	// True when the order ships from several warehouses, in which case `groups` holds one
+	// shipment each and `current` describes none of them.
 	multiple: boolean;
 	options: { value: string; label: string }[];
+	groups?: OrderShippingGroup[];
 }
 
 export interface OrderMethods {

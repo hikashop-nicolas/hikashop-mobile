@@ -123,6 +123,11 @@
 /* A select used as a listing filter takes the row it is on, up to a readable width. */
 .hk-filter-select { min-height: 2.1rem; width: 100%; max-width: 20rem; }
 
+/* One shipment of a multi-warehouse order: its method and its share of the cost, grouped so
+   several of them read as separate blocks rather than one long run of fields. */
+.hk-shipment { display: flex; flex-direction: column; gap: var(--hk-s2); padding: var(--hk-s3); border: 1px solid var(--hk-line); border-radius: var(--hk-r2); background: var(--hk-surface-2); }
+.hk-shipment + .hk-shipment { margin-top: var(--hk-s2); }
+
 .hk-check { display: inline-flex; align-items: center; gap: var(--hk-s2); margin-top: var(--hk-s3); font-size: .85rem; color: var(--hk-muted); cursor: pointer; }
 .hk-check input { width: 1.05rem; height: 1.05rem; accent-color: var(--hk-accent); cursor: pointer; }
 

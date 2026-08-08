@@ -338,7 +338,14 @@ export class ApiClient {
 		return (await this.request<OrderMethods>('GET', `orders/${id}/methods`)).data;
 	}
 
-	async saveOrderFees(id: number, fees: Record<'discount' | 'shipping' | 'payment', { amount: number; tax_namekeys: string[]; code?: string; method?: string }>): Promise<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }> {
+	async saveOrderFees(id: number, fees: Record<'discount' | 'shipping' | 'payment', {
+		amount: number;
+		tax_namekeys: string[];
+		code?: string;
+		method?: string;
+		// One entry per shipment, for an order that ships from several warehouses.
+		groups?: { key: string; method: string; price: number; tax: number }[];
+	}>): Promise<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }> {
 		const { data } = await this.request<{ id: number; fees: OrderFees; totals: OrderDetail['totals'] }>('PUT', `orders/${id}/fees`, { body: { fees } });
 		return data;
 	}

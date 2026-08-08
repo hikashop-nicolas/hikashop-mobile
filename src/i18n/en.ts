@@ -283,7 +283,9 @@ export const en: Messages = {
 
 	'order.discount': 'Discount',
 	'order.paymentFee': 'Payment fee',
-	'order.methodPerShipment': 'This order ships from several warehouses, so its shipping methods are set per shipment in the shop backend.',
+	'order.shipments': 'Shipments',
+	'order.warehouseNo': 'Warehouse {key}',
+	'order.feeAmountInclTax': 'Amount (incl. tax)',
 	'order.tax': 'Tax',
 	'order.payment': 'Payment method',
 	'order.shippingMethod': 'Shipping method',

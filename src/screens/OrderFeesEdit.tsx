@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
 import { useT, tError } from '../i18n';
-import type { OrderDetail, OrderFee, OrderMethods, TaxRate } from '../core';
+import type { OrderDetail, OrderFee, OrderMethods, OrderShippingGroup, TaxRate } from '../core';
 import { Screen, Spinner, Icon, Field, Money, Button } from '../ui';
 import { ApplyCouponModal } from './ApplyCouponModal';
 
@@ -55,6 +55,8 @@ export function OrderFeesEdit() {
 	// requests can land in either order without one clearing the other.
 	const [methods, setMethods] = useState<OrderMethods | null>(null);
 	const [picked, setPicked] = useState<Record<MethodType, string>>({ shipping: '', payment: '' });
+	// One editable row per shipment, for an order that ships from several warehouses.
+	const [groups, setGroups] = useState<OrderShippingGroup[]>([]);
 	useEffect(() => {
 		if (!client || !orderId) return;
 		let alive = true;
@@ -63,10 +65,15 @@ export function OrderFeesEdit() {
 				if (!alive) return;
 				setMethods(m);
 				setPicked({ shipping: m.shipping.current, payment: m.payment.current });
+				setGroups(m.shipping.groups ?? []);
 			})
 			.catch(() => { if (alive) setMethods(null); });
 		return () => { alive = false; };
 	}, [client, orderId]);
+
+	function setGroup(key: string, patch: Partial<OrderShippingGroup>) {
+		setGroups((gs) => gs.map((g) => (g.key === key ? { ...g, ...patch } : g)));
+	}
 
 	const [busy, setBusy] = useState(false);
 	const [saveErr, setSaveErr] = useState('');
@@ -104,15 +111,18 @@ export function OrderFeesEdit() {
 		setSaveErr('');
 		setBusy(true);
 		try {
-			const payload = {} as Record<FeeType, { amount: number; tax_namekeys: string[]; code?: string; method?: string }>;
+			const payload = {} as Parameters<typeof client.saveOrderFees>[1];
 			for (const type of FEE_TYPES) {
 				const row = rows[type];
 				// Drop blanks and de-duplicate rates before sending.
 				const nks = [...new Set(row.rates.filter((nk) => nk))];
 				payload[type] = { amount: Number(row.amount) || 0, tax_namekeys: nks };
 				if (type === 'discount') payload[type].code = row.code;
-				// Send the method only where there is a picker to have chosen one.
-				else if (methods && !methods[type].multiple && picked[type]) payload[type].method = picked[type];
+				else if (!methods) continue;
+				// One method for the order, or one per shipment when it ships from several places.
+				else if (type === 'shipping' && methods.shipping.multiple) {
+					if (groups.length) payload[type].groups = groups.map((g) => ({ key: g.key, method: g.current, price: g.price, tax: g.tax }));
+				} else if (picked[type]) payload[type].method = picked[type];
 			}
 			const res = await client.saveOrderFees(orderId, payload);
 			await cache.putOrderDetail(storeId, orderId, { ...order, fees: res.fees, totals: res.totals });
@@ -153,7 +163,31 @@ export function OrderFeesEdit() {
 								)}
 								{type !== 'discount' && methods && (
 									methods[type].multiple ? (
-										<div className="hk-row-sub">{t('order.methodPerShipment')}</div>
+										// One shipment per warehouse, each with its own method and its own
+										// share of the cost, which is how the shop stores them.
+										<Field label={t('order.shipments')}>
+											{groups.map((g) => (
+												<div key={g.key} className="hk-shipment">
+													<span className="hk-row-sub">{t('order.warehouseNo', { key: g.key })}</span>
+													<select className="hk-select" value={g.current}
+														onChange={(e) => setGroup(g.key, { current: e.target.value })}>
+														{methods.shipping.options.map((o) => (
+															<option key={o.value} value={o.value}>{o.label}</option>
+														))}
+													</select>
+													<div className="hk-form-row">
+														<Field label={t('order.feeAmountInclTax')}>
+															<input className="hk-input" type="number" inputMode="decimal" value={g.price}
+																onChange={(e) => setGroup(g.key, { price: Number(e.target.value) || 0 })} />
+														</Field>
+														<Field label={t('order.tax')}>
+															<input className="hk-input" type="number" inputMode="decimal" value={g.tax}
+																onChange={(e) => setGroup(g.key, { tax: Number(e.target.value) || 0 })} />
+														</Field>
+													</div>
+												</div>
+											))}
+										</Field>
 									) : (
 										<Field label={t(type === 'shipping' ? 'order.shippingMethod' : 'order.payment')}>
 											<select className="hk-select" value={picked[type]}

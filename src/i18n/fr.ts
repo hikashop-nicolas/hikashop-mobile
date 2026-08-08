@@ -281,7 +281,9 @@ export const fr: Messages = {
 
 	'order.discount': 'Remise',
 	'order.paymentFee': 'Frais de paiement',
-	'order.methodPerShipment': 'Cette commande est expédiée depuis plusieurs entrepôts : ses modes de livraison se règlent par expédition, dans l\'administration de la boutique.',
+	'order.shipments': 'Expéditions',
+	'order.warehouseNo': 'Entrepôt {key}',
+	'order.feeAmountInclTax': 'Montant (TTC)',
 	'order.tax': 'Taxe',
 	'order.payment': 'Moyen de paiement',
 	'order.shippingMethod': 'Mode de livraison',
