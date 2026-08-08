@@ -221,6 +221,13 @@
 .hk-viewer-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hk-viewer-count { color: rgba(255,255,255,.6); font-variant-numeric: tabular-nums; flex: none; }
 
+/* Published state as a control. On is affirmative; off is quiet rather than alarming, since an
+   unpublished record is a decision, not a fault. */
+.hk-pub { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--hk-line); background: var(--hk-surface); color: var(--hk-faint); cursor: pointer; display: grid; place-items: center; padding: 0; }
+.hk-pub:hover { border-color: var(--hk-muted); color: var(--hk-muted); }
+.hk-pub.hk-on { border-color: transparent; background: var(--hk-ok-soft); color: var(--hk-ok); }
+.hk-pub:disabled { opacity: .45; cursor: default; }
+
 /* The shop's own logo, beside its name in the app bar and in the store list. */
 .hk-logo { height: 1.5rem; max-width: 7rem; object-fit: contain; display: block; flex: none; }
 .hk-appbar .hk-title-wrap { display: flex; align-items: center; gap: var(--hk-s2); min-width: 0; }

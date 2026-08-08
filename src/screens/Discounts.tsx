@@ -5,8 +5,9 @@ import { usePaged } from '../app/use-paged';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { Discount, DiscountType } from '../core';
-import { Screen, Search, Money, Spinner, NewButton, LoadMore } from '../ui';
+import { Screen, Search, Money, Spinner, NewButton, LoadMore, PublishToggle } from '../ui';
 import { useDataChanged } from '../app/data-changed';
+import { usePublish } from '../app/use-publish';
 
 // Rows per request. The connector caps a page at 100.
 const PAGE = 30;
@@ -31,6 +32,12 @@ export function Discounts() {
 	});
 
 
+	// A partial save: the connector keeps every column the payload does not mention.
+	const publish = usePublish<Discount>({
+		resetKey: filterKey,
+		save: (d, published) => client!.updateDiscount(d.id, { published }),
+	});
+
 	function quotaLabel(d: Discount): string {
 		if (d.quota > 0) return t('discount.usedOfQuota', { used: d.used_times, quota: d.quota });
 		return t('discount.usedTimes', { count: d.used_times });
@@ -46,6 +53,7 @@ export function Discounts() {
 					</button>
 				))}
 			</div>
+			{publish.error && <div className="hk-error-note">{tError(t, publish.error)}</div>}
 			{loading ? (
 				<div className="hk-center-col"><Spinner /></div>
 			) : error ? (
@@ -59,7 +67,7 @@ export function Discounts() {
 							<div className="hk-row-grow">
 								<span className="hk-row-title">
 									{d.type === 'coupon' ? d.code : t('discount.typeAuto')}
-									{!d.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('discount.unpublished')}</span>}
+									{!publish.isPublished(d) && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('discount.unpublished')}</span>}
 								</span>
 								<span className="hk-row-sub">
 									{d.type === 'coupon' ? t('discount.typeCoupon') : t('discount.autoApplied')} · {quotaLabel(d)}
@@ -70,6 +78,7 @@ export function Discounts() {
 									{d.kind === 'percent' ? `${d.value}%` : <Money value={d.value} currency={d.currency_id} />}
 								</span>
 							</div>
+							<PublishToggle published={publish.isPublished(d)} busy={publish.busy[d.id]} onToggle={() => publish.toggle(d)} />
 						</NavLink>
 					))}
 					<LoadMore shown={items.length} total={total} hasMore={hasMore} loading={loadingMore} error={moreError} onLoad={loadMore} />

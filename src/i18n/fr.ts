@@ -492,6 +492,8 @@ export const fr: Messages = {
 	'media.nextImage': 'Image suivante',
 	'media.imageOf': '{shown} sur {total}',
 	'common.close': 'Fermer',
+	'common.publish': 'Publier',
+	'common.unpublish': 'Dépublier',
 	'category.imageBrowse': 'Choisir dans la médiathèque',
 	'category.imageUpload': 'Envoyer une image',
 };

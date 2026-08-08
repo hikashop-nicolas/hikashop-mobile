@@ -10,6 +10,7 @@ export * from './layout';
 export * from './QrScanner';
 export * from './icons';
 export * from './image-viewer';
+export * from './publish-toggle';
 export * from './load-more';
 export * from './unsaved-prompt';
 export * from './chart';

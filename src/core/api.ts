@@ -238,8 +238,9 @@ export class ApiClient {
 		return (await this.request<Discount>('POST', 'discounts', { body: input })).data;
 	}
 
-	// Update a coupon (write scope). Returns the saved coupon.
-	async updateDiscount(id: number, input: DiscountInput): Promise<Discount> {
+	// Update a coupon (write scope). Returns the saved coupon. Partial: the connector keeps every
+	// column the payload does not mention, so a single field can be sent on its own.
+	async updateDiscount(id: number, input: Partial<DiscountInput>): Promise<Discount> {
 		return (await this.request<Discount>('PUT', `discounts/${id}`, { body: input })).data;
 	}
 
@@ -499,7 +500,8 @@ export class ApiClient {
 		return (await this.request<CategoryDetail>('GET', `categories/${id}`)).data;
 	}
 
-	async updateCategory(id: number, body: CategoryInput): Promise<CategoryDetail> {
+	// Partial: the connector writes only the fields the payload carries.
+	async updateCategory(id: number, body: Partial<CategoryInput>): Promise<CategoryDetail> {
 		return (await this.request<CategoryDetail>('PUT', `categories/${id}`, { body })).data;
 	}
 

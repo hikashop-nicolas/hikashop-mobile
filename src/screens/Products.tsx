@@ -5,7 +5,8 @@ import { usePaged } from '../app/use-paged';
 import { useT, tError } from '../i18n';
 import { ordersFilterKey } from '../core';
 import type { ProductSummary } from '../core';
-import { Screen, Search, Money, Spinner, Icon, NewButton, Button, LoadMore } from '../ui';
+import { Screen, Search, Money, Spinner, Icon, NewButton, Button, LoadMore, PublishToggle } from '../ui';
+import { usePublish } from '../app/use-publish';
 import { ScanProductModal } from './ScanProductModal';
 import { ListingFields } from './ListingFields';
 import { CategoryPicker } from './CategoryPicker';
@@ -75,6 +76,11 @@ export function Products() {
 	});
 
 
+	const publish = usePublish<ProductSummary>({
+		resetKey: filterKey,
+		save: (p, published) => client!.updateProduct(p.id, { published }),
+	});
+
 	function stockLabel(p: ProductSummary): string {
 		if (p.has_variants) return '';
 		if (p.quantity < 0) return t('product.unlimited');
@@ -103,6 +109,7 @@ export function Products() {
 				)}
 			</div>
 			{createErr && <div className="hk-error-note">{createErr}</div>}
+			{publish.error && <div className="hk-error-note">{tError(t, publish.error)}</div>}
 			{showFilter && (
 				<div style={{ marginBottom: 'var(--hk-s3)' }}>
 					<CategoryPicker type="product" selected={categoryId ? [categoryId] : []} multiple={false}
@@ -124,11 +131,12 @@ export function Products() {
 								? <img className="hk-avatar-img" src={p.image} alt="" loading="lazy" />
 								: <div className="hk-avatar">{(p.name || '?').charAt(0).toUpperCase()}</div>}
 							<div className="hk-row-grow">
-								<span className="hk-row-title">{p.name}{!p.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}</span>
+								<span className="hk-row-title">{p.name}{!publish.isPublished(p) && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}</span>
 								<span className="hk-row-sub">{p.code} · {stockLabel(p)}</span>
 								<ListingFields fields={fields} values={p.custom_fields} />
 							</div>
 							<div className="hk-row-rt">{p.price !== null && <Money value={p.price} currency={p.currency_id} />}</div>
+							<PublishToggle published={publish.isPublished(p)} busy={publish.busy[p.id]} onToggle={() => publish.toggle(p)} />
 						</NavLink>
 					))}
 					<LoadMore shown={items.length} total={total} hasMore={hasMore} loading={loadingMore} error={moreError} onLoad={loadMore} />

@@ -4,8 +4,9 @@ import { useStores } from '../app/store-context';
 import { usePaged } from '../app/use-paged';
 import { useT, tError } from '../i18n';
 import type { CategoryListItem } from '../core';
-import { Screen, Spinner, NewButton, Search, Icon, LoadMore } from '../ui';
+import { Screen, Spinner, NewButton, Search, Icon, LoadMore, PublishToggle } from '../ui';
 import { useDataChanged } from '../app/data-changed';
+import { usePublish } from '../app/use-publish';
 
 type Kind = 'product' | 'manufacturer';
 
@@ -69,6 +70,13 @@ export function Categories() {
 		write: async (page) => { if (!searching) await cache.putCategories(storeId, kind, page.items); },
 		deps: [storeId, kind, search.trim(), changed.version('categories')],
 		debounceMs: searching ? 300 : 0,
+	});
+
+	// Covers the open branches as well as the top level: a branch is not reloaded when it is
+	// reopened, so a toggle down the tree has to be remembered here too.
+	const publish = usePublish<CategoryListItem>({
+		resetKey: `${kind}|${search.trim()}`,
+		save: (c, published) => client!.updateCategory(c.id, { published }),
 	});
 
 	// Opening a branch loads its children; closing keeps them, so reopening is instant.
@@ -137,12 +145,13 @@ export function Categories() {
 					<button type="button" className="hk-row-grow hk-row-btn" onClick={() => nav(`/categories/${c.id}/edit`)}>
 						<span className="hk-row-title">
 							{c.name}
-							{!c.published && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}
+							{!publish.isPublished(c) && <span className="hk-status hk-status--neutral" style={{ marginLeft: 'var(--hk-s2)' }}>{t('product.unpublished')}</span>}
 						</span>
 						{c.path && c.path.length > 0 && (
 							<span className="hk-row-sub">{c.path.map((p) => p.name).join(' › ')}</span>
 						)}
 					</button>
+					<PublishToggle published={publish.isPublished(c)} busy={publish.busy[c.id]} onToggle={() => publish.toggle(c)} />
 				</div>
 				{isOpen && (
 					<div className="hk-branch">
@@ -176,6 +185,7 @@ export function Categories() {
 				<button type="button" className={`hk-chip${kind === 'manufacturer' ? ' hk-on' : ''}`} onClick={() => setKind('manufacturer')}>{t('categories.brands')}</button>
 			</div>
 
+			{publish.error && <div className="hk-error-note">{tError(t, publish.error)}</div>}
 			{top.loading ? (
 				<div className="hk-center-col"><Spinner /></div>
 			) : top.error ? (

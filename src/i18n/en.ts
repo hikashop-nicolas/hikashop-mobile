@@ -494,6 +494,8 @@ export const en: Messages = {
 	'media.nextImage': 'Next image',
 	'media.imageOf': '{shown} of {total}',
 	'common.close': 'Close',
+	'common.publish': 'Publish',
+	'common.unpublish': 'Unpublish',
 	'category.imageBrowse': 'Choose from the media library',
 	'category.imageUpload': 'Upload an image',
 };
