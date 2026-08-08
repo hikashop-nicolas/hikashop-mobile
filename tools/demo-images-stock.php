@@ -121,6 +121,12 @@ final class DemoImagesStock
 		return (string)$bytes;
 	}
 
+	/** The photographs behind a query, for tools that want to judge a word rather than use one. */
+	public function photosFor(string $query): array
+	{
+		return $this->search($query);
+	}
+
 	/**
 	 * A view maps to a stable slot in the results, so a re-run picks the same photographs and a
 	 * product's second image is a different photograph from its first.
