@@ -475,4 +475,10 @@ export const fr: Messages = {
 	'categories.choose': 'Choisir',
 	'categories.allLevel': 'Toutes',
 	'categories.openLevel': 'Ouvrir {name}',
+
+	// Leaving a form that has changes which have not been saved.
+	'unsaved.title': 'Modifications non enregistrées',
+	'unsaved.body': 'Ce formulaire contient des modifications non enregistrées. En ouvrir un autre les perdra.',
+	'unsaved.stay': 'Continuer la modification',
+	'unsaved.discard': 'Abandonner les modifications',
 };

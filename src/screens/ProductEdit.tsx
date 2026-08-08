@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
@@ -12,6 +12,7 @@ import { ProductMediaSection } from './ProductMediaSection';
 import { RelatedProducts } from './RelatedProducts';
 import { AccessField, ACCESS_ALL, accessSummary, toAccess } from './AccessField';
 import { CategoryPicker } from './CategoryPicker';
+import { useUnsavedChanges } from '../app/unsaved';
 
 // Everything the form edits as a scalar. Access is structured, so it has its own state.
 type Form = Record<string, string | boolean>;
@@ -76,8 +77,12 @@ export function ProductEdit() {
 	const [media, setMedia] = useState<{ images: ProductImage[]; files: ProductFile[] } | null>(null);
 	const [related, setRelated] = useState<{ bundle: RelatedProduct[]; options: RelatedProduct[]; related: RelatedProduct[] } | null>(null);
 	const [tags, setTags] = useState<number[]>([]);
+	// Which record the form currently holds. A background refresh of the same record must not
+	// overwrite what is being typed; a different record must replace it.
+	const formFor = useRef<number | null>(null);
 	useEffect(() => {
-		if (fetched && !form) {
+		if (fetched && formFor.current !== fetched.id) {
+			formFor.current = fetched.id;
 			setForm(toForm(fetched));
 			setAccess(toAccess(fetched.access));
 			setCats(fetched.categories.map((c) => c.id));
@@ -92,6 +97,26 @@ export function ProductEdit() {
 			setCustomFiles(fetched.custom_field_files ?? {});
 		}
 	}, [fetched, form]);
+
+	// Whether the form differs from the record it was loaded from, so the shell can ask before
+	// opening another one. Compared against the record rather than tracked as a "touched" flag,
+	// so typing something and undoing it does not leave a warning behind. Stock, media, related
+	// products and custom-field files each save on their own and are not part of this.
+	const signature = (
+		f: Form | null, a: Access, c: number[], brand: number, cf: Record<string, string>, tg: number[],
+	) => JSON.stringify([f, a, [...c].sort((x, y) => x - y), brand, cf, [...tg].sort((x, y) => x - y)]);
+
+	const baseline = fetched
+		? signature(
+			toForm(fetched),
+			toAccess(fetched.access),
+			fetched.categories.map((c) => c.id),
+			fetched.manufacturer_id || 0,
+			Object.fromEntries(Object.entries(fetched.custom_fields ?? {}).map(([k, v]) => [k, v ?? ''])),
+			fetched.tags ?? [],
+		)
+		: null;
+	useUnsavedChanges(!!form && baseline !== null && signature(form, access, cats, manufacturerId, custom, tags) !== baseline);
 
 	async function saveStock() {
 		if (!client || stockBusy) return;

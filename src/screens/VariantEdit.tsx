@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useCached } from '../app/use-cached';
@@ -49,8 +49,11 @@ export function VariantEdit() {
 	const [custom, setCustom] = useState<Record<string, string>>({});
 	const [customFiles, setCustomFiles] = useState<Record<string, FieldFile[]>>({});
 	const [media, setMedia] = useState<{ images: ProductImage[]; files: ProductFile[] } | null>(null);
+	// See ProductEdit: keyed on the variant the form holds, so switching variant reloads it.
+	const formFor = useRef<number | null>(null);
 	useEffect(() => {
-		if (variant && parent && !form) {
+		if (variant && parent && formFor.current !== variant.id) {
+			formFor.current = variant.id;
 			const p0 = variant.prices[0];
 			setForm({ code: variant.code, quantity: variant.quantity >= 0 ? String(variant.quantity) : '', price: p0 ? String(p0.value) : '', currency_id: p0?.currency_id ?? 1, published: variant.published });
 			const vids = variant.value_ids ?? [];

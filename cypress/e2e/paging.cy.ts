@@ -60,15 +60,21 @@ describe('Listing pagination', () => {
 
 	it('returns to the first page of everything when the search is cleared', () => {
 		cy.visitApp('/products');
-		cy.get('input').first().type('Vol test product 1');
-		cy.get('.hk-listfoot', { timeout: 10000 }).should('contain', '100');
-		cy.get('.hk-listfoot button').click();
-		cy.get('.hk-row').should('have.length', 60);
+		// Remember the shop's own total rather than hard-coding it; the fixture shop grows.
+		cy.get('.hk-listfoot').invoke('text').then((full) => {
+			const shopTotal = full.match(/(\d+)\s*$/)?.[1];
+			expect(shopTotal, 'shop total').to.be.a('string');
 
-		// Clearing is just another query change: back to page one, of the full list.
-		cy.get('input').first().clear();
-		cy.get('.hk-listfoot', { timeout: 10000 }).should('contain', '307');
-		cy.get('.hk-row').should('have.length', 30);
+			cy.get('input').first().type('Vol test product 1');
+			cy.get('.hk-listfoot', { timeout: 10000 }).should('contain', '100');
+			cy.get('.hk-listfoot button').click();
+			cy.get('.hk-row').should('have.length', 60);
+
+			// Clearing is just another query change: back to page one, of the full list.
+			cy.get('input').first().clear();
+			cy.get('.hk-listfoot', { timeout: 10000 }).should('contain', shopTotal!);
+			cy.get('.hk-row').should('have.length', 30);
+		});
 	});
 
 	it('returns to the top of the list when the query changes', () => {

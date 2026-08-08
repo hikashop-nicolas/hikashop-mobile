@@ -8,6 +8,7 @@ import { validateDiscount } from '../app/discounts';
 import { IdChips } from './IdChips';
 import { AccessField } from './AccessField';
 import { CategoryPicker } from './CategoryPicker';
+import { useUnsavedChanges } from '../app/unsaved';
 
 function codeOf(e: unknown): string {
 	return (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
@@ -71,6 +72,9 @@ export function DiscountEdit() {
 	const [productOnly, setProductOnly] = useState(false);
 	const [discountedProducts, setDiscountedProducts] = useState(0);
 
+	// A signature of everything the form edits, captured when it is filled from the record, so
+	// the shell can ask before opening another discount over unsaved changes.
+	const [baseline, setBaseline] = useState('');
 	const [busy, setBusy] = useState(false);
 	const [err, setErr] = useState('');
 	const [showRestrictions, setShowRestrictions] = useState(false);
@@ -109,6 +113,12 @@ export function DiscountEdit() {
 		})();
 		return () => { alive = false; };
 	}, [client, id, editing, t]);
+
+	const signature = JSON.stringify([type, code, kind, value, published, start, end, shippingPercent, minOrder, maxOrder, minProducts, maxProducts, quota, perUser, productIds, excludeProductIds, categoryIds, categoryChilds, excludeCategoryIds, excludeCategoryChilds, zoneIds, userIds, access, excludeAccess, autoLoad, productOnly, discountedProducts]);
+	// An empty baseline means nothing has been loaded to compare against: a new discount is only
+	// "changed" once it differs from the empty form it starts as.
+	useEffect(() => { if (loaded && baseline === '') setBaseline(signature); }, [loaded, baseline, signature]);
+	useUnsavedChanges(loaded && baseline !== '' && signature !== baseline);
 
 	async function save() {
 		if (!client || busy) return;

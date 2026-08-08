@@ -477,4 +477,10 @@ export const en: Messages = {
 	'categories.choose': 'Choose',
 	'categories.allLevel': 'All',
 	'categories.openLevel': 'Open {name}',
+
+	// Leaving a form that has changes which have not been saved.
+	'unsaved.title': 'Unsaved changes',
+	'unsaved.body': 'This form has changes that have not been saved. Opening another one will lose them.',
+	'unsaved.stay': 'Keep editing',
+	'unsaved.discard': 'Discard changes',
 };

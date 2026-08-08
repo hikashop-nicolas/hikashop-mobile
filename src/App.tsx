@@ -30,6 +30,7 @@ import { DiscountEdit } from './screens/DiscountEdit';
 import { Stores } from './screens/Stores';
 import { Notifications } from './screens/Notifications';
 import { SplitView } from './ui/split';
+import { UnsavedProvider } from './app/unsaved';
 
 const TAB_DEFS: { key: string; icon: IconName; labelKey: string }[] = [
 	{ key: 'dashboard', icon: 'dashboard', labelKey: 'tabs.dashboard' },
@@ -192,6 +193,7 @@ const AppProviders = composeProviders([
 	VersionsProvider,
 	HikaDictProvider,
 	StatusesProvider,
+	UnsavedProvider,
 ]);
 
 export default function App() {

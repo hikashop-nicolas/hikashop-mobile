@@ -97,4 +97,56 @@ describe('Split layout', () => {
 		cy.hash().should('match', /#\/orders$/);
 		cy.get('.hk-split').should('not.exist');
 	});
+
+	it('loads the record you opened, not the one before it', () => {
+		cy.viewport(WIDE.w, WIDE.h);
+		cy.visitApp('/products');
+		cy.get('.hk-row').eq(3).click();
+		cy.get('.hk-split-detail input.hk-input').first().invoke('val').should('not.be.empty');
+
+		// Straight from one record to another: the form must follow, not keep the first one.
+		cy.get('.hk-split-list .hk-row').eq(5).then(($row) => {
+			const name = $row.find('.hk-row-title').text();
+			cy.wrap($row).click();
+			cy.get('.hk-split-detail input.hk-input').first()
+				.invoke('val').should((v) => expect(name).to.contain(String(v)));
+		});
+	});
+
+	it('asks before dropping unsaved changes, and only when there are some', () => {
+		cy.viewport(WIDE.w, WIDE.h);
+		cy.visitApp('/products');
+		const name = () => cy.get('.hk-split-detail input.hk-input').first();
+		// The form is showing the row that is marked open, rather than one still on its way out.
+		const settled = (i: number) => {
+			cy.get('.hk-split-list .hk-row').eq(i).should('have.class', 'hk-row--on');
+			cy.get('.hk-split-list .hk-row').eq(i).find('.hk-row-title').invoke('text').then((title) => {
+				name().should(($el) => expect(title).to.contain(String($el.val())));
+			});
+		};
+
+		cy.get('.hk-row').eq(3).click();
+		settled(3);
+
+		// Nothing typed: switching must not nag.
+		cy.get('.hk-split-list .hk-row').eq(5).click();
+		cy.get('.hk-modal').should('not.exist');
+		settled(5);
+
+		// With a change pending, switching asks and stays put with the change intact.
+		name().type('X');
+		cy.get('.hk-split-list .hk-row').eq(2).click();
+		cy.get('.hk-modal').should('be.visible');
+		cy.contains('.hk-modal button', /Keep editing/i).click();
+		cy.get('.hk-modal').should('not.exist');
+		cy.get('.hk-split-list .hk-row').eq(5).should('have.class', 'hk-row--on');
+		name().should(($el) => expect(String($el.val())).to.match(/X$/));
+
+		// Discarding moves on to the row that was clicked, on the record it belongs to.
+		cy.get('.hk-split-list .hk-row').eq(2).click();
+		cy.contains('.hk-modal button', /Discard/i).click();
+		cy.get('.hk-modal').should('not.exist');
+		settled(2);
+		name().should(($el) => expect(String($el.val())).to.not.match(/X$/));
+	});
 });
