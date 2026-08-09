@@ -355,8 +355,18 @@
 .hk-slide { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; }
 
 /* A record, over the list on a phone and beside it on a wide screen. */
+/* An order line carries a name, a stepper, a price and a delete. On a phone they do not fit on
+   one line, and the flex squeeze fell entirely on the name: "Lacquered Planner" became "Lacq..."
+   while its SKU wrapped. The controls take their own line instead when the name needs the room. */
+.hk-oitem { flex-wrap: wrap; row-gap: var(--hk-s2); }
+.hk-oitem > .hk-row-grow { min-width: 55%; }
+.hk-oitem-ctl { display: flex; align-items: center; gap: var(--hk-s2); margin-left: auto; }
+
 .hk-stack { position: relative; flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; }
-.hk-stack-under { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+/* z-index 0 makes this a stacking context, which keeps the list's sticky app bar (z-index 5)
+   inside it. Without that the bar of the covered list paints over the record covering it, so a
+   phone showed "Products / New" above an open record instead of its title and its back button. */
+.hk-stack-under { position: relative; z-index: 0; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
 .hk-detail-over { position: absolute; inset: 0; z-index: 4; background: var(--hk-bg); display: flex; flex-direction: column; overflow: clip; }
 .hk-detail--in { animation: hk-detail-in var(--hk-detail-ms) var(--hk-ease) both; }
 /* On its way out it is a picture of where you were, not something to click: it must not stand

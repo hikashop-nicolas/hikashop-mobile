@@ -152,13 +152,13 @@ export function OrderDetail() {
 							<Button variant="pri" size="sm" onClick={() => setAddingProduct(true)}><Icon name="plus" size={16} /> {t('order.addProduct')}</Button>
 						</div>
 						{order.items.map((it, i) => (
-							<div key={i} className="hk-row">
+							<div key={i} className="hk-row hk-oitem">
 								<div className="hk-row-grow">
 									<span className="hk-row-title">{it.name}</span>
 									<span className="hk-row-sub">{it.code || ' '}</span>
 								</div>
 								{it.editable ? (
-									<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--hk-s2)' }}>
+									<div className="hk-oitem-ctl">
 										<button className="hk-iconbtn" disabled={!!qtyBusy || it.quantity <= 1} aria-label={t('order.decrease')} onClick={() => void changeQty(it.id, it.quantity - 1)}>−</button>
 										<span style={{ minWidth: '1.5em', textAlign: 'center' }}>{qtyBusy === it.id ? '…' : it.quantity}</span>
 										<button className="hk-iconbtn" disabled={!!qtyBusy} aria-label={t('order.increase')} onClick={() => void changeQty(it.id, it.quantity + 1)}>+</button>
@@ -166,7 +166,7 @@ export function OrderDetail() {
 										<button className="hk-iconbtn" disabled={!!qtyBusy} aria-label={t('common.delete')} onClick={() => void changeQty(it.id, 0)}><Icon name="trash" size={18} /></button>
 									</div>
 								) : (
-									<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--hk-s2)' }}>
+									<div className="hk-oitem-ctl">
 										<span className="hk-row-sub">{t('order.qty', { count: it.quantity })}</span>
 										<Money value={it.price * it.quantity} currency={order.currency_id} />
 									</div>

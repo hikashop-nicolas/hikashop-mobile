@@ -2,6 +2,16 @@
 	"name": "hikashop-mobile",
 	"private": true,
 	"version": "0.0.0",
+	"description": "Manage a HikaShop store from a phone, a tablet or a browser.",
+	"license": "GPL-3.0-or-later",
+	"homepage": "https://www.hikashop.com",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/hikashop-nicolas/hikashop-mobile.git"
+	},
+	"bugs": {
+		"url": "https://github.com/hikashop-nicolas/hikashop-mobile/issues"
+	},
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
@@ -15,6 +25,7 @@
 		"build:app": "npm run build && cap sync",
 		"cypress": "cypress open",
 		"e2e": "cypress run",
+		"screenshots": "cypress run --config specPattern=cypress/docs/**/*.cy.ts,screenshotsFolder=docs/screenshots && node tools/flatten-screenshots.mjs",
 		"hooks": "git config core.hooksPath .githooks"
 	},
 	"dependencies": {
