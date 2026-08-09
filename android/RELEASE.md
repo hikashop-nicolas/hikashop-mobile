@@ -22,15 +22,25 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 Signing is driven entirely by environment variables, so no keystore or password is ever
 committed. With none of them set, `assembleRelease` simply produces an unsigned build.
 
-Create the keystore once and keep it somewhere safe and backed up. Losing it means you can no
-longer update the app on Play under the same identity:
+Release keystores live in `~/.keys`, one per app, outside every repository, mirrored to the
+Dropbox backup; see the README there. Create this app's key once:
 
 ```sh
-keytool -genkeypair -v -keystore hikashop-release.keystore \
-  -alias hikashop -keyalg RSA -keysize 2048 -validity 10000
+~/.keys/new-keystore.sh hikashop com.hikashop.app
 ```
 
-Then build:
+That prompts for the passwords through keytool, writes the base64 form for the
+`ANDROID_KEYSTORE_BASE64` CI secret, and copies both to the backup. Record the passwords in
+KeePass. Losing the file means the app can no longer be updated on Play under the same identity,
+unless Play App Signing is on, in which case this is only the upload key and support can reset it.
+
+Then build with `tools/android-release.sh`. It prompts for the passwords, so they stay in the
+terminal: never in a file, never in an argument, never in the shell history. It keeps the version
+code next to the keystore and increments it per build, because Play rejects an upload whose
+version code it has already seen, and it verifies the signature on the finished APK rather than
+assuming the config was picked up.
+
+To drive the build yourself instead:
 
 ```sh
 export ANDROID_KEYSTORE_FILE=/absolute/path/to/hikashop-release.keystore
