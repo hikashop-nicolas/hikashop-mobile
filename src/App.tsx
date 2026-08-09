@@ -160,27 +160,40 @@ function SideNav() {
 	);
 }
 
-// Loads the active store's currencies (from cache, then network) and provides them
-// so the Money atom can format prices to each currency's settings.
+// Loads the active store's currencies and its rounding mode (from cache, then network) and
+// provides them so the Money atom can format prices to each currency's settings.
 function CurrencyGate({ children }: { children: React.ReactNode }) {
 	const { client, active, cache } = useStores();
 	const [currencies, setCurrencies] = useState<Currency[]>([]);
+	const [roundCalculations, setRoundCalculations] = useState(0);
 	useEffect(() => {
-		if (!client || !active) { setCurrencies([]); return; }
+		if (!client || !active) { setCurrencies([]); setRoundCalculations(0); return; }
 		let alive = true;
 		void (async () => {
 			const cached = await cache.getProductMeta(active.id);
 			if (alive && cached?.data) setCurrencies(cached.data.currencies ?? []);
+			const cachedSettings = await cache.getSettings(active.id);
+			if (alive && cachedSettings?.data) setRoundCalculations(cachedSettings.data.round_calculations ?? 0);
 			try {
 				const m = await client.getProductMeta();
 				if (!alive) return;
 				setCurrencies(m.currencies ?? []);
 				await cache.putProductMeta(active.id, m);
 			} catch { /* keep cached currencies */ }
+			try {
+				const s = await client.getSettings();
+				if (!alive) return;
+				setRoundCalculations(s.round_calculations ?? 0);
+				await cache.putSettings(active.id, s);
+			} catch { /* keep the cached mode */ }
 		})();
 		return () => { alive = false; };
 	}, [client, active, cache]);
-	return <CurrencyProvider currencies={currencies}>{children}</CurrencyProvider>;
+	return (
+		<CurrencyProvider currencies={currencies} roundCalculations={roundCalculations}>
+			{children}
+		</CurrencyProvider>
+	);
 }
 
 // Runs the foreground poller (new orders + low stock) whenever a store is active and

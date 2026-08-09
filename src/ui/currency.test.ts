@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { formatMoney } from './currency';
+import { formatMoney, roundToIncrement } from './currency';
 import type { Currency } from '../core';
 
-const EUR: Currency = { id: 1, code: 'EUR', symbol: '€', name: 'Euro', decimals: 2, decimal_sep: ',', thousands_sep: '.', symbol_before: false, space: true };
-const USD: Currency = { id: 2, code: 'USD', symbol: '$', name: 'Dollar', decimals: 2, decimal_sep: '.', thousands_sep: ',', symbol_before: true, space: false };
-const JPY: Currency = { id: 3, code: 'JPY', symbol: '¥', name: 'Yen', decimals: 0, decimal_sep: '.', thousands_sep: ',', symbol_before: true, space: false };
+const EUR: Currency = { id: 1, code: 'EUR', symbol: '€', name: 'Euro', decimals: 2, decimal_sep: ',', thousands_sep: '.', symbol_before: false, space: true, rounding_increment: 0 };
+const USD: Currency = { id: 2, code: 'USD', symbol: '$', name: 'Dollar', decimals: 2, decimal_sep: '.', thousands_sep: ',', symbol_before: true, space: false, rounding_increment: 0 };
+const JPY: Currency = { id: 3, code: 'JPY', symbol: '¥', name: 'Yen', decimals: 0, decimal_sep: '.', thousands_sep: ',', symbol_before: true, space: false, rounding_increment: 0 };
 
 describe('formatMoney', () => {
 	it('formats EUR with symbol after and a space, comma decimal, dot thousands', () => {
@@ -40,5 +40,43 @@ describe('formatMoney', () => {
 	it('treats non-finite input as zero', () => {
 		expect(formatMoney(Number.NaN, USD)).toBe('$0.00');
 		expect(formatMoney(Infinity, EUR)).toBe('0,00 €');
+	});
+});
+
+// A shop whose currency has no 1 cent coin: HikaShop rounds to the increment, and until now
+// the app did not, so it printed prices the site would never show.
+const CHF: Currency = {
+	id: 4, code: 'CHF', symbol: 'CHF', name: 'Franc', decimals: 2, decimal_sep: '.',
+	thousands_sep: "'", symbol_before: true, space: true, rounding_increment: 0.05,
+};
+
+describe('cash rounding increment', () => {
+	it('rounds to the nearest increment', () => {
+		expect(roundToIncrement(12.32, 0.05)).toBeCloseTo(12.30, 5);
+		expect(roundToIncrement(12.33, 0.05)).toBeCloseTo(12.35, 5);
+		expect(roundToIncrement(12.375, 0.05)).toBeCloseTo(12.40, 5);
+		expect(roundToIncrement(0, 0.05)).toBe(0);
+	});
+
+	it('leaves the value alone when the currency has no increment', () => {
+		expect(roundToIncrement(12.32, 0)).toBe(12.32);
+		expect(formatMoney(12.32, EUR)).toBe('12,32 €');
+	});
+
+	it('applies the increment when the shop rounds at display time', () => {
+		expect(formatMoney(12.32, CHF)).toBe("CHF 12.30");
+		expect(formatMoney(12.33, CHF, 0)).toBe("CHF 12.35");
+		expect(formatMoney(12.33, CHF, 2)).toBe("CHF 12.35");
+	});
+
+	it('leaves it to the shop when the shop rounds while calculating', () => {
+		expect(formatMoney(12.33, CHF, 1)).toBe("CHF 12.33");
+	});
+
+	it('rounds a negative amount symmetrically, for refunds', () => {
+		expect(formatMoney(-12.33, CHF)).toBe("-CHF 12.35");
+		// Half away from zero, as PHP's round() does: Math.round would give -12.35 here.
+		expect(roundToIncrement(-12.375, 0.05)).toBeCloseTo(-12.40, 5);
+		expect(roundToIncrement(12.375, 0.05)).toBeCloseTo(12.40, 5);
 	});
 });

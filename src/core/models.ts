@@ -483,6 +483,8 @@ export interface Currency {
 	thousands_sep: string;
 	symbol_before: boolean;
 	space: boolean;
+	// Cash rounding increment (0.05 where there is no 1 cent coin). 0 when the shop has none.
+	rounding_increment: number;
 }
 
 export interface ProductMeta {
@@ -707,6 +709,9 @@ export interface Settings {
 	// Prices float by zone: HikaShop then stores only the incl-tax amount.
 	floating_tax_prices: boolean;
 	show_original_price: boolean;
+	// How the shop applies a currency's rounding increment: 1 means during calculation, so
+	// prices arrive already rounded. Anything else means at display time, which is ours to do.
+	round_calculations: number;
 }
 
 // A store the app has been paired with (its token is kept separately, in secure storage).
