@@ -502,4 +502,5 @@ export const fr: Messages = {
 	'mass.selected.one': '{count} sélectionné',
 	'mass.selected.other': '{count} sélectionnés',
 	'mass.restricted': 'Certaines vont plus loin que ce que votre compte peut exécuter ; ces étapes seront ignorées.',
+	'stores.build': 'Version de l\'application',
 };

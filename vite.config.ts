@@ -1,6 +1,15 @@
+import { execSync } from 'node:child_process'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+
+// Which build this is. An installed PWA can run for weeks without ever being closed, so when
+// something looks wrong the first question is which build the person is actually running -- and
+// the answer has to come from the page, not from what was last deployed.
+const build = process.env.VITE_APP_BUILD || (() => {
+  try { return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() }
+  catch { return 'dev' }
+})()
 
 // https://vite.dev/config/
 // Where the app will be served from. Root by default (a custom domain, and the Capacitor
@@ -10,6 +19,7 @@ const base = process.env.PWA_BASE || '/'
 
 export default defineConfig({
   base,
+  define: { __APP_BUILD__: JSON.stringify(build) },
   plugins: [
     react(),
     VitePWA({

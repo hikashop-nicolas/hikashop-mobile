@@ -19,10 +19,42 @@ export async function registerServiceWorker(): Promise<void> {
 	// BASE_URL, not '/', so a build hosted on a subpath registers the right worker and scope.
 	const base = import.meta.env.BASE_URL || '/';
 	try {
-		await navigator.serviceWorker.register(`${base}sw.js`, { scope: base });
+		const reg = await navigator.serviceWorker.register(`${base}sw.js`, { scope: base });
+		watchForNewBuild(reg);
 	} catch {
 		// An unavailable worker only costs offline support; the app still runs.
 	}
+}
+
+// An installed PWA is opened once and can then run for weeks. The worker updates itself in the
+// background and takes over (the build is generated with skipWaiting), but the code already
+// running in the tab is still the old one until something reloads it -- so a shop would go on
+// using a build that was replaced days ago, and say the fix never arrived.
+//
+// So: ask for a new worker now and again, and reload once when one takes over.
+const UPDATE_EVERY_MS = 60 * 60 * 1000;
+
+function watchForNewBuild(reg: ServiceWorkerRegistration): void {
+	// Once only. controllerchange also fires on the very first registration, when there is
+	// nothing to pick up and a reload would be a loop.
+	let reloading = false;
+	if (navigator.serviceWorker.controller) {
+		navigator.serviceWorker.addEventListener('controllerchange', () => {
+			if (reloading) return;
+			reloading = true;
+			window.location.reload();
+		});
+	}
+
+	const check = () => { void reg.update().catch(() => { /* offline: try again later */ }); };
+	setInterval(check, UPDATE_EVERY_MS);
+	// And whenever it comes back to the foreground, which is when someone is about to use it.
+	document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+}
+
+// The commit this bundle was built from, for the about line and for bug reports.
+export function appBuild(): string {
+	return typeof __APP_BUILD__ === 'string' ? __APP_BUILD__ : 'dev';
 }
 
 async function unregisterAll(): Promise<void> {

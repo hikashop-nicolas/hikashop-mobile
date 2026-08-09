@@ -1,0 +1,71 @@
+# Publishes the PWA to GitHub Pages.
+#
+# The app is desktop-and-browser as well as Android, and this is how the browser half is served.
+# Routing is hash-based, so Pages needs no rewrite rules: every URL is index.html plus a fragment.
+#
+# Before the first run, in the repository: Settings > Pages > Source = GitHub Actions. Nothing
+# else to set up; the workflow needs no secrets.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  # So a deploy can be made without waiting for a commit.
+  workflow_dispatch:
+
+# A project site is served from /<repo>/, so the build has to be told its base. A user or custom
+# domain (app.hikashop.com) is served from the root instead: set PAGES_BASE to "/" there.
+env:
+  PAGES_BASE: /${{ github.event.repository.name }}/
+
+# The token this workflow is given, and nothing more.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time, and let a running one finish rather than shipping a half-uploaded site.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # The same gates as CI. A broken build must not be what people get served.
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Build
+        env:
+          PWA_BASE: ${{ env.PAGES_BASE }}
+          # What the app shows as its version, so a report can be tied to a build.
+          VITE_APP_BUILD: ${{ github.sha }}
+        run: npm run build
+
+      # Pages serves a 404 for unknown paths; giving it the app means a shared deep link still
+      # opens the app, which then reads its own hash.
+      - run: cp dist/index.html dist/404.html
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

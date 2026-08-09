@@ -504,4 +504,5 @@ export const en: Messages = {
 	'mass.selected.one': '{count} selected',
 	'mass.selected.other': '{count} selected',
 	'mass.restricted': 'Some of these do more than your account is allowed to run; those steps will be skipped.',
+	'stores.build': 'App version',
 };

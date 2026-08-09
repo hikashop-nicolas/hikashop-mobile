@@ -3,6 +3,7 @@ import { useStores } from '../app/store-context';
 import { useI18n, LOCALES } from '../i18n';
 import { Screen, Button, Icon, DeleteButton, StoreLogo } from '../ui';
 import { hostOf } from '../app/utils';
+import { appBuild } from '../app/register-sw';
 import { useTheme } from '../app/theme';
 import type { ThemeChoice } from '../app/theme';
 
@@ -72,6 +73,16 @@ export function Stores() {
 						<option value="light">{t('stores.themeLight')}</option>
 						<option value="dark">{t('stores.themeDark')}</option>
 					</select>
+				</div>
+
+				{/* Which build is running. An installed app can go a long time without being closed,
+				    so "did you get the fix?" is otherwise unanswerable. */}
+				<div className="hk-row" style={{ borderBottom: 'none', padding: 'var(--hk-s3) 0 0' }}>
+					<span className="hk-lead-ic"><Icon name="check" size={20} /></span>
+					<div className="hk-row-grow">
+						<span className="hk-row-title">{t('stores.build')}</span>
+						<span className="hk-row-sub">{appBuild()}</span>
+					</div>
 				</div>
 			</div>
 		</Screen>
