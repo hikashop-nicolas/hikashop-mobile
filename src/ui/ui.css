@@ -465,7 +465,8 @@
 /* ---- keyboard shortcut help ------------------------------------------------ */
 .hk-keys-group + .hk-keys-group { margin-top: var(--hk-s4); }
 .hk-keys-title { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--hk-muted); font-weight: 650; margin: 0 0 var(--hk-s2); }
-.hk-keys-row { display: flex; align-items: center; justify-content: space-between; gap: var(--hk-s4); padding: var(--hk-s2) 0; border-bottom: 1px solid var(--hk-line); font-size: .9rem; }
+.hk-keys-row { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: var(--hk-s4); padding: var(--hk-s2); border: none; border-bottom: 1px solid var(--hk-line); border-radius: var(--hk-r1); background: none; color: var(--hk-ink); font: inherit; font-size: .9rem; text-align: left; cursor: pointer; }
+.hk-keys-row.hk-on { background: var(--hk-accent-soft); }
 .hk-keys-row:last-child { border-bottom: none; }
 .hk-keys { display: inline-flex; gap: var(--hk-s1); }
 .hk-kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .78rem; line-height: 1; padding: .35rem .5rem; border: 1px solid var(--hk-line); border-bottom-width: 2px; border-radius: var(--hk-r1); background: var(--hk-surface-2); color: var(--hk-ink); }

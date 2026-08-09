@@ -56,11 +56,20 @@ export function Modal({ title, onClose, footer, children }: {
 	const titleId = useId();
 	const box = useRef<HTMLDivElement>(null);
 
+	// Captured on the first render, not in the effect: a dialog with an autofocused field has
+	// already taken focus by the time effects run, so reading it there would "restore" focus to
+	// the field this dialog is about to remove, and it would land on the body instead.
+	const opener = useRef<HTMLElement | null>(null);
+	if (opener.current === null) opener.current = document.activeElement as HTMLElement | null;
+
 	useEffect(() => {
-		const opener = document.activeElement as HTMLElement | null;
-		const first = box.current?.querySelector<HTMLElement>(FOCUSABLE);
-		(first ?? box.current)?.focus();
-		return () => opener?.focus?.();
+		const previous = opener.current;
+		// A dialog that autofocuses one of its own fields keeps it.
+		if (!box.current?.contains(document.activeElement)) {
+			const first = box.current?.querySelector<HTMLElement>(FOCUSABLE);
+			(first ?? box.current)?.focus();
+		}
+		return () => previous?.focus?.();
 	}, []);
 
 	function onKeyDown(e: ReactKeyboardEvent<HTMLDivElement>) {

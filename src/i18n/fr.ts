@@ -519,4 +519,7 @@ export const fr: Messages = {
 	'shortcut.close': 'Fermer ce qui est ouvert',
 	'shortcut.help': 'Afficher cette liste',
 	'shortcut.note': 'Les raccourcis sont désactivés pendant la saisie.',
+	'shortcut.filter': 'Filtrer',
+	'shortcut.none': 'Aucun résultat.',
+	'shortcut.palette': 'Ouvrir cette palette, même en cours de saisie',
 };

@@ -58,15 +58,30 @@ and the two themes fail independently.
 - **Landmarks are partial.** The shell is not fully marked up with `<nav>`, `<main>` and
   friends, so "jump to the main content" is not available to a screen reader either.
 - **Not tested with a real screen reader.** Everything above is either automated or reasoned
-  from the markup. A pass with VoiceOver and with TalkBack is the obvious next step, and it is
-  the only way to find out whether the labels actually say something useful.
+  from the markup. A pass with VoiceOver and with TalkBack remains the only way to find out
+  whether the labels say something *useful* rather than merely existing.
+
+  `web-test-runner-voiceover` was considered on 2026-08-09 and turned down. It drives macOS
+  VoiceOver only, so it covers nothing on Android, which is where most of these users are; it
+  cannot run in CI at all, since GitHub Actions cannot grant the accessibility permissions it
+  needs; and it is built on a third test runner beside Vitest and Cypress. What it would give
+  us over the accessible-name check below is confirmation of exact phrasing on one platform we
+  are not shipping to first.
 - **The chart** is a picture of a series with no text alternative. The figures beside it carry
   the same information, but the shape does not.
 
+## The accessible name check
+
+The audit also walks every button, link, field and option on the main screens and computes the
+accessible name a browser would hand a screen reader. Any control that comes out blank fails
+the run. This is the part of screen-reader testing that can run in CI: it does not tell you
+whether a name reads well, but it does tell you when a control has none, which is exactly the
+failure that a sighted test never notices.
+
 ## Keyboard shortcuts
 
-Press `?` in the app for the list. They never fire while you are typing, because a shop's
-product names contain every letter they use.
+Press `Cmd`/`Ctrl`+`K` for the palette or `?` for the list. The plain keys never fire while you
+are typing, because a shop's product names contain every letter they use.
 
 | | |
 | --- | --- |
@@ -81,6 +96,14 @@ product names contain every letter they use.
 | `n` | New |
 | `Esc` | Close what is open |
 | `?` | Show the list |
+| `Cmd`/`Ctrl` + `K` | Open the palette, **including while typing** |
 
-All of them are single keys or one leading key. A shortcut behind a modifier is one the
-browser or the operating system may already have taken.
+All but one are single keys or one leading key, because most modifier combinations are already
+spoken for. `Cmd+N`, `Cmd+T` and `Cmd+W` never reach a page at all, and the ones that do
+(`Cmd+P`, `Cmd+F`, `Cmd+S`, `Cmd+D`) are ones a merchant uses; taking `Cmd+P` from someone
+printing an invoice would be a poor trade. `Option`+letter is worse again, since on macOS it
+types accented characters, inside the very fields where it would need to work.
+
+The cost of plain keys is that they cannot fire while you are typing. `Cmd`/`Ctrl`+`K` covers
+that: it works from inside any field, and the palette it opens can run any of the others, so
+you are never more than one binding away from the rest.

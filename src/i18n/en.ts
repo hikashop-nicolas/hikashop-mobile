@@ -521,4 +521,7 @@ export const en: Messages = {
 	'shortcut.close': 'Close what is open',
 	'shortcut.help': 'Show this list',
 	'shortcut.note': 'Shortcuts are off while you are typing.',
+	'shortcut.filter': 'Type to filter',
+	'shortcut.none': 'Nothing matches.',
+	'shortcut.palette': 'Open this palette, even while typing',
 };

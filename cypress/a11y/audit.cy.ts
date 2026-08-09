@@ -126,6 +126,37 @@ describe('accessibility', () => {
 		audit('connect');
 	});
 
+	// What a screen reader would announce for every control on a screen: its role and its
+	// accessible name, computed by axe the same way a browser computes it. This is the part of
+	// screen-reader testing that can run in CI, and it is where an unnamed control shows up as a
+	// blank rather than as a passing test.
+	it('every control has a role and a name', () => {
+		const unnamed: string[] = [];
+		for (const [hash, label] of [['/orders', 'orders'], ['/products', 'products'], ['/stores', 'stores']]) {
+			cy.viewport(...WIDE);
+			cy.visitApp(hash);
+			cy.get('.hk-appbar', { timeout: 20000 }).should('exist');
+			cy.wait(500);
+			cy.window({ log: false }).then((win) => {
+				const s = win.document.createElement('script');
+				s.textContent = axeSource;
+				win.document.head.appendChild(s);
+			});
+			cy.window({ log: false }).then((win) => {
+				const doc = win.document;
+				const controls = doc.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [role="option"]');
+				for (const el of controls) {
+					// @ts-expect-error axe's utils are on the injected global
+					const name = win.axe.utils.getAccessibleText ? win.axe.utils.getAccessibleText(el).trim() : (el.getAttribute('aria-label') ?? el.textContent ?? '').trim();
+					if (!name) unnamed.push(`${label}: <${el.tagName.toLowerCase()} class="${el.className}">`);
+				}
+			});
+		}
+		cy.then(() => {
+			expect(unnamed, `controls a screen reader would announce as blank:\n${unnamed.join('\n')}`).to.deep.equal([]);
+		});
+	});
+
 	after(() => {
 		cy.writeFile('/tmp/a11y.json', JSON.stringify(findings, null, 2));
 	});

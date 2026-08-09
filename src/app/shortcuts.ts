@@ -1,11 +1,18 @@
 // Keyboard shortcuts.
 //
-// Two rules shape the whole thing. They never fire while you are typing, because a shop's
-// product names contain every letter these use. And they are all single keys or one leading
-// key, because a shortcut that needs a modifier is one the browser or the OS may have taken
-// already.
+// Two rules shape the plain ones. They never fire while you are typing, because a shop's
+// product names contain every letter they use. And they are single keys or one leading key,
+// because most modifier combinations are already taken: Cmd+N, Cmd+T and Cmd+W never reach a
+// page at all, and the ones that do (Cmd+P, Cmd+F, Cmd+S, Cmd+D) are ones a merchant uses,
+// printing an invoice being the obvious one. Option+letter is worse still, since on macOS it
+// types accented characters, inside the very fields where it would need to work.
 //
-// Discoverable through "?", which is the convention people already expect.
+// The cost of that is real: with a plain key you cannot jump anywhere while the caret is in the
+// search box. So there is one modifier shortcut, Cmd/Ctrl+K, which works from anywhere
+// including a field, and opens a palette that can run any of the others. It is the one
+// combination the browser leaves alone and that people already reach for.
+//
+// Discoverable through "?" as well, which is the other convention people expect.
 
 export type Shortcut = {
 	/** The key, or "g p" for a two-key sequence. */
@@ -50,6 +57,7 @@ export const SHORTCUTS: Shortcut[] = [
 	{ keys: 'Escape', label: 'shortcut.close', group: 'act', run: (c) => c.close() },
 
 	{ keys: '?', label: 'shortcut.help', group: 'help', run: (c) => c.toggleHelp() },
+	{ keys: 'Cmd K', label: 'shortcut.palette', group: 'help', run: (c) => c.toggleHelp() },
 ];
 
 // A tiny state machine, so "g" then "p" is one shortcut and "p" on its own is not.

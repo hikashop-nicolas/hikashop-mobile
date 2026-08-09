@@ -35,9 +35,20 @@ export function ShortcutProvider({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		const matcher = new ShortcutMatcher();
 		function onKey(e: KeyboardEvent) {
-			// A shortcut must never eat a keystroke meant for a field, and must never fight a
+			if (e.defaultPrevented) return;
+
+			// The one modifier binding, and the only way to reach a shortcut while the caret is in
+			// a field. Chrome puts the address bar on Cmd/Ctrl+K, but a page may take it, and every
+			// app people already use for this does.
+			if ((e.metaKey || e.ctrlKey) && !e.altKey && e.key.toLowerCase() === 'k') {
+				e.preventDefault();
+				setHelpOpen((v) => !v);
+				return;
+			}
+
+			// A plain shortcut must never eat a keystroke meant for a field, and must never fight a
 			// browser or OS binding.
-			if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+			if (e.metaKey || e.ctrlKey || e.altKey) return;
 			if (e.key !== 'Escape' && isTyping(e.target)) return;
 
 			const hit = matcher.press(e.key);

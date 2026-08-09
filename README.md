@@ -28,8 +28,9 @@ middle, and nothing about your shop is stored anywhere but on your server and on
 | --- | --- |
 | ![Orders](docs/screenshots/02-orders.png) | ![Editing a product](docs/screenshots/03-product.png) |
 
-Press `?` in the app for the keyboard shortcuts: `g p` for products, `g o` for orders, `/` to
-search, `n` for new, `Esc` to close.
+Press `Cmd`/`Ctrl`+`K` for the command palette, which works even while you are typing, or `?`
+for the shortcut list: `g p` for products, `g o` for orders, `/` to search, `n` for new, `Esc`
+to close.
 
 ## Requirements
 
