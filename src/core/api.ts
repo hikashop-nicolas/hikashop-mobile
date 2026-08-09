@@ -455,6 +455,21 @@ export class ApiClient {
 		return (await this.request<MediaListing>('GET', 'media/browse', { query })).data;
 	}
 
+	// One image's bytes, through the API rather than from the shop's own url.
+	//
+	// The site serves its images with no cross-origin header, so an <img> from there taints any
+	// canvas it is drawn into and the edited result cannot be read back. Here they arrive from
+	// the API, which does send one, and become a blob the editor can both show and export.
+	async mediaContent(path: string): Promise<Blob> {
+		const url = this.url('media/content', { path });
+		const res = await fetch(url, {
+			headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+			cache: 'no-store',
+		});
+		if (!res.ok) throw Object.assign(new Error('media_content'), { code: res.status === 404 ? 'not_found' : 'generic' });
+		return await res.blob();
+	}
+
 	// Upload a file for an ajax image/file custom field; returns its stored path + url.
 	async uploadFieldFile(table: 'product' | 'category' | 'order', namekey: string, file: { data: string; name: string }): Promise<FieldFile> {
 		return (await this.request<FieldFile>('POST', `fields/${table}/${namekey}/file`, { body: file })).data;

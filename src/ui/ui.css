@@ -486,3 +486,12 @@
 .hk-keys { display: inline-flex; gap: var(--hk-s1); }
 .hk-kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .78rem; line-height: 1; padding: .35rem .5rem; border: 1px solid var(--hk-line); border-bottom-width: 2px; border-radius: var(--hk-r1); background: var(--hk-surface-2); color: var(--hk-ink); }
 .hk-keys-note { margin: var(--hk-s4) 0 0; font-size: .82rem; color: var(--hk-muted); }
+
+/* ---- image editor ---------------------------------------------------------- */
+.hk-imgedit { display: flex; flex-direction: column; gap: var(--hk-s3); }
+/* Cropt sizes itself from this box, so it needs a height of its own. */
+.hk-imgedit-stage { height: 340px; background: var(--hk-surface-2); border-radius: var(--hk-r2); overflow: hidden; }
+.hk-imgedit-controls { display: flex; flex-wrap: wrap; gap: var(--hk-s4); }
+.hk-imgedit-controls .hk-field { flex: 1; min-width: 12rem; }
+.hk-chiprow { display: flex; gap: var(--hk-s2); flex-wrap: wrap; }
+@media (min-width: 720px) { .hk-imgedit-stage { height: 420px; } }

@@ -3,16 +3,20 @@ import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import type { MediaListing } from '../core';
 import { Modal, Button, Spinner, Icon, Search, LoadMore } from '../ui';
+import { ImageEditModal } from './ImageEditModal';
 
 // A HikaShop-style media picker: folders on the left, items on the right. Selecting
 // one and confirming attaches it (by path) to the product. For images it shows a
 // thumbnail grid; for downloadable files (no public url) a name list.
-export function MediaBrowser({ kind = 'images', onClose, onPick }: {
+export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }: {
 	kind?: 'images' | 'files';
 	onClose: () => void;
 	// The url comes along so a caller that only shows the choice (rather than attaching it
 	// straight away) can preview it without asking the shop where the file ended up.
 	onPick: (path: string, name: string, url: string) => Promise<void>;
+	// An edited copy, as bytes, for a caller that can upload one. Without it the edit button is
+	// not offered, since there would be nowhere for the result to go.
+	onPickEdited?: (blob: Blob, name: string) => Promise<void>;
 }) {
 	const { client } = useStores();
 	const t = useT();
@@ -27,6 +31,7 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 	const [busy, setBusy] = useState(false);
 	const [query, setQuery] = useState('');
 	const [search, setSearch] = useState('');
+	const [editing, setEditing] = useState<{ src: string; name: string } | null>(null);
 	const isFiles = kind === 'files';
 
 	// Typing filters the whole folder, not the page in hand, so it is a query rather than a
@@ -67,6 +72,27 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 		}
 	}
 
+	// The bytes come through the API rather than from the image's own url: the shop serves its
+	// images without a cross-origin header, so a canvas that loads one directly is tainted and
+	// the edited result could not be read back out.
+	async function edit() {
+		if (!client || !selected || busy) return;
+		setBusy(true); setErr('');
+		try {
+			const blob = await client.mediaContent(selected.path);
+			setEditing({ src: URL.createObjectURL(blob), name: selected.name });
+		} catch (e) {
+			setErr(tError(t, codeOf(e)));
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	function closeEditor() {
+		if (editing) URL.revokeObjectURL(editing.src);
+		setEditing(null);
+	}
+
 	async function attach() {
 		if (!selected || busy) return;
 		setBusy(true); setErr('');
@@ -84,6 +110,11 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 		<Modal title={t('media.browseTitle')} size="wide" onClose={onClose}
 			footer={<>
 				<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
+				{!isFiles && onPickEdited && (
+					<Button disabled={busy || !selected} onClick={() => void edit()}>
+						<Icon name="edit" size={16} /> {t('media.edit')}
+					</Button>
+				)}
 				<Button variant="pri" onClick={() => void attach()} disabled={busy || !selected}><Icon name="check" size={16} /> {busy ? t('product.saving') : (isFiles ? t('media.useFile') : t('media.useImage'))}</Button>
 			</>}
 		>
@@ -140,6 +171,14 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 				</div>
 			</div>
 			{err && <div className="hk-error-note">{err}</div>}
+			{editing && onPickEdited && (
+				<ImageEditModal
+					src={editing.src}
+					name={editing.name}
+					onClose={closeEditor}
+					onSave={async (blob, name) => { await onPickEdited(blob, name); closeEditor(); }}
+				/>
+			)}
 		</Modal>
 	);
 }

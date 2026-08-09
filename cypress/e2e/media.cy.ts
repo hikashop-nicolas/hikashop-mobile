@@ -46,3 +46,53 @@ describe('Media browser', () => {
 		});
 	});
 });
+
+// Editing a library image. The shop serves its own images without a cross-origin header, so
+// the pixels come through the API instead: an <img> straight from the shop taints the canvas
+// and the export throws. Both halves are checked here, since a mock would prove neither.
+describe('Image editor', () => {
+	const api = () => `${Cypress.env('storeUrl')}/index.php/hikashop-api/v1`;
+	const auth = () => ({ Authorization: `Bearer ${Cypress.env('token')}` });
+
+	// Whatever this test attaches, it takes away again.
+	const sweepEdited = (productId: number) => {
+		cy.request({ url: `${api()}/products/${productId}`, headers: auth() }).then((r) => {
+			for (const img of (r.body.data.images ?? []).filter((i: { name?: string }) => /-edited\.jpg$/.test(i.name ?? ''))) {
+				cy.request({ method: 'DELETE', url: `${api()}/products/${productId}/files/${img.id}`, headers: auth(), failOnStatusCode: false });
+			}
+		});
+	};
+
+	it('opens a library image, exports it, and attaches it as a new file', () => {
+		let productId = 0;
+		let before = 0;
+
+		cy.viewport(1440, 900);
+		cy.visitApp('/products');
+		cy.get('.hk-row', { timeout: 20000 }).first().click();
+		cy.get('.hk-split-detail, .hk-detail-over', { timeout: 20000 }).should('exist');
+		cy.location('hash').then((h) => { productId = Number(h.split('/').pop()); });
+		cy.then(() => cy.request({ url: `${api()}/products/${productId}`, headers: auth() }))
+			.then((r) => { before = (r.body.data.images ?? []).length; });
+
+		cy.contains('button', 'Browse', { timeout: 20000 }).first().click();
+		cy.get('.hk-mb-grid .hk-media-cell', { timeout: 20000 }).first().scrollIntoView().click();
+		cy.get('.hk-modal-foot').contains('button', 'Edit').should('not.be.disabled').click();
+
+		// The pixels arrived. A tainted image would be width 0 here, and the export below would
+		// throw rather than produce a file.
+		cy.get('.cr-image', { timeout: 20000 }).should(($i) => {
+			expect(($i[0] as HTMLImageElement).naturalWidth, 'the image loaded').to.be.greaterThan(0);
+		});
+
+		cy.get('.hk-modal-foot').contains('button', 'Save as new image').click();
+		cy.get('.hk-imgedit', { timeout: 30000 }).should('not.exist');
+
+		cy.then(() => cy.request({ url: `${api()}/products/${productId}`, headers: auth() })).then((r) => {
+			const imgs = r.body.data.images ?? [];
+			expect(imgs.length, 'one more image on the product').to.equal(before + 1);
+			expect(imgs.some((i: { name?: string }) => /-edited\.jpg$/.test(i.name ?? '')), 'saved under a new name').to.be.true;
+		});
+		cy.then(() => sweepEdited(productId));
+	});
+});

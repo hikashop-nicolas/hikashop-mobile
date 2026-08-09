@@ -42,6 +42,18 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 		} catch (e) { setErr(codeOf(e, t)); } finally { setBusy(false); }
 	}
 
+	// An image edited in the browser: a new file on the product, never a change to the library
+	// image it came from, which may well be attached to other products too.
+	async function onEdited(blob: Blob, name: string) {
+		if (!client || busy) return;
+		setErr(''); setBusy(true);
+		try {
+			const data = await readAsDataUrl(new File([blob], name, { type: blob.type }));
+			const added = await client.uploadProductMedia(productId, 'images', { name, data });
+			onChange([...images, added], files);
+		} catch (e) { setErr(codeOf(e, t)); throw e; } finally { setBusy(false); }
+	}
+
 	// Drop files onto an area to upload them (images area accepts image types only).
 	function onDrop(kind: 'images' | 'files', e: React.DragEvent) {
 		e.preventDefault();
@@ -153,7 +165,14 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 					onClose={() => setViewing(null)} />
 			)}
 
-			{browsing && <MediaBrowser kind={browsing} onClose={() => setBrowsing(null)} onPick={(path, name) => attachFromBrowser(browsing, path, name)} />}
+			{browsing && (
+				<MediaBrowser
+					kind={browsing}
+					onClose={() => setBrowsing(null)}
+					onPick={(path, name) => attachFromBrowser(browsing, path, name)}
+					onPickEdited={browsing === 'images' ? async (blob, name) => { await onEdited(blob, name); setBrowsing(null); } : undefined}
+				/>
+			)}
 			{editing && <FileOptionsModal productId={productId} file={editing.file} kind={editing.kind} onClose={() => setEditing(null)} onSaved={onFileEdited} />}
 		</>
 	);
