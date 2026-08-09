@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import type { MediaListing } from '../core';
 import { Modal, Button, Spinner, Icon, Search, LoadMore } from '../ui';
-import { ImageEditModal } from './ImageEditModal';
+import { ImageEditor, editedName } from './ImageEditor';
+import type { ImageEditorHandle } from './ImageEditor';
 
 // A HikaShop-style media picker: folders on the left, items on the right. Selecting
 // one and confirming attaches it (by path) to the product. For images it shows a
@@ -32,6 +33,8 @@ export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }:
 	const [query, setQuery] = useState('');
 	const [search, setSearch] = useState('');
 	const [editing, setEditing] = useState<{ src: string; name: string } | null>(null);
+	const [editorReady, setEditorReady] = useState(false);
+	const editor = useRef<ImageEditorHandle>(null);
 	const isFiles = kind === 'files';
 
 	// Typing filters the whole folder, not the page in hand, so it is a query rather than a
@@ -91,6 +94,21 @@ export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }:
 	function closeEditor() {
 		if (editing) URL.revokeObjectURL(editing.src);
 		setEditing(null);
+		setEditorReady(false);
+	}
+
+	async function saveEdited() {
+		if (!editor.current || !editing || !onPickEdited || busy) return;
+		setBusy(true); setErr('');
+		try {
+			const blob = await editor.current.save();
+			await onPickEdited(blob, editedName(editing.name));
+			closeEditor();
+		} catch (e) {
+			setErr(tError(t, codeOf(e)));
+		} finally {
+			setBusy(false);
+		}
 	}
 
 	async function attach() {
@@ -107,17 +125,33 @@ export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }:
 	const total = listing?.total ?? 0;
 
 	return (
-		<Modal title={t('media.browseTitle')} size="wide" onClose={onClose}
-			footer={<>
-				<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
-				{!isFiles && onPickEdited && (
-					<Button disabled={busy || !selected} onClick={() => void edit()}>
-						<Icon name="edit" size={16} /> {t('media.edit')}
+		<Modal
+			title={editing ? t('media.editTitle') : t('media.browseTitle')}
+			size="wide"
+			// While the editor is open, Escape and the backdrop go back to the library rather
+			// than closing everything: the way out of a pane is the pane's own Cancel.
+			onClose={editing ? closeEditor : onClose}
+			footer={editing ? (
+				<>
+					<Button onClick={closeEditor} disabled={busy}>{t('common.cancel')}</Button>
+					<Button variant="pri" disabled={busy || !editorReady} onClick={() => void saveEdited()}>
+						<Icon name="check" size={16} /> {busy ? t('product.saving') : t('media.editSave')}
 					</Button>
-				)}
-				<Button variant="pri" onClick={() => void attach()} disabled={busy || !selected}><Icon name="check" size={16} /> {busy ? t('product.saving') : (isFiles ? t('media.useFile') : t('media.useImage'))}</Button>
-			</>}
+				</>
+			) : (
+				<>
+					<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
+					{!isFiles && onPickEdited && (
+						<Button disabled={busy || !selected} onClick={() => void edit()}>
+							<Icon name="edit" size={16} /> {t('media.edit')}
+						</Button>
+					)}
+					<Button variant="pri" onClick={() => void attach()} disabled={busy || !selected}><Icon name="check" size={16} /> {busy ? t('product.saving') : (isFiles ? t('media.useFile') : t('media.useImage'))}</Button>
+				</>
+			)}
 		>
+			<div className={`hk-mbsplit${editing ? ' hk-mbsplit--open' : ''}`}>
+				<div className="hk-mbsplit-list">
 			<div className="hk-mb">
 				<div className="hk-mb-tree">
 					<button type="button" className={`hk-mb-folder${folder === '' ? ' hk-on' : ''}`} onClick={() => setFolder('')}>
@@ -170,15 +204,18 @@ export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }:
 					)}
 				</div>
 			</div>
+				</div>
+				{/* Placed rather than laid out, like the record pane in the app's own split: in
+				    the row it would make the row wider than the dialog while it animates. */}
+				{editing && onPickEdited && (
+					<div className="hk-mbsplit-edit">
+						<div className="hk-slide hk-detail--in">
+							<ImageEditor ref={editor} src={editing.src} onReady={setEditorReady} />
+						</div>
+					</div>
+				)}
+			</div>
 			{err && <div className="hk-error-note">{err}</div>}
-			{editing && onPickEdited && (
-				<ImageEditModal
-					src={editing.src}
-					name={editing.name}
-					onClose={closeEditor}
-					onSave={async (blob, name) => { await onPickEdited(blob, name); closeEditor(); }}
-				/>
-			)}
 		</Modal>
 	);
 }

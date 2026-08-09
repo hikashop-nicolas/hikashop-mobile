@@ -487,8 +487,26 @@
 .hk-kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .78rem; line-height: 1; padding: .35rem .5rem; border: 1px solid var(--hk-line); border-bottom-width: 2px; border-radius: var(--hk-r1); background: var(--hk-surface-2); color: var(--hk-ink); }
 .hk-keys-note { margin: var(--hk-s4) 0 0; font-size: .82rem; color: var(--hk-muted); }
 
+/* ---- media browser: library and editor, side by side ------------------------
+   The same move the app makes when a record opens beside a listing, inside the dialog: the
+   library gives up the width the editor needs, and the editor slides in from the right.
+   Deliberately the same timing and the same easing, since it is meant to read as the same
+   gesture. */
+.hk-mbsplit { position: relative; display: flex; min-height: 0; min-width: 0; overflow: hidden; }
+.hk-mbsplit-list { flex: 0 0 100%; min-width: 0; transition: flex-basis var(--hk-detail-ms) var(--hk-ease); }
+/* Narrow, the editor takes the dialog: a library squeezed into half a phone is not a library. */
+.hk-mbsplit-edit { position: absolute; inset: 0; overflow: clip; background: var(--hk-surface); }
+@media (min-width: 900px) {
+	.hk-mbsplit--open .hk-mbsplit-list { flex-basis: 42%; border-right: 1px solid var(--hk-line); padding-right: var(--hk-s3); }
+	.hk-mbsplit-edit { left: auto; width: 58%; }
+	/* The folders go while the editor is open. They are for finding an image, which is done by
+	   then, and holding their column left the grid one image wide. */
+	.hk-mbsplit--open .hk-mb-tree { display: none; }
+	.hk-mbsplit--open .hk-mb { grid-template-columns: 1fr; }
+}
+
 /* ---- image editor ---------------------------------------------------------- */
-.hk-imgedit { display: flex; flex-direction: column; gap: var(--hk-s3); }
+.hk-imgedit { display: flex; flex-direction: column; gap: var(--hk-s3); height: 100%; padding-left: var(--hk-s3); }
 /* Cropt sizes itself from this box, so it needs a height of its own. */
 .hk-imgedit-stage { height: 340px; background: var(--hk-surface-2); border-radius: var(--hk-r2); overflow: hidden; }
 @media (min-width: 720px) { .hk-imgedit-stage { height: 420px; } }

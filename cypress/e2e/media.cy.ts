@@ -63,6 +63,40 @@ describe('Image editor', () => {
 		});
 	};
 
+	it('slides in beside the library rather than opening a second dialog', () => {
+		cy.viewport(1440, 900);
+		cy.visitApp('/products');
+		cy.get('.hk-row', { timeout: 20000 }).first().click();
+		cy.get('.hk-split-detail, .hk-detail-over', { timeout: 20000 }).should('exist');
+		cy.contains('button', 'Browse', { timeout: 20000 }).first().click();
+		cy.get('.hk-mb-grid .hk-media-cell', { timeout: 20000 }).first().scrollIntoView().click();
+
+		cy.get('.hk-mbsplit-list').then(($l) => {
+			const before = $l[0].getBoundingClientRect().width;
+			cy.get('.hk-modal-foot').contains('button', 'Edit').click();
+			cy.get('.cr-image', { timeout: 20000 }).should('exist');
+			cy.wait(900);
+
+			// One dialog, and the library gave up the width the editor needed.
+			cy.get('.hk-modal').should('have.length', 1);
+			cy.get('.hk-modal-title').should('have.text', 'Edit image');
+			cy.get('.hk-mbsplit-list').then(($after) => {
+				expect($after[0].getBoundingClientRect().width, 'library narrower').to.be.lessThan(before);
+			});
+			cy.get('.hk-mbsplit-edit').then(($e) => {
+				const edit = $e[0].getBoundingClientRect();
+				const list = Cypress.$('.hk-mbsplit-list')[0].getBoundingClientRect();
+				expect(Math.round(list.right), 'side by side, not stacked').to.be.at.most(Math.round(edit.left) + 2);
+			});
+		});
+
+		// Cancel goes back to the library instead of closing everything.
+		cy.get('.hk-modal-foot').contains('button', 'Cancel').click();
+		cy.get('.hk-mbsplit-edit').should('not.exist');
+		cy.get('.hk-mb-grid').should('be.visible');
+		cy.get('.hk-modal-title').should('have.text', 'Media library');
+	});
+
 	it('opens a library image, exports it, and attaches it as a new file', () => {
 		let productId = 0;
 		let before = 0;
