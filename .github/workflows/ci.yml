@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write # to publish the APK as a release asset
 
 jobs:
   web:
@@ -39,6 +43,15 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - uses: android-actions/setup-android@v3
+
+      # Pin what the build actually asks for rather than trusting the runner image to keep
+      # shipping it; see android/variables.gradle.
+      - name: Install SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" > /dev/null
+
       - run: npm ci
       - run: npm run build
       - run: npx cap sync android
@@ -62,23 +75,35 @@ jobs:
             echo "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/release.keystore"
             export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/release.keystore"
             ./gradlew assembleRelease bundleRelease --no-daemon
-            echo "kind=signed" >> "$GITHUB_OUTPUT"
+            cp app/build/outputs/apk/release/app-release.apk ../hikashop.apk
+            cp app/build/outputs/bundle/release/app-release.aab ../hikashop.aab
+            echo "kind=signed release" >> "$GITHUB_OUTPUT"
           else
             ./gradlew assembleDebug --no-daemon
-            echo "kind=debug" >> "$GITHUB_OUTPUT"
+            cp app/build/outputs/apk/debug/app-debug.apk ../hikashop.apk
+            echo "kind=debug (no signing secrets set)" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/upload-artifact@v4
-        if: steps.build.outputs.kind == 'debug'
+      # A permanent download link for the APK. Workflow artifacts expire and need a GitHub
+      # login, which makes them useless for handing a build to a beta tester.
+      - name: Publish rolling release (APK for sideload)
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
         with:
-          name: app-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          tag_name: android-latest
+          name: Latest Android APK
+          prerelease: true
+          files: hikashop.apk
+          body: |
+            Android APK built automatically from the latest `main` (${{ steps.build.outputs.kind }}).
+            Sideload it to try the HikaShop app; Android will warn about installing from an
+            unknown source.
 
+      # The AAB is what the Play Console accepts. Download it from this run with:
+      #   gh run download <run-id> -n play-aab
       - uses: actions/upload-artifact@v4
-        if: steps.build.outputs.kind == 'signed'
+        if: steps.build.outputs.kind == 'signed release'
         with:
-          name: app-release
-          path: |
-            android/app/build/outputs/apk/release/app-release.apk
-            android/app/build/outputs/bundle/release/app-release.aab
+          name: play-aab
+          path: hikashop.aab
           retention-days: 60

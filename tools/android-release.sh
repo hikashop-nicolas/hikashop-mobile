@@ -31,11 +31,13 @@ read -rsp "Keystore password: " ANDROID_KEYSTORE_PASSWORD; echo
 read -rsp "Key password (empty if same): " ANDROID_KEY_PASSWORD; echo
 [ -n "$ANDROID_KEY_PASSWORD" ] || ANDROID_KEY_PASSWORD="$ANDROID_KEYSTORE_PASSWORD"
 
-# Play rejects an upload whose versionCode it has seen, so it has to climb. Default to one past
-# whatever was built last, kept next to the keystore rather than in the repository.
+# Play rejects an upload whose versionCode it has seen, so it has to climb. CI numbers its own
+# builds by run number, so local ones sit in a band well above those to avoid ever claiming a
+# number CI would later hand out. The counter lives next to the keystore, not in the repository.
+LOCAL_BAND=1000000
 COUNTER="$(dirname "$KEYSTORE")/hikashop-version-code"
 if [ -z "${APP_VERSION_CODE:-}" ]; then
-	APP_VERSION_CODE=$(( $(cat "$COUNTER" 2>/dev/null || echo 0) + 1 ))
+	APP_VERSION_CODE=$(( $(cat "$COUNTER" 2>/dev/null || echo $LOCAL_BAND) + 1 ))
 fi
 
 export ANDROID_KEYSTORE_FILE="$KEYSTORE" ANDROID_KEY_ALIAS="$ALIAS"
