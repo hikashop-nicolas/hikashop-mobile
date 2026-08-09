@@ -2,19 +2,29 @@
 
 Target: **WCAG 2.2 level AA**.
 
-## The automated part
+## What runs, and where
 
-`npm run a11y` runs axe-core over 21 screen states: every listing, a record open, the pairing
-screen and the shortcut dialog, at a phone width and at a width where the split layout is in
-use, in the light theme and in the dark one. It reports **no violations**.
+| | Covers | Runs |
+| --- | --- | --- |
+| `npm test` | Palette contrast, computed from the tokens. What a screen reader announces, through a simulated one. | **CI, every push** |
+| `npm run a11y` | axe-core over 32 screen states, plus a check that no control is nameless. | Locally and before a release |
+| A real screen reader | Whether what is announced reads well | By hand |
 
-Worth being blunt about what that is worth: axe finds a minority of what WCAG asks for. It
+`npm run a11y` covers every listing, a record open in each, the editors, all five modals, the
+pairing screen and the palette, at a phone width and at a width where the split layout is in
+use, in both themes. It reports **no violations**.
+
+It needs a running dev server and a paired shop, which is why it is not on every push: CI has
+no shop. What CI does carry is the part that needs neither. Contrast is a property of the
+tokens rather than of a rendered page, so it is computed from `tokens.css` directly and fails
+on the commit that changes a colour; that check, written after this audit, fails on the exact
+palette the app shipped with. The announcement tests run against jsdom, so they need no
+browser either.
+
+Worth being blunt about what axe is worth: it finds a minority of what WCAG asks for. It
 checks names, roles, contrast and structure. It cannot tell whether a label says something
 useful, whether the focus order makes sense, or whether the app can be operated at all without
 a mouse. Those are checked by hand and listed below.
-
-Audit both themes when you change the palette. Contrast is a property of the colours in use,
-and the two themes fail independently.
 
 ## Fixed in the audit of 2026-08-09
 
@@ -37,6 +47,14 @@ and the two themes fail independently.
   into a page it could not see. It now traps focus, closes on Escape, returns focus to whatever
   opened it, and is named by its own title. Its close button was labelled in English
   regardless of the language in use.
+- **The rich text editor had no name.** It is a `div` with `role="textbox"`, which a `Field`
+  label cannot attach to, so it announced as an editable area with no clue what belonged in it.
+  Its toolbar was labelled in English whatever the language, the same bug as the modal's close
+  button.
+- **Three icon-only "add image" buttons had no name**, in the product media section, the
+  category editor and the image custom field.
+- **The access level select had no name**, since it sits beside a checkbox list and `Field`
+  leaves multi-control fields alone by design.
 - **Focus rings on inputs.** `.hk-input:focus` and `.hk-select:focus` set `outline: none` and
   out-specified the global `:focus-visible` ring, leaving only a 1px border colour change.
 - **Two `<main>` elements** whenever the split layout had a record open, so "go to the main
@@ -68,10 +86,12 @@ and the two themes fail independently.
   only way to know whether what is announced is *useful* rather than merely present, and to
   meet real quirks. The simulated announcement tests below cover the regressions; they do not
   cover this.
-- **Not audited beyond the screens listed above.** The audit covers the listings, a record, the
-  pairing screen and the palette. The modals reached from inside a record (address forms, the
-  product picker, the media browser) are covered by the name check but have not had a pass of
-  their own.
+- **The browser audit is not on every push**, because it drives a real shop. A future option is
+  to stub the connector with `cy.intercept` so it can run without one; until then it is a local
+  and pre-release gate, and the contrast and announcement checks are what guard CI.
+- **Three modals are still opened only by the name check**: the address form, the coupon
+  dialog and the file options. They are reached through several steps from a record, and the
+  audit opens the five that are one click away.
 
 ## Screen reader testing
 

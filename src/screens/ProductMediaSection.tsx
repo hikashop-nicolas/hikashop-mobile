@@ -117,7 +117,7 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 							)}
 						</div>
 					))}
-					<button className="hk-media-add" disabled={busy} onClick={() => imgInput.current?.click()}><Icon name="plus" size={22} /></button>
+					<button type="button" className="hk-media-add" aria-label={t('product.addImage')} disabled={busy} onClick={() => imgInput.current?.click()}><Icon name="plus" size={22} /></button>
 				</div>
 				{dragOver === 'images' && <div className="hk-muted" style={{ textAlign: 'center', marginTop: 'var(--hk-s2)' }}>{t('media.dropHint')}</div>}
 				<input ref={imgInput} type="file" accept="image/*" multiple hidden onChange={(e) => void onPick('images', e.target.files)} />

@@ -252,7 +252,7 @@ export function ProductEdit() {
 						{settings?.product_contact && (
 							<label className="hk-check"><input type="checkbox" checked={!!form.contact} onChange={(e) => set('contact', e.target.checked)} /><span>{t('product.contact')}</span></label>
 						)}
-						<Field label={t('product.description')}><RichText value={s('description')} onChange={(html) => set('description', html)} /></Field>
+						<Field label={t('product.description')}><RichText value={s('description')} onChange={(html) => set('description', html)} label={t('product.description')} /></Field>
 						<div className="hk-form-row">
 							<Field label={t('product.msrp')}><input className="hk-input" type="number" inputMode="decimal" value={s('msrp')} onChange={(e) => set('msrp', e.target.value)} /></Field>
 							<Field label={t('product.gtin')}><input className="hk-input" value={s('gtin')} onChange={(e) => set('gtin', e.target.value)} /></Field>

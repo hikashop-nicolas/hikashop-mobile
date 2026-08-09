@@ -159,7 +159,7 @@ function AjaxFiles({ field, files, onUpload, onFiles }: {
 						</div>
 					))}
 					{(field.multiple || files.length === 0) && (
-						<button type="button" className="hk-media-add" disabled={busy} onClick={() => input.current?.click()}><Icon name="plus" size={22} /></button>
+						<button type="button" className="hk-media-add" aria-label={t('product.addImage')} disabled={busy} onClick={() => input.current?.click()}><Icon name="plus" size={22} /></button>
 					)}
 				</div>
 			) : (

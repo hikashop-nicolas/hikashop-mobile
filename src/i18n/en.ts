@@ -525,4 +525,13 @@ export const en: Messages = {
 	'shortcut.none': 'Nothing matches.',
 	'shortcut.palette': 'Open this palette, even while typing',
 	'common.skipToContent': 'Skip to content',
+	'rte.toolbar': 'Formatting',
+	'rte.bold': 'Bold',
+	'rte.italic': 'Italic',
+	'rte.underline': 'Underline',
+	'rte.heading': 'Heading',
+	'rte.bulletList': 'Bulleted list',
+	'rte.numberedList': 'Numbered list',
+	'rte.link': 'Link',
+	'rte.clearFormatting': 'Clear formatting',
 };

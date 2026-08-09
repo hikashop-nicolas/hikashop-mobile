@@ -113,6 +113,70 @@ describe('accessibility', () => {
 		audit('shortcut help');
 	});
 
+	// The modals reached from inside a record. They are where the forms live, so they are where
+	// an unnamed field or a colour that does not contrast would matter most, and they were the
+	// last part of the app the audit did not open.
+	it('the modals', () => {
+		const inject = () => cy.window({ log: false }).then((win) => {
+			const el = win.document.createElement('script');
+			el.textContent = axeSource;
+			win.document.head.appendChild(el);
+		});
+		// Reloaded each time rather than closed. cy.visit with only a different hash does not
+		// remount the app, so a dialog left open would still be there on the next step, over the
+		// row it needs to click, and not every dialog can be relied on to close: the scanner
+		// dismisses itself when there is no camera, which there is not in a headless browser.
+		const openFrom = (hash: string, act: () => void, label: string) => {
+			cy.viewport(...WIDE);
+			cy.visitApp(hash);
+			cy.reload();
+			cy.get('.hk-appbar', { timeout: 20000 }).should('exist');
+			act();
+			cy.get('.hk-modal', { timeout: 20000 }).should('be.visible');
+			cy.wait(600);
+			inject();
+			audit(label);
+		};
+
+		openFrom('/orders', () => cy.get('[data-hk-new]').click(), 'modal: new order');
+		openFrom('/customers', () => cy.get('[data-hk-new]').click(), 'modal: new customer');
+		openFrom('/products', () => cy.contains('button', 'Scan').click(), 'modal: scan');
+		openFrom('/products', () => {
+			cy.get('.hk-row', { timeout: 20000 }).first().click();
+			cy.get('.hk-split-detail, .hk-detail-over', { timeout: 20000 }).should('exist');
+			cy.contains('button', 'Browse', { timeout: 20000 }).first().click();
+		}, 'modal: media browser');
+		openFrom('/orders', () => {
+			cy.get('.hk-row', { timeout: 20000 }).first().click();
+			cy.get('.hk-split-detail, .hk-detail-over', { timeout: 20000 }).should('exist');
+			cy.contains('button', 'Add product', { timeout: 20000 }).click();
+		}, 'modal: add product');
+	});
+
+	// The record screens that are not a listing: the ones reached by opening something.
+	it('the editors', () => {
+		cy.viewport(...WIDE);
+		open('/categories', 'categories', ...WIDE);
+		cy.get('.hk-row').first().click();
+		cy.get('.hk-split-detail, .hk-detail-over', { timeout: 20000 }).should('exist');
+		cy.wait(600);
+		audit('category edit');
+
+		open('/discounts', 'discounts (before opening)', ...WIDE);
+		cy.get('.hk-row').first().click();
+		cy.get('.hk-split-detail, .hk-detail-over', { timeout: 20000 }).should('exist');
+		cy.wait(600);
+		audit('discount edit');
+
+		open('/customers', 'customers (before opening)', ...WIDE);
+		cy.get('.hk-row').first().click();
+		cy.get('.hk-split-detail, .hk-detail-over', { timeout: 20000 }).should('exist');
+		cy.wait(600);
+		audit('customer detail');
+
+		open('/notifications', 'notifications', ...NARROW);
+	});
+
 	it('the pairing screen, which is what a new user meets first', () => {
 		cy.viewport(...NARROW);
 		cy.visit('/#/connect');

@@ -523,4 +523,13 @@ export const fr: Messages = {
 	'shortcut.none': 'Aucun résultat.',
 	'shortcut.palette': 'Ouvrir cette palette, même en cours de saisie',
 	'common.skipToContent': 'Aller au contenu',
+	'rte.toolbar': 'Mise en forme',
+	'rte.bold': 'Gras',
+	'rte.italic': 'Italique',
+	'rte.underline': 'Souligné',
+	'rte.heading': 'Titre',
+	'rte.bulletList': 'Liste à puces',
+	'rte.numberedList': 'Liste numérotée',
+	'rte.link': 'Lien',
+	'rte.clearFormatting': 'Supprimer la mise en forme',
 };

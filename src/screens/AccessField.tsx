@@ -51,6 +51,7 @@ export function AccessField({ label, hint, value, onChange }: {
 		<Field label={label} hint={hint}>
 			<select
 				className="hk-select"
+				aria-label={label}
 				value={value.mode}
 				onChange={(e) => {
 					const mode = e.target.value as Access['mode'];

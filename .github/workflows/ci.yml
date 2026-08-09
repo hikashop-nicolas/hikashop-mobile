@@ -22,6 +22,10 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
+      # Includes the accessibility checks that need no shop: the palette's contrast ratios,
+      # computed from the tokens, and what a screen reader would announce, through the virtual
+      # one. The browser audit (npm run a11y) and the end-to-end suite both drive a real shop,
+      # so they stay a local and pre-release gate; see docs/accessibility.md.
       - run: npm test
       - run: npm run build
       - uses: actions/upload-artifact@v4

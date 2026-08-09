@@ -122,7 +122,7 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 						emptyLabel={brand ? t('product.noBrands') : t('product.noCategories')} />
 				</Field>
 
-				<Field label={t('category.description')}><RichText value={description} onChange={setDescription} /></Field>
+				<Field label={t('category.description')}><RichText value={description} onChange={setDescription} label={t('category.description')} /></Field>
 
 				{/* Two ways to an image, the same two a product has: send one from the device, or
 				    take one already on the site. */}
@@ -135,7 +135,7 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 								<button type="button" className="hk-media-view" onClick={() => setViewing(true)} aria-label={t('media.viewImage')}><Icon name="eye" size={13} /></button>
 							</div>
 						) : (
-							<button type="button" className="hk-media-add hk-cat-imgadd" onClick={() => imgInput.current?.click()}><Icon name="plus" size={20} /></button>
+							<button type="button" className="hk-media-add hk-cat-imgadd" aria-label={t('product.addImage')} onClick={() => imgInput.current?.click()}><Icon name="plus" size={20} /></button>
 						)}
 						<div className="hk-cat-imgacts">
 							<Button size="sm" onClick={() => imgInput.current?.click()}><Icon name="upload" size={15} /> {t('category.imageUpload')}</Button>
