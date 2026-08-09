@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import type { MediaListing } from '../core';
-import { Modal, Button, Spinner, Icon } from '../ui';
+import { Modal, Button, Spinner, Icon, Search, LoadMore } from '../ui';
 
 // A HikaShop-style media picker: folders on the left, items on the right. Selecting
 // one and confirming attaches it (by path) to the product. For images it shows a
@@ -16,13 +16,25 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 }) {
 	const { client } = useStores();
 	const t = useT();
+	const PAGE = 60;
 	const [listing, setListing] = useState<MediaListing | null>(null);
+	const [items, setItems] = useState<MediaListing['images']>([]);
 	const [folder, setFolder] = useState('');
 	const [loading, setLoading] = useState(true);
+	const [more, setMore] = useState(false);
 	const [err, setErr] = useState('');
 	const [selected, setSelected] = useState<{ path: string; name: string; url: string } | null>(null);
 	const [busy, setBusy] = useState(false);
+	const [query, setQuery] = useState('');
+	const [search, setSearch] = useState('');
 	const isFiles = kind === 'files';
+
+	// Typing filters the whole folder, not the page in hand, so it is a query rather than a
+	// local filter. Debounced, or every keystroke asks the shop.
+	useEffect(() => {
+		const id = setTimeout(() => setSearch(query.trim()), 250);
+		return () => clearTimeout(id);
+	}, [query]);
 
 	useEffect(() => {
 		if (!client) return;
@@ -30,8 +42,8 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 		setLoading(true); setErr('');
 		void (async () => {
 			try {
-				const l = await client.browseMedia(folder, isFiles ? 'file' : 'image');
-				if (alive) { setListing(l); setSelected(null); }
+				const l = await client.browseMedia(folder, isFiles ? 'file' : 'image', { search, limit: PAGE, offset: 0 });
+				if (alive) { setListing(l); setItems(l.images); setSelected(null); }
 			} catch (e) {
 				if (alive) setErr(tError(t, codeOf(e)));
 			} finally {
@@ -39,7 +51,21 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 			}
 		})();
 		return () => { alive = false; };
-	}, [client, folder, isFiles, t]);
+	}, [client, folder, isFiles, search, t]);
+
+	async function loadMore() {
+		if (!client || !listing || more) return;
+		setMore(true); setErr('');
+		try {
+			const l = await client.browseMedia(folder, isFiles ? 'file' : 'image', { search, limit: PAGE, offset: items.length });
+			setItems((prev) => [...prev, ...l.images]);
+			setListing(l);
+		} catch (e) {
+			setErr(tError(t, codeOf(e)));
+		} finally {
+			setMore(false);
+		}
+	}
 
 	async function attach() {
 		if (!selected || busy) return;
@@ -52,10 +78,10 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 		}
 	}
 
-	const items = listing?.images ?? [];
+	const total = listing?.total ?? 0;
 
 	return (
-		<Modal title={t('media.browseTitle')} onClose={onClose}
+		<Modal title={t('media.browseTitle')} size="wide" onClose={onClose}
 			footer={<>
 				<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
 				<Button variant="pri" onClick={() => void attach()} disabled={busy || !selected}><Icon name="check" size={16} /> {busy ? t('product.saving') : (isFiles ? t('media.useFile') : t('media.useImage'))}</Button>
@@ -78,10 +104,13 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 					))}
 				</div>
 				<div className="hk-mb-grid">
+					<div className="hk-mb-search">
+						<Search value={query} onChange={setQuery} placeholder={t('media.searchHere')} />
+					</div>
 					{loading ? (
 						<div className="hk-center-col"><Spinner /></div>
 					) : items.length === 0 ? (
-						<div className="hk-empty">{isFiles ? t('media.noFiles') : t('media.noImages')}</div>
+						<div className="hk-empty">{search ? t('media.noMatch') : isFiles ? t('media.noFiles') : t('media.noImages')}</div>
 					) : isFiles ? (
 						<div>
 							{items.map((f) => (
@@ -98,6 +127,15 @@ export function MediaBrowser({ kind = 'images', onClose, onPick }: {
 								</button>
 							))}
 						</div>
+					)}
+					{!loading && items.length > 0 && (
+						<LoadMore
+							shown={items.length}
+							total={total}
+							hasMore={items.length < total}
+							loading={more}
+							onLoad={() => void loadMore()}
+						/>
 					)}
 				</div>
 			</div>

@@ -213,7 +213,12 @@
 
 /* Modal dialog */
 .hk-modal-backdrop { position: fixed; inset: 0; background: rgba(10, 15, 20, .5); display: grid; place-items: center; padding: var(--hk-s4); z-index: 100; }
+/* A dialog is as wide as it asks for or as wide as the screen, whichever is smaller, so the
+   same rule covers a phone and a laptop. 560px suits a form: a column of fields wider than
+   that reads badly. */
 .hk-modal { background: var(--hk-surface); border-radius: var(--hk-r3); box-shadow: var(--hk-shadow); width: min(560px, 100%); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
+/* For a grid of images, where the useful thing is how many fit across. */
+.hk-modal--wide { width: min(1080px, 100%); }
 .hk-modal-head { display: flex; align-items: center; gap: var(--hk-s2); padding: var(--hk-s3) var(--hk-s4); border-bottom: 1px solid var(--hk-line); }
 .hk-modal-title { font-weight: 650; font-size: 1.05rem; flex: 1; }
 .hk-modal-body { padding: var(--hk-s4); overflow-y: auto; }
@@ -277,7 +282,13 @@
 .hk-mb-folder { display: flex; align-items: center; gap: var(--hk-s2); border: none; background: none; color: var(--hk-ink); font: inherit; text-align: left; cursor: pointer; padding: var(--hk-s2); border-radius: var(--hk-r1); }
 .hk-mb-folder:hover { background: var(--hk-surface-2); }
 .hk-mb-folder.hk-on { background: var(--hk-accent-soft); color: var(--hk-accent); font-weight: 600; }
-.hk-mb-grid { overflow-y: auto; max-height: 60vh; }
+.hk-mb-grid { overflow-y: auto; max-height: 60vh; display: flex; flex-direction: column; }
+/* Stays put while the grid under it scrolls: it filters what is below, so it should not
+   scroll away from what it filters. */
+.hk-mb-search { position: sticky; top: 0; z-index: 1; background: var(--hk-surface); padding-bottom: var(--hk-s2); }
+/* Bigger cells than the product's own strip: this is a library being browsed, not a summary
+   of what is already attached, so the picture matters more than the count. */
+.hk-mb-grid .hk-media-grid { grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); }
 .hk-mb-cell { border: 2px solid transparent; cursor: pointer; padding: 0; background: var(--hk-surface-2); }
 .hk-mb-cell.hk-on { border-color: var(--hk-accent); }
 @media (max-width: 560px) { .hk-mb { grid-template-columns: 1fr; } .hk-mb-tree { flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 1px solid var(--hk-line); padding: 0 0 var(--hk-s2); max-height: none; } }

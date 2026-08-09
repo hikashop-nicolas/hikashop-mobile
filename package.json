@@ -35,6 +35,7 @@
 		"@capacitor/app": "^7.1.2",
 		"@capacitor/core": "^7.6.8",
 		"@capacitor/status-bar": "^7.0.6",
+		"cropt": "^1.3.0",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7",
 		"react-router-dom": "^7.18.1"

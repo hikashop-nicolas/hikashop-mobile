@@ -286,6 +286,10 @@ export interface MediaListing {
 	has_parent: boolean;
 	folders: { name: string; path: string }[];
 	images: { name: string; path: string; url: string }[];
+	// How many files the folder holds once the search is applied, and where this page starts.
+	// A media folder can hold thousands, so the grid asks for them a page at a time.
+	total: number;
+	offset: number;
 }
 
 export interface CharacteristicValue {

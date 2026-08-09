@@ -447,8 +447,12 @@ export class ApiClient {
 
 	// Browse the shop's upload folder for the media picker: images (public folder) or
 	// downloadable files (secure folder).
-	async browseMedia(folder = '', type: 'image' | 'file' = 'image'): Promise<MediaListing> {
-		return (await this.request<MediaListing>('GET', 'media/browse', { query: { folder, type } })).data;
+	async browseMedia(folder = '', type: 'image' | 'file' = 'image', opts: { search?: string; limit?: number; offset?: number } = {}): Promise<MediaListing> {
+		const query: Record<string, string | number> = { folder, type };
+		if (opts.search) query.search = opts.search;
+		if (opts.limit != null) query.limit = opts.limit;
+		if (opts.offset) query.offset = opts.offset;
+		return (await this.request<MediaListing>('GET', 'media/browse', { query })).data;
 	}
 
 	// Upload a file for an ajax image/file custom field; returns its stored path + url.

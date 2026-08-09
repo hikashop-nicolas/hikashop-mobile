@@ -534,4 +534,6 @@ export const en: Messages = {
 	'rte.numberedList': 'Numbered list',
 	'rte.link': 'Link',
 	'rte.clearFormatting': 'Clear formatting',
+	'media.searchHere': 'Search this folder',
+	'media.noMatch': 'No file here matches.',
 };

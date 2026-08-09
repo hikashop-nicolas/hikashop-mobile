@@ -59,11 +59,14 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
 // aria-modal hides the page behind it from a screen reader, but it does nothing about the tab
 // key, so without the trap a keyboard walks straight out of the dialog into a page it cannot
 // see.
-export function Modal({ title, onClose, footer, children }: {
+export function Modal({ title, onClose, footer, children, size = 'default' }: {
 	title?: ReactNode;
 	onClose: () => void;
 	footer?: ReactNode;
 	children: ReactNode;
+	// How much room the dialog asks for. A form reads better narrow; a grid of images is
+	// pointless narrow. Both stay inside the viewport on a phone.
+	size?: 'default' | 'wide';
 }) {
 	const t = useT();
 	const titleId = useId();
@@ -105,7 +108,7 @@ export function Modal({ title, onClose, footer, children }: {
 		<div className="hk-modal-backdrop" onClick={onClose} role="presentation">
 			<div
 				ref={box}
-				className="hk-modal"
+				className={`hk-modal${size === 'wide' ? ' hk-modal--wide' : ''}`}
 				onClick={(e) => e.stopPropagation()}
 				onKeyDown={onKeyDown}
 				role="dialog"

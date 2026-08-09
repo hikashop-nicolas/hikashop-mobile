@@ -532,4 +532,6 @@ export const fr: Messages = {
 	'rte.numberedList': 'Liste numérotée',
 	'rte.link': 'Lien',
 	'rte.clearFormatting': 'Supprimer la mise en forme',
+	'media.searchHere': 'Rechercher dans ce dossier',
+	'media.noMatch': 'Aucun fichier ne correspond ici.',
 };
