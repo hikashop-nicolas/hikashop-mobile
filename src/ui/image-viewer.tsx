@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useT } from '../i18n';
 import { Icon } from './icons';
 
@@ -37,7 +38,10 @@ export function ImageViewer({ images, start = 0, onClose }: {
 	const current = images[at];
 	if (!current) return null;
 
-	return (
+	// Into the body, like every other overlay: the panes animate with transforms, and a
+	// transformed ancestor is the containing block for position: fixed, so a viewer written
+	// inside the record pane covered the record pane instead of the page.
+	return createPortal(
 		<div className="hk-viewer" role="dialog" aria-modal="true" aria-label={t('media.viewImage')} onClick={onClose}>
 			<button type="button" className="hk-viewer-close" aria-label={t('common.close')}
 				onClick={onClose}><Icon name="close" size={24} /></button>
@@ -59,6 +63,7 @@ export function ImageViewer({ images, start = 0, onClose }: {
 				{current.label && <span className="hk-viewer-name">{current.label}</span>}
 				{count > 1 && <span className="hk-viewer-count">{t('media.imageOf', { shown: at + 1, total: count })}</span>}
 			</div>
-		</div>
+		</div>,
+		document.body,
 	);
 }

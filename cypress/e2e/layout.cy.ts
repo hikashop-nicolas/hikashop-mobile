@@ -164,6 +164,33 @@ describe('Split layout', () => {
 // transforms, and a transformed ancestor is the containing block for position: fixed, so this
 // is one CSS change away from breaking again without anyone noticing.
 describe('Dialogs cover the app', () => {
+	// Every overlay in the app, so a new one written inside a pane is caught here rather than in
+	// a screenshot. There are two: the dialog backdrop and the image viewer.
+	const fillsViewport = (selector: string) => {
+		cy.get(selector, { timeout: 20000 }).should('be.visible').then(($o) => {
+			const box = $o[0].getBoundingClientRect();
+			expect(Math.round(box.left), `${selector} starts at the left edge`).to.equal(0);
+			expect(Math.round(box.top), `${selector} starts at the top edge`).to.equal(0);
+			expect(Math.round(box.width), `${selector} is as wide as the viewport`).to.equal(1280);
+		});
+		cy.get('.hk-sidenav').then(($n) => {
+			const nav = $n[0].getBoundingClientRect();
+			cy.get(selector).then(($o) => {
+				const box = $o[0].getBoundingClientRect();
+				expect(box.left <= nav.left && box.right >= nav.right, `${selector} covers the navigation`).to.be.true;
+			});
+		});
+	};
+
+	it('the image viewer fills the viewport, not the pane it was opened from', () => {
+		cy.viewport(1280, 860);
+		cy.visitApp('/products');
+		cy.get('.hk-row', { timeout: 20000 }).first().click();
+		cy.get('.hk-split-detail, .hk-detail-over', { timeout: 20000 }).should('exist');
+		cy.get('.hk-media-view', { timeout: 20000 }).first().scrollIntoView().click({ force: true });
+		fillsViewport('.hk-viewer');
+	});
+
 	it('fills the viewport and covers the navigation', () => {
 		cy.viewport(1280, 860);
 		cy.visitApp('/products');
