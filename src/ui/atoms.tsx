@@ -29,7 +29,7 @@ export function Button({ variant = 'default', size = 'default', block, className
 export function NewButton({ onClick, disabled, label }: { onClick: () => void; disabled?: boolean; label?: string }) {
 	const t = useT();
 	return (
-		<Button variant="pri" size="sm" disabled={disabled} onClick={onClick}>
+		<Button variant="pri" size="sm" disabled={disabled} onClick={onClick} data-hk-new>
 			<Icon name="plus" size={16} /> {label ?? t('common.new')}
 		</Button>
 	);

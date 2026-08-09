@@ -1,11 +1,28 @@
-import type { ReactNode } from 'react';
+import { Children, cloneElement, isValidElement, useId } from 'react';
+import type { ReactNode, ReactElement } from 'react';
 import { Icon } from './icons';
 
+// Which children a label can be attached to. A field that holds something else (a picker
+// button, a row of controls, a chip list) is left alone: labelling the wrong control, or
+// wrapping the whole field in a label so that clicking anywhere presses its button, would both
+// be worse than the plain text this used to render.
+const NATIVE_CONTROLS = ['input', 'select', 'textarea'];
+
 export function Field({ label, hint, error, children }: { label?: string; hint?: string; error?: string; children: ReactNode }) {
+	const id = useId();
+	const only = Children.count(children) === 1 ? Children.only(children) : null;
+	const control = isValidElement(only) && typeof only.type === 'string' && NATIVE_CONTROLS.includes(only.type)
+		? (only as ReactElement<{ id?: string }>)
+		: null;
+
+	// The label used to be a span, so a screen reader announced every field in the app as an
+	// unnamed text box. It is a real label now, tied to its control by id.
+	const body = control && !control.props.id ? cloneElement(control, { id }) : children;
+
 	return (
 		<div className="hk-field">
-			{label && <span className="hk-label">{label}</span>}
-			{children}
+			{label && (control ? <label className="hk-label" htmlFor={id}>{label}</label> : <span className="hk-label">{label}</span>)}
+			{body}
 			{error ? <span className="hk-err">{error}</span> : hint ? <span className="hk-hint">{hint}</span> : null}
 		</div>
 	);
@@ -49,7 +66,9 @@ export function Search({ value, onChange, placeholder }: { value: string; onChan
 	return (
 		<div className="hk-search">
 			<span className="hk-search-ic"><Icon name="search" size={18} /></span>
-			<input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
+			{/* A placeholder is not a name: it disappears as soon as there is a value, and some
+			    screen readers ignore it. The placeholder text doubles as the label. */}
+			<input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} aria-label={placeholder} data-hk-search />
 		</div>
 	);
 }

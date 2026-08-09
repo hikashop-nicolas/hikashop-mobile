@@ -211,6 +211,7 @@ export function OrderDetail() {
 						<span className="hk-muted">{t('order.changeStatus')}</span>
 						<select
 							className="hk-select"
+							aria-label={t('order.changeStatus')}
 							style={{ width: '100%', marginTop: 'var(--hk-s2)' }}
 							value={order.status}
 							disabled={!!busy}

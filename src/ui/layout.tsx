@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
-import type { ReactNode } from 'react';
+import { useEffect, useId, useRef } from 'react';
+import type { ReactNode, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { Icon } from './icons';
 import type { IconName } from './icons';
+import { useT } from '../i18n';
 
 export function Screen({ title, left, right, children, center, scrollResetKey }: {
 	title?: ReactNode;
@@ -35,19 +36,60 @@ export function Screen({ title, left, right, children, center, scrollResetKey }:
 	);
 }
 
-// A centered overlay dialog. Clicking the backdrop or the close button dismisses it.
+// What a keyboard can land on inside the dialog.
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// A centered overlay dialog. Clicking the backdrop or the close button dismisses it, and so
+// does Escape.
+//
+// Focus is kept inside while it is open and put back where it came from when it closes.
+// aria-modal hides the page behind it from a screen reader, but it does nothing about the tab
+// key, so without the trap a keyboard walks straight out of the dialog into a page it cannot
+// see.
 export function Modal({ title, onClose, footer, children }: {
 	title?: ReactNode;
 	onClose: () => void;
 	footer?: ReactNode;
 	children: ReactNode;
 }) {
+	const t = useT();
+	const titleId = useId();
+	const box = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const opener = document.activeElement as HTMLElement | null;
+		const first = box.current?.querySelector<HTMLElement>(FOCUSABLE);
+		(first ?? box.current)?.focus();
+		return () => opener?.focus?.();
+	}, []);
+
+	function onKeyDown(e: ReactKeyboardEvent<HTMLDivElement>) {
+		if (e.key === 'Escape') { e.stopPropagation(); onClose(); return; }
+		if (e.key !== 'Tab') return;
+		const items = [...(box.current?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [])]
+			.filter((el) => el.offsetParent !== null || el === document.activeElement);
+		if (!items.length) return;
+		const first = items[0];
+		const last = items[items.length - 1];
+		if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+		else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+	}
+
 	return (
 		<div className="hk-modal-backdrop" onClick={onClose} role="presentation">
-			<div className="hk-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+			<div
+				ref={box}
+				className="hk-modal"
+				onClick={(e) => e.stopPropagation()}
+				onKeyDown={onKeyDown}
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby={title ? titleId : undefined}
+				tabIndex={-1}
+			>
 				<header className="hk-modal-head">
-					{title && <div className="hk-modal-title">{title}</div>}
-					<button type="button" className="hk-iconbtn" onClick={onClose} aria-label="close"><Icon name="close" size={22} /></button>
+					{title && <div className="hk-modal-title" id={titleId}>{title}</div>}
+					<button type="button" className="hk-iconbtn" onClick={onClose} aria-label={t('common.close')}><Icon name="close" size={22} /></button>
 				</header>
 				<div className="hk-modal-body">{children}</div>
 				{footer && <footer className="hk-modal-foot">{footer}</footer>}

@@ -7,6 +7,8 @@ import { HikaDictProvider } from './app/hika-dict';
 import { StatusesProvider } from './app/statuses';
 import { ThemeProvider } from './app/theme';
 import { composeProviders } from './app/compose-providers';
+import { ShortcutProvider } from './app/use-shortcuts';
+import { ShortcutHelp } from './screens/ShortcutHelp';
 import { useOrderPoll } from './app/use-order-poll';
 import { I18nProvider, useT } from './i18n';
 import { TabBar, Spinner, Icon, CurrencyProvider, StoreLogo } from './ui';
@@ -286,7 +288,11 @@ export default function App() {
 	return (
 		<AppProviders>
 			<HashRouter>
-				<Shell />
+				{/* Inside the router: the shortcuts navigate, so they need its context. */}
+				<ShortcutProvider>
+					<Shell />
+					<ShortcutHelp />
+				</ShortcutProvider>
 			</HashRouter>
 		</AppProviders>
 	);

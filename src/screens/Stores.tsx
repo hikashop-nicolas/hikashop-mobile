@@ -56,7 +56,7 @@ export function Stores() {
 					<div className="hk-row-grow">
 						<span className="hk-row-title">{t('stores.language')}</span>
 					</div>
-					<select className="hk-select" value={locale} onChange={(e) => setLocale(e.target.value)}>
+					<select className="hk-select" aria-label={t('stores.language')} value={locale} onChange={(e) => setLocale(e.target.value)}>
 						{Object.entries(LOCALES).map(([code, def]) => (
 							<option key={code} value={code}>{def.name}</option>
 						))}
@@ -68,7 +68,7 @@ export function Stores() {
 					<div className="hk-row-grow">
 						<span className="hk-row-title">{t('stores.appearance')}</span>
 					</div>
-					<select className="hk-select" value={theme} onChange={(e) => setTheme(e.target.value as ThemeChoice)}>
+					<select className="hk-select" aria-label={t('stores.appearance')} value={theme} onChange={(e) => setTheme(e.target.value as ThemeChoice)}>
 						<option value="auto">{t('stores.themeAuto')}</option>
 						<option value="light">{t('stores.themeLight')}</option>
 						<option value="dark">{t('stores.themeDark')}</option>

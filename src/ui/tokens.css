@@ -6,20 +6,20 @@
 	--hk-surface: #ffffff;
 	--hk-surface-2: #eef1f4;
 	--hk-ink: #181c20;
-	--hk-muted: #626b73;
-	--hk-faint: #aab0b6;
+	--hk-muted: #565f67;
+	--hk-faint: #6a727b;
 	--hk-line: #e1e6ea;
 	/* The brand blue, deepened: the mark's #297EBA only reaches 4.39:1 against white,
 	   short of the 4.5 minimum for the text sitting on our buttons. */
 	--hk-accent: #1F6494;
 	--hk-accent-ink: #ffffff;
 	--hk-accent-soft: #dbe9f5;
-	--hk-ok: #2c7c52;
-	--hk-ok-soft: #e0f1e8;
-	--hk-warn: #a56718;
-	--hk-warn-soft: #f6ecda;
-	--hk-crit: #b0423a;
-	--hk-crit-soft: #f6e2e0;
+	--hk-ok: #2a7650;
+	--hk-ok-soft: #e6f4ec;
+	--hk-warn: #945c15;
+	--hk-warn-soft: #f9f1e3;
+	--hk-crit: #a93e36;
+	--hk-crit-soft: #f7e6e4;
 
 	--hk-s1: 4px;
 	--hk-s2: 8px;
@@ -47,7 +47,7 @@
 		--hk-surface-2: #1e242a;
 		--hk-ink: #e7eaec;
 		--hk-muted: #98a1a8;
-		--hk-faint: #5b636a;
+		--hk-faint: #7e888f;
 		--hk-line: #293037;
 		/* Lightened for a dark surface, as the teal was. */
 		--hk-accent: #6FB6E8;
@@ -68,20 +68,20 @@
 	--hk-surface: #ffffff;
 	--hk-surface-2: #eef1f4;
 	--hk-ink: #181c20;
-	--hk-muted: #626b73;
-	--hk-faint: #aab0b6;
+	--hk-muted: #565f67;
+	--hk-faint: #6a727b;
 	--hk-line: #e1e6ea;
 	/* The brand blue, deepened: the mark's #297EBA only reaches 4.39:1 against white,
 	   short of the 4.5 minimum for the text sitting on our buttons. */
 	--hk-accent: #1F6494;
 	--hk-accent-ink: #ffffff;
 	--hk-accent-soft: #dbe9f5;
-	--hk-ok: #2c7c52;
-	--hk-ok-soft: #e0f1e8;
-	--hk-warn: #a56718;
-	--hk-warn-soft: #f6ecda;
-	--hk-crit: #b0423a;
-	--hk-crit-soft: #f6e2e0;
+	--hk-ok: #2a7650;
+	--hk-ok-soft: #e6f4ec;
+	--hk-warn: #945c15;
+	--hk-warn-soft: #f9f1e3;
+	--hk-crit: #a93e36;
+	--hk-crit-soft: #f7e6e4;
 	--hk-shadow: 0 1px 2px rgba(20, 30, 40, .05), 0 6px 20px rgba(20, 30, 40, .06);
 }
 
@@ -91,7 +91,7 @@
 	--hk-surface-2: #1e242a;
 	--hk-ink: #e7eaec;
 	--hk-muted: #98a1a8;
-	--hk-faint: #5b636a;
+	--hk-faint: #7e888f;
 	--hk-line: #293037;
 	--hk-accent: #6FB6E8;
 	--hk-accent-ink: #08202e;

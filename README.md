@@ -28,6 +28,9 @@ middle, and nothing about your shop is stored anywhere but on your server and on
 | --- | --- |
 | ![Orders](docs/screenshots/02-orders.png) | ![Editing a product](docs/screenshots/03-product.png) |
 
+Press `?` in the app for the keyboard shortcuts: `g p` for products, `g o` for orders, `/` to
+search, `n` for new, `Esc` to close.
+
 ## Requirements
 
 - **HikaShop Business 6.6.0 or newer**, on Joomla or on WordPress. The app talks to the
@@ -88,8 +91,12 @@ paired store: copy `cypress.env.example.json` to `cypress.env.json` and fill it 
 
 ```sh
 npm run e2e          # end-to-end suite
+npm run a11y         # accessibility audit, axe-core over every screen
 npm run screenshots  # regenerates the images in this README
 ```
+
+The app targets WCAG 2.2 AA; see [docs/accessibility.md](docs/accessibility.md) for what is
+covered, what was fixed and what is still missing.
 
 ## Reporting something
 
