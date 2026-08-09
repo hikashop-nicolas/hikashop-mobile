@@ -63,7 +63,7 @@ describe('Image editor', () => {
 		});
 	};
 
-	it('slides in beside the library rather than opening a second dialog', () => {
+	it('replaces the library, both views moving, and comes back the same way', () => {
 		cy.viewport(1440, 900);
 		cy.visitApp('/products');
 		cy.get('.hk-row', { timeout: 20000 }).first().click();
@@ -71,30 +71,61 @@ describe('Image editor', () => {
 		cy.contains('button', 'Browse', { timeout: 20000 }).first().click();
 		cy.get('.hk-mb-grid .hk-media-cell', { timeout: 20000 }).first().scrollIntoView().click();
 
-		cy.get('.hk-mbsplit-list').then(($l) => {
-			const before = $l[0].getBoundingClientRect().width;
-			cy.get('.hk-modal-foot').contains('button', 'Edit').click();
-			cy.get('.cr-image', { timeout: 20000 }).should('exist');
-			cy.wait(900);
+		cy.get('.hk-modal-foot').contains('button', 'Edit').click();
+		// Mid-move: both on screen, the library leaving to the left and the editor arriving from
+		// the right. This is the assertion that would catch a fade or a jump replacing the slide.
+		cy.get('.hk-mbpane-view--out-left').should('exist');
+		cy.get('.hk-mbpane-view--in-right').should('exist');
 
-			// One dialog, and the library gave up the width the editor needed.
-			cy.get('.hk-modal').should('have.length', 1);
-			cy.get('.hk-modal-title').should('have.text', 'Edit image');
-			cy.get('.hk-mbsplit-list').then(($after) => {
-				expect($after[0].getBoundingClientRect().width, 'library narrower').to.be.lessThan(before);
-			});
-			cy.get('.hk-mbsplit-edit').then(($e) => {
-				const edit = $e[0].getBoundingClientRect();
-				const list = Cypress.$('.hk-mbsplit-list')[0].getBoundingClientRect();
-				expect(Math.round(list.right), 'side by side, not stacked').to.be.at.most(Math.round(edit.left) + 2);
-			});
+		cy.get('.cr-image', { timeout: 20000 }).should('exist');
+		cy.wait(900);
+		// Settled: one dialog, the editor across the whole of it, the library gone from view.
+		cy.get('.hk-modal').should('have.length', 1);
+		cy.get('.hk-modal-title').should('have.text', 'Edit image');
+		cy.get('.hk-mb-grid').should('not.be.visible');
+		cy.get('.hk-imgedit').then(($e) => {
+			const body = Cypress.$('.hk-modal-body')[0].getBoundingClientRect();
+			expect($e[0].getBoundingClientRect().width, 'fills the dialog').to.be.greaterThan(body.width - 40);
 		});
 
-		// Cancel goes back to the library instead of closing everything.
+		// Back the other way.
 		cy.get('.hk-modal-foot').contains('button', 'Cancel').click();
-		cy.get('.hk-mbsplit-edit').should('not.exist');
+		cy.get('.hk-mbpane-view--in-left').should('exist');
+		cy.get('.hk-mbpane-view--out-right').should('exist');
+		cy.wait(900);
 		cy.get('.hk-mb-grid').should('be.visible');
+		cy.get('.hk-imgedit').should('not.exist');
 		cy.get('.hk-modal-title').should('have.text', 'Media library');
+	});
+
+	it('comes back to the library exactly as it was left', () => {
+		cy.viewport(1440, 900);
+		cy.visitApp('/products');
+		cy.get('.hk-row', { timeout: 20000 }).first().click();
+		cy.get('.hk-split-detail, .hk-detail-over', { timeout: 20000 }).should('exist');
+		cy.contains('button', 'Browse', { timeout: 20000 }).first().click();
+		cy.get('.hk-mb-grid .hk-media-cell', { timeout: 20000 }).should('have.length', 60);
+
+		// A second page, and a choice from it, so returning to page one would be obvious.
+		cy.get('.hk-mb-grid').scrollTo('bottom');
+		cy.get('.hk-mb-grid .hk-media-cell', { timeout: 20000 }).should('have.length.greaterThan', 60);
+		cy.get('.hk-mb-grid .hk-media-cell').eq(70).scrollIntoView().click();
+		cy.get('.hk-mb-grid .hk-media-cell.hk-on').invoke('attr', 'title').as('picked');
+		cy.get('.hk-mb-grid').invoke('scrollTop').as('scrollBefore');
+
+		cy.get('.hk-modal-foot').contains('button', 'Edit').click();
+		cy.get('.cr-image', { timeout: 20000 }).should('exist');
+		cy.wait(900);
+		cy.get('.hk-modal-foot').contains('button', 'Cancel').click();
+		cy.wait(900);
+
+		cy.get('.hk-mb-grid .hk-media-cell').should('have.length.greaterThan', 60);
+		cy.get('@picked').then((picked) => {
+			cy.get('.hk-mb-grid .hk-media-cell.hk-on').should('have.attr', 'title', picked as unknown as string);
+		});
+		cy.get('@scrollBefore').then((before) => {
+			cy.get('.hk-mb-grid').invoke('scrollTop').should('eq', before as unknown as number);
+		});
 	});
 
 	it('opens a library image, exports it, and attaches it as a new file', () => {

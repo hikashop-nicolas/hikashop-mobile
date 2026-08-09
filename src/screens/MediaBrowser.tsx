@@ -9,6 +9,10 @@ import type { ImageEditorHandle } from './ImageEditor';
 // A HikaShop-style media picker: folders on the left, items on the right. Selecting
 // one and confirming attaches it (by path) to the product. For images it shows a
 // thumbnail grid; for downloadable files (no public url) a name list.
+// How long the two views take to change places. The same half second a record takes to open
+// elsewhere in the app, so it reads as the same gesture; kept in step with --hk-detail-ms.
+const PANE_MS = 500;
+
 export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }: {
 	kind?: 'images' | 'files';
 	onClose: () => void;
@@ -35,6 +39,23 @@ export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }:
 	const [editing, setEditing] = useState<{ src: string; name: string } | null>(null);
 	const [editorReady, setEditorReady] = useState(false);
 	const editor = useRef<ImageEditorHandle>(null);
+	// Which view is current, and which is still on screen sliding away. The one leaving stays
+	// mounted for as long as the move takes, or there would be nothing to see leaving.
+	const [pane, setPane] = useState<'list' | 'edit'>('list');
+	const [leaving, setLeaving] = useState<'list' | 'edit' | null>(null);
+
+	useEffect(() => {
+		if (!leaving) return;
+		const id = setTimeout(() => {
+			setLeaving(null);
+			// The editor's image is only let go once it is off screen.
+			if (leaving === 'edit') {
+				setEditing((e) => { if (e?.src) URL.revokeObjectURL(e.src); return null; });
+				setEditorReady(false);
+			}
+		}, PANE_MS);
+		return () => clearTimeout(id);
+	}, [leaving]);
 	const isFiles = kind === 'files';
 
 	// Typing filters the whole folder, not the page in hand, so it is a query rather than a
@@ -80,21 +101,29 @@ export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }:
 	// the edited result could not be read back out.
 	async function edit() {
 		if (!client || !selected || busy) return;
+		// The move starts at once and the image arrives into it. Waiting for the bytes first
+		// meant a second of nothing happening after the button was pressed, on a file that can
+		// be a megabyte.
+		const from = selected;
+		setEditing({ src: '', name: from.name });
+		setLeaving('list');
+		setPane('edit');
 		setBusy(true); setErr('');
 		try {
-			const blob = await client.mediaContent(selected.path);
-			setEditing({ src: URL.createObjectURL(blob), name: selected.name });
+			const blob = await client.mediaContent(from.path);
+			setEditing((e) => (e ? { ...e, src: URL.createObjectURL(blob) } : e));
 		} catch (e) {
 			setErr(tError(t, codeOf(e)));
+			closeEditor();
 		} finally {
 			setBusy(false);
 		}
 	}
 
 	function closeEditor() {
-		if (editing) URL.revokeObjectURL(editing.src);
-		setEditing(null);
-		setEditorReady(false);
+		if (pane !== 'edit') return;
+		setLeaving('edit');
+		setPane('list');
 	}
 
 	async function saveEdited() {
@@ -126,12 +155,12 @@ export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }:
 
 	return (
 		<Modal
-			title={editing ? t('media.editTitle') : t('media.browseTitle')}
+			title={pane === 'edit' ? t('media.editTitle') : t('media.browseTitle')}
 			size="wide"
 			// While the editor is open, Escape and the backdrop go back to the library rather
 			// than closing everything: the way out of a pane is the pane's own Cancel.
-			onClose={editing ? closeEditor : onClose}
-			footer={editing ? (
+			onClose={pane === 'edit' ? closeEditor : onClose}
+			footer={pane === 'edit' ? (
 				<>
 					<Button onClick={closeEditor} disabled={busy}>{t('common.cancel')}</Button>
 					<Button variant="pri" disabled={busy || !editorReady} onClick={() => void saveEdited()}>
@@ -150,8 +179,15 @@ export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }:
 				</>
 			)}
 		>
-			<div className={`hk-mbsplit${editing ? ' hk-mbsplit--open' : ''}`}>
-				<div className="hk-mbsplit-list">
+			<div className="hk-mbpane">
+				{/* The library stays mounted behind the editor, hidden once it is off screen: it
+				    holds the folder, the search, the scroll position and the selection, and
+				    coming back to a listing that had forgotten all four would be worse than the
+				    move is good. */}
+				<div className={`hk-mbpane-view${
+					leaving === 'list' ? ' hk-mbpane-view--out-left'
+					: leaving === 'edit' ? ' hk-mbpane-view--in-left'
+					: pane === 'edit' ? ' hk-mbpane-view--away' : ''}`}>
 			<div className="hk-mb">
 				<div className="hk-mb-tree">
 					<button type="button" className={`hk-mb-folder${folder === '' ? ' hk-on' : ''}`} onClick={() => setFolder('')}>
@@ -205,13 +241,9 @@ export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }:
 				</div>
 			</div>
 				</div>
-				{/* Placed rather than laid out, like the record pane in the app's own split: in
-				    the row it would make the row wider than the dialog while it animates. */}
-				{editing && onPickEdited && (
-					<div className="hk-mbsplit-edit">
-						<div className="hk-slide hk-detail--in">
-							<ImageEditor ref={editor} src={editing.src} onReady={setEditorReady} />
-						</div>
+				{editing && onPickEdited && (pane === 'edit' || leaving === 'edit') && (
+					<div className={`hk-mbpane-view${leaving === 'edit' ? ' hk-mbpane-view--out-right' : ' hk-mbpane-view--in-right'}`}>
+						<ImageEditor ref={editor} src={editing.src} onReady={setEditorReady} />
 					</div>
 				)}
 			</div>

@@ -43,7 +43,9 @@ export function ImageEditor({ src, ref, onReady }: {
 
 	useEffect(() => {
 		const el = host.current;
-		if (!el) return;
+		// The pane opens before the image has arrived, so an empty src is "still loading" rather
+		// than an error.
+		if (!el || !src) return;
 		const c = new Cropt(el, {
 			viewport: { width: 260, height: 260, borderRadius: '0' },
 			mouseWheelZoom: 'on',
@@ -63,8 +65,12 @@ export function ImageEditor({ src, ref, onReady }: {
 
 	return (
 		<div className="hk-imgedit">
-			<div ref={host} className="hk-imgedit-stage" />
-			{!ready && !err && <div className="hk-center-col"><Spinner /></div>}
+			{/* The stage stays in the layout while the image is on its way: cropt measures this
+			    box when it binds, and a hidden one measures zero. The spinner sits over it. */}
+			<div className="hk-imgedit-stagewrap">
+				<div ref={host} className="hk-imgedit-stage" />
+				{!ready && !err && <div className="hk-imgedit-loading"><Spinner /></div>}
+			</div>
 			<p className="hk-hint">{t('media.editHint')}</p>
 			{err && <div className="hk-error-note">{err}</div>}
 		</div>
