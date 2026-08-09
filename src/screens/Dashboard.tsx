@@ -4,6 +4,7 @@ import { useCached } from '../app/use-cached';
 import { useT, tError, useI18n } from '../i18n';
 import type { DashboardStats } from '../core';
 import { Screen, StatCard, Spinner, Money, AreaChart, BarList, StoreLogo } from '../ui';
+import { formatMoney, useCurrency, useRoundCalculations } from '../ui/currency';
 
 // A point is labelled by what it covers: an hour of today, a day, or the week it starts. The
 // axis only has room for the short form of any of them.
@@ -35,6 +36,7 @@ export function Dashboard() {
 	const { locale } = useI18n();
 	const [range, setRange] = useState('week');
 	const storeId = active?.id ?? '';
+	const roundCalculations = useRoundCalculations();
 
 	const { data, loading, error } = useCached<DashboardStats>({
 		enabled: !!client && !!active,
@@ -43,6 +45,8 @@ export function Dashboard() {
 		write: async (d) => { await cache.putDashboard(storeId, range, d); },
 		deps: [storeId, range],
 	});
+	// Resolved here rather than in the chart, which has no business knowing about currencies.
+	const currency = useCurrency(data?.currency_id);
 
 	return (
 		<Screen title={
@@ -96,6 +100,9 @@ export function Dashboard() {
 								</>
 							) : undefined}
 							emptyLabel={t('dashboard.noRevenue')}
+							// The table behind the curve should read as money, like every other
+							// figure on this screen.
+							describe={(p) => formatMoney(p.value, currency, roundCalculations)}
 						/>
 					</div>
 					<div className="hk-card hk-card--pad">

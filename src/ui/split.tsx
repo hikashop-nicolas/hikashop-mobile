@@ -1,10 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { createContext, useEffect, useRef, useState } from 'react';
 import { useOutlet, useNavigate } from 'react-router-dom';
 import type { MouseEvent, ReactNode } from 'react';
 import { useUnsaved } from '../app/unsaved';
 
 // Both panes fit side by side from here up. Kept in step with the same value in ui.css.
 const SPLIT_QUERY = '(min-width: 1100px)';
+
+// A document has one main. With both panes on screen the list is it and the record beside it is
+// a region, or landmark navigation offers two "main"s and neither means anything. Narrow, the
+// record covers the list and is the main content itself, and the list underneath is inert and
+// therefore not in the accessibility tree at all.
+export const DetailLandmark = createContext<'main' | 'region'>('main');
 
 export function useIsSplit(): boolean {
 	const [split, setSplit] = useState(
@@ -88,7 +94,13 @@ export function SplitView({ list }: { list: ReactNode }) {
 		return (
 			<div className="hk-stack">
 				<div className="hk-stack-under" inert={detail ? true : undefined}>{list}</div>
-				{detail && <div className="hk-detail-over"><div className={`hk-slide${motion}`}>{detail}</div></div>}
+				{detail && (
+					<div className="hk-detail-over">
+						<div className={`hk-slide${motion}`}>
+							<DetailLandmark.Provider value="main">{detail}</DetailLandmark.Provider>
+						</div>
+					</div>
+				)}
 			</div>
 		);
 	}
@@ -101,7 +113,13 @@ export function SplitView({ list }: { list: ReactNode }) {
 			<div className="hk-split-list" onClickCapture={onListClick}>{list}</div>
 			{/* The pane is placed; what slides is its contents, clipped by the pane. Sliding the
 			    pane itself would reach past the split and make it scrollable sideways. */}
-			{detail && <div className="hk-split-detail"><div className={`hk-slide${motion}`}>{detail}</div></div>}
+			{detail && (
+				<div className="hk-split-detail">
+					<div className={`hk-slide${motion}`}>
+						<DetailLandmark.Provider value="region">{detail}</DetailLandmark.Provider>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }

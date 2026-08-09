@@ -522,4 +522,5 @@ export const fr: Messages = {
 	'shortcut.filter': 'Filtrer',
 	'shortcut.none': 'Aucun résultat.',
 	'shortcut.palette': 'Ouvrir cette palette, même en cours de saisie',
+	'common.skipToContent': 'Aller au contenu',
 };

@@ -1,8 +1,9 @@
-import { useEffect, useId, useRef } from 'react';
+import { useContext, useEffect, useId, useRef } from 'react';
 import type { ReactNode, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { Icon } from './icons';
 import type { IconName } from './icons';
 import { useT } from '../i18n';
+import { DetailLandmark } from './split';
 
 export function Screen({ title, left, right, children, center, scrollResetKey }: {
 	title?: ReactNode;
@@ -16,6 +17,7 @@ export function Screen({ title, left, right, children, center, scrollResetKey }:
 	scrollResetKey?: string | number;
 }) {
 	const hasBar = title || left || right;
+	const landmark = useContext(DetailLandmark);
 	const bodyRef = useRef<HTMLElement | null>(null);
 	useEffect(() => {
 		if (scrollResetKey === undefined) return;
@@ -31,7 +33,17 @@ export function Screen({ title, left, right, children, center, scrollResetKey }:
 					{right}
 				</header>
 			)}
-			<main className={`hk-body${center ? ' hk-center' : ''}`} ref={bodyRef}>{children}</main>
+			{landmark === 'main' ? (
+				<main id="hk-main" className={`hk-body${center ? ' hk-center' : ''}`} ref={bodyRef}>{children}</main>
+			) : (
+				<section
+					className={`hk-body${center ? ' hk-center' : ''}`}
+					ref={bodyRef as React.RefObject<HTMLElement>}
+					aria-label={typeof title === 'string' ? title : undefined}
+				>
+					{children}
+				</section>
+			)}
 		</>
 	);
 }

@@ -68,6 +68,7 @@ export function ShortcutHelp() {
 				aria-controls="hk-palette"
 				role="combobox"
 				aria-expanded="true"
+				aria-activedescendant={matches[at] ? `hk-opt-${matches[at].keys.replace(/[^a-z]/gi, '')}` : undefined}
 			/>
 			<div id="hk-palette" ref={listRef} role="listbox" aria-label={t('shortcut.title')}>
 				{matches.length === 0 && <p className="hk-keys-note">{t('shortcut.none')}</p>}
@@ -75,14 +76,17 @@ export function ShortcutHelp() {
 					const rows = matches.filter((s) => s.group === g.key);
 					if (!rows.length) return null;
 					return (
-						<div key={g.key} className="hk-keys-group">
-							<h3 className="hk-keys-title">{g.title}</h3>
+						// A listbox may own groups of options and nothing else, so the heading is
+						// the group's name rather than a child of it, and is not announced twice.
+						<div key={g.key} className="hk-keys-group" role="group" aria-label={g.title}>
+							<h3 className="hk-keys-title" aria-hidden="true">{g.title}</h3>
 							{rows.map((s) => {
 								const i = matches.indexOf(s);
 								return (
 									<button
 										type="button"
 										key={s.keys}
+										id={`hk-opt-${s.keys.replace(/[^a-z]/gi, '')}`}
 										role="option"
 										aria-selected={i === at}
 										className={`hk-keys-row${i === at ? ' hk-on' : ''}`}

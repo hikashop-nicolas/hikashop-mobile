@@ -524,4 +524,5 @@ export const en: Messages = {
 	'shortcut.filter': 'Type to filter',
 	'shortcut.none': 'Nothing matches.',
 	'shortcut.palette': 'Open this palette, even while typing',
+	'common.skipToContent': 'Skip to content',
 };

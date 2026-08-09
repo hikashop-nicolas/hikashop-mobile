@@ -12,6 +12,7 @@ import { virtual } from '@guidepup/virtual-screen-reader';
 import { I18nProvider } from '../i18n';
 import { Field, Search } from './molecules';
 import { Modal } from './layout';
+import { AreaChart } from './chart';
 
 // jsdom in this setup exposes a non-functional localStorage, as NewCustomerModal.test.tsx notes.
 beforeAll(() => {
@@ -87,6 +88,29 @@ describe('what a screen reader announces', () => {
 		// A dialog that announced only "dialog" would leave someone with no idea what opened.
 		expect(heard).toContain('dialog');
 		expect(heard).toContain('Add a product');
+	});
+
+	it('reads the figures behind a chart, which is otherwise only a shape', async () => {
+		withI18n(
+			<AreaChart
+				points={[{ label: '2 Aug', value: 0 }, { label: '3 Aug', value: 1329.61 }]}
+				emptyLabel="No revenue"
+				describe={(p) => `${p.value.toFixed(2)} euros`}
+			/>,
+		);
+
+		await virtual.start({ container: document.body });
+		const heard: string[] = [];
+		for (let i = 0; i < 30; i++) {
+			await virtual.next();
+			heard.push(await virtual.lastSpokenPhrase());
+		}
+		await virtual.stop();
+
+		const all = heard.join(' | ');
+		// The dates and the amounts, not just "image".
+		expect(all).toContain('3 Aug');
+		expect(all).toContain('1329.61 euros');
 	});
 
 	it('gives the close button a name in the language in use, not a hardcoded one', async () => {

@@ -23,13 +23,17 @@ const PAD_BOTTOM = 6;
 
 // Revenue over time: an area under a line. The shape of the trend is the point; the figures
 // themselves are in the cards above, so the chart carries no gridlines or value axis.
-export function AreaChart({ points, peak, emptyLabel }: {
+export function AreaChart({ points, peak, emptyLabel, describe }: {
 	points: Point[];
 	// The highest value, already formatted, labelled on the chart so the scale is readable.
 	peak?: ReactNode;
 	emptyLabel: string;
+	// Formats one point for the text alternative. Without it the table below carries the raw
+	// numbers, which for money is the wrong shape.
+	describe?: (p: Point) => string;
 }) {
 	const gradientId = useId();
+	const tableId = useId();
 
 	if (points.length === 0) return <div className="hk-empty">{emptyLabel}</div>;
 
@@ -56,6 +60,7 @@ export function AreaChart({ points, peak, emptyLabel }: {
 				viewBox={`0 0 ${W} ${H}`}
 				preserveAspectRatio="none"
 				role="img"
+				aria-describedby={tableId}
 				aria-label={`${points[0].label} to ${points[points.length - 1].label}`}
 			>
 				<defs>
@@ -76,6 +81,19 @@ export function AreaChart({ points, peak, emptyLabel }: {
 				<span>{points[0].label}</span>
 				{points.length > 1 && <span>{points[points.length - 1].label}</span>}
 			</div>
+			{/* The same series as a table, for a screen reader and for anyone who wants the
+			    figures rather than the shape. A curve is not a text alternative to itself. */}
+			<table id={tableId} className="hk-sr-only">
+				<caption>{`${points[0].label} to ${points[points.length - 1].label}`}</caption>
+				<tbody>
+					{points.map((p, i) => (
+						<tr key={i}>
+							<th scope="row">{p.label}</th>
+							<td>{describe ? describe(p) : String(p.value)}</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
 		</div>
 	);
 }

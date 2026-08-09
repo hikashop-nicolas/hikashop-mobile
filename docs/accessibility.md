@@ -39,6 +39,16 @@ and the two themes fail independently.
   regardless of the language in use.
 - **Focus rings on inputs.** `.hk-input:focus` and `.hk-select:focus` set `outline: none` and
   out-specified the global `:focus-visible` ring, leaving only a 1px border colour change.
+- **Two `<main>` elements** whenever the split layout had a record open, so "go to the main
+  content" offered two and neither meant anything. The list is the main content and the record
+  beside it is a labelled region; on a phone, where the record covers the list and the list is
+  inert, the record is the main content itself.
+- **No skip link.** The tab order began at the navigation on every screen, so reaching the
+  content meant tabbing past every section, every time. There is one now, first in the tab
+  order and invisible until focused.
+- **The chart had a text alternative that said nothing**: the date range and no figures. The
+  same series is now a table, in the shop's currency, so what is announced is the data rather
+  than the fact that a picture is present.
 
 ## Checked by hand
 
@@ -54,15 +64,14 @@ and the two themes fail independently.
 
 ## Known gaps
 
-- **No skip link.** The tab order starts at the navigation on every screen. Worth adding.
-- **Landmarks are partial.** The shell is not fully marked up with `<nav>`, `<main>` and
-  friends, so "jump to the main content" is not available to a screen reader either.
 - **Not tested with a real screen reader.** A pass with VoiceOver and with TalkBack remains the
   only way to know whether what is announced is *useful* rather than merely present, and to
   meet real quirks. The simulated announcement tests below cover the regressions; they do not
   cover this.
-- **The chart** is a picture of a series with no text alternative. The figures beside it carry
-  the same information, but the shape does not.
+- **Not audited beyond the screens listed above.** The audit covers the listings, a record, the
+  pairing screen and the palette. The modals reached from inside a record (address forms, the
+  product picker, the media browser) are covered by the name check but have not had a pass of
+  their own.
 
 ## Screen reader testing
 

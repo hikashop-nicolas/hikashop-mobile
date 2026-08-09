@@ -209,6 +209,7 @@ function OrderPoller() {
 
 function Shell() {
 	const { ready, active } = useStores();
+	const skipLabel = useT()('common.skipToContent');
 	if (!ready) {
 		return (
 			<div className="hk-app">
@@ -218,6 +219,9 @@ function Shell() {
 	}
 	return (
 		<div className="hk-app">
+			{/* First in the tab order, and the only way past the navigation without tabbing
+			    through every section on every screen. Invisible until it has focus. */}
+			<a className="hk-skip" href="#hk-main">{skipLabel}</a>
 			<UnsavedPrompt />
 			{active && <SideNav />}
 			<div className="hk-main">
