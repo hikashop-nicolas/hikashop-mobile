@@ -57,26 +57,42 @@ and the two themes fail independently.
 - **No skip link.** The tab order starts at the navigation on every screen. Worth adding.
 - **Landmarks are partial.** The shell is not fully marked up with `<nav>`, `<main>` and
   friends, so "jump to the main content" is not available to a screen reader either.
-- **Not tested with a real screen reader.** Everything above is either automated or reasoned
-  from the markup. A pass with VoiceOver and with TalkBack remains the only way to find out
-  whether the labels say something *useful* rather than merely existing.
-
-  `web-test-runner-voiceover` was considered on 2026-08-09 and turned down. It drives macOS
-  VoiceOver only, so it covers nothing on Android, which is where most of these users are; it
-  cannot run in CI at all, since GitHub Actions cannot grant the accessibility permissions it
-  needs; and it is built on a third test runner beside Vitest and Cypress. What it would give
-  us over the accessible-name check below is confirmation of exact phrasing on one platform we
-  are not shipping to first.
+- **Not tested with a real screen reader.** A pass with VoiceOver and with TalkBack remains the
+  only way to know whether what is announced is *useful* rather than merely present, and to
+  meet real quirks. The simulated announcement tests below cover the regressions; they do not
+  cover this.
 - **The chart** is a picture of a series with no text alternative. The figures beside it carry
   the same information, but the shape does not.
 
-## The accessible name check
+## Screen reader testing
 
-The audit also walks every button, link, field and option on the main screens and computes the
-accessible name a browser would hand a screen reader. Any control that comes out blank fails
-the run. This is the part of screen-reader testing that can run in CI: it does not tell you
-whether a name reads well, but it does tell you when a control has none, which is exactly the
-failure that a sighted test never notices.
+Three layers, cheapest first, and only the last one needs a person.
+
+**1. Names exist.** The audit walks every button, link, field and option on the main screens
+and computes the accessible name a browser would hand a screen reader. Any control that comes
+out blank fails the run.
+
+**2. What is announced** (`src/ui/announced.test.tsx`). `@guidepup/virtual-screen-reader`
+reads the accessibility tree the way a screen reader does and reports the phrases it would
+speak, so the tests assert the words rather than the markup. It is a simulator, headless and
+cross-platform, so it runs in CI on any runner and in the ordinary `npm test`.
+
+Its worth was checked rather than assumed: with the pre-audit `Field`, the label test reports
+`textbox, Hand-Thrown Mug`, which is what someone would have heard, with no idea what the
+field was for. With the fix it reports the label.
+
+**3. A real screen reader**, which is still the only way to judge whether a phrase reads well.
+
+*On tooling for layer 3.* `web-test-runner-voiceover` was turned down on 2026-08-09: macOS
+VoiceOver only, so nothing for Android where most of these users are, no CI support, and a
+third test runner beside Vitest and Cypress.
+
+**Guidepup itself can drive the real thing in CI**, which is worth knowing when layer 3 is
+scheduled: `guidepup/setup-action` configures a GitHub Actions runner for real VoiceOver on
+macOS and real NVDA on Windows. Neither is free (a macOS runner costs about ten times a Linux
+one) and neither covers TalkBack, so the sensible shape is a nightly or pre-release job rather
+than a per-pull-request one. Between them, NVDA and VoiceOver reach roughly 80 to 85% of
+screen reader users, and TalkBack stays a manual pass on a device.
 
 ## Keyboard shortcuts
 

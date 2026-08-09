@@ -41,6 +41,7 @@
 	},
 	"devDependencies": {
 		"@capacitor/cli": "^7.6.8",
+		"@guidepup/virtual-screen-reader": "^0.32.1",
 		"@testing-library/react": "^16.3.2",
 		"@types/node": "^24.13.2",
 		"@types/react": "^19.2.17",
