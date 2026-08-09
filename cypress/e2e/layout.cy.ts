@@ -159,3 +159,32 @@ describe('Split layout', () => {
 		name().should(($el) => expect(String($el.val())).to.not.match(/X$/));
 	});
 });
+
+// A dialog belongs to the app, not to the pane it was opened from. The panes animate with
+// transforms, and a transformed ancestor is the containing block for position: fixed, so this
+// is one CSS change away from breaking again without anyone noticing.
+describe('Dialogs cover the app', () => {
+	it('fills the viewport and covers the navigation', () => {
+		cy.viewport(1280, 860);
+		cy.visitApp('/products');
+		cy.get('.hk-row', { timeout: 20000 }).first().click();
+		cy.get('.hk-split-detail', { timeout: 20000 }).should('exist');
+		cy.contains('button', 'Browse', { timeout: 20000 }).first().click();
+		cy.get('.hk-modal-backdrop', { timeout: 20000 }).should('be.visible');
+
+		cy.get('.hk-modal-backdrop').then(($b) => {
+			const back = $b[0].getBoundingClientRect();
+			expect(Math.round(back.left), 'starts at the left edge').to.equal(0);
+			expect(Math.round(back.top), 'starts at the top edge').to.equal(0);
+			expect(Math.round(back.width), 'as wide as the viewport').to.equal(1280);
+		});
+		// The navigation is behind it, so nothing outside the dialog is a target.
+		cy.get('.hk-sidenav').then(($n) => {
+			const nav = $n[0].getBoundingClientRect();
+			cy.get('.hk-modal-backdrop').then(($b) => {
+				const back = $b[0].getBoundingClientRect();
+				expect(back.left <= nav.left && back.right >= nav.right, 'covers the navigation').to.be.true;
+			});
+		});
+	});
+});

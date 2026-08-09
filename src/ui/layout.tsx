@@ -1,4 +1,5 @@
 import { useContext, useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import type { ReactNode, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { Icon } from './icons';
 import type { IconName } from './icons';
@@ -96,7 +97,11 @@ export function Modal({ title, onClose, footer, children }: {
 		else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 	}
 
-	return (
+	// Rendered into the body rather than where it is written. A dialog is over the whole app,
+	// but the panes animate with transforms, and a transformed ancestor becomes the containing
+	// block for position: fixed, so a backdrop written inside the record pane covered the record
+	// pane and left the listing and the navigation live behind it.
+	return createPortal(
 		<div className="hk-modal-backdrop" onClick={onClose} role="presentation">
 			<div
 				ref={box}
@@ -115,7 +120,8 @@ export function Modal({ title, onClose, footer, children }: {
 				<div className="hk-modal-body">{children}</div>
 				{footer && <footer className="hk-modal-foot">{footer}</footer>}
 			</div>
-		</div>
+		</div>,
+		document.body,
 	);
 }
 
