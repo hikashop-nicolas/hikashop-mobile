@@ -487,7 +487,7 @@ export const messages: Partial<Messages> = {
 	'status.confirmed': "確認されました",
 	'status.created': "作成されました",
 	'status.delivered': "配達済み",
-	'status.pending': "作成されました",
+	'status.pending': "保留中",
 	'status.processing': "処理中",
 	'status.refunded': "返金されました",
 	'status.shipped': "発送されました",

@@ -11,6 +11,14 @@ interface HikaDictValue {
 
 const HikaDictContext = createContext<HikaDictValue>({ hk: (key, fallback) => fallback ?? key });
 
+// The dictionary is only usable in the language it was asked for. A store that has no pack for
+// that language serves the site's own instead, and those strings would put another language into
+// an otherwise translated screen; the app's catalogue is already in the operator's language, so
+// it is the better answer.
+function served(tag: string, d: { locale: string; strings: Record<string, string> }): Record<string, string> {
+	return d.locale === tag ? d.strings : {};
+}
+
 // Loads HikaShop's translation dictionary for the active store and locale (cache-first), and
 // re-downloads it only when its shared change token differs, so the app can render
 // HikaShop-sourced strings the way the store does, including any text the merchant customized.
@@ -26,7 +34,7 @@ export function HikaDictProvider({ children }: { children: ReactNode }) {
 		let alive = true;
 		void (async () => {
 			const cached = await cache.getTranslations(storeId, tag);
-			if (cached && alive) setStrings(cached.data.strings);
+			if (cached && alive) setStrings(served(tag, cached.data));
 			if (!versions) return; // wait for the shared change token
 			try {
 				// Only re-download the (large) dictionary when its change token differs.
@@ -34,7 +42,7 @@ export function HikaDictProvider({ children }: { children: ReactNode }) {
 				if (cached && seen === versions.i18n) return;
 				const d = await client.getTranslations(tag);
 				if (!alive) return;
-				setStrings(d.strings);
+				setStrings(served(tag, d));
 				await cache.putTranslations(storeId, tag, d);
 				await cache.putVersionTag(storeId, name, versions.i18n);
 			} catch { /* keep whatever we have; HikaShop strings just fall back */ }

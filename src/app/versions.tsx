@@ -1,10 +1,20 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useStores } from './store-context';
-import { useI18n } from '../i18n';
+import { LOCALES, useI18n } from '../i18n';
 
-// Map the app's short locale to the HikaShop language tag the store installs its packs under.
-const TAG: Record<string, string> = { en: 'en-GB', fr: 'fr-FR' };
+// The tag the store installs its language pack under. The app's locales are HikaShop's own tags
+// already (ja-JP, de-DE); only the two written by hand here are short. A tag the connector will
+// not parse (nl-NL-flemish) asks under the fuller sibling it already reads from.
+const SHORT: Record<string, string> = { en: 'en-GB', fr: 'fr-FR' };
+
+export function hikaTag(locale: string): string {
+	for (let t: string | undefined = locale; t; t = LOCALES[t]?.base) {
+		if (SHORT[t]) return SHORT[t];
+		if (/^[a-z]{2,3}-[A-Z]{2}$/.test(t)) return t;
+	}
+	return 'en-GB';
+}
 
 export interface Versions { i18n: string; statuses: string }
 
@@ -16,7 +26,7 @@ const VersionsContext = createContext<{ versions: Versions | null; tag: string }
 export function VersionsProvider({ children }: { children: ReactNode }) {
 	const { client, active } = useStores();
 	const { locale } = useI18n();
-	const tag = TAG[locale] ?? 'en-GB';
+	const tag = hikaTag(locale);
 	const [versions, setVersions] = useState<Versions | null>(null);
 
 	useEffect(() => {
