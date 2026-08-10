@@ -82,6 +82,9 @@ phone back, without touching anybody else's.
 - **Products.** Full editing: images, prices, variants, characteristics, related products,
   files and your own custom fields. Crop, zoom and rotate an image before attaching it.
 - **Categories, customers, discounts and coupons.**
+- **Translations** of what you sell. On a multilingual shop, the name, the description and your
+  translatable custom fields of a product or a category can be written in each of your languages
+  without leaving the app.
 - **A dashboard** of revenue, orders, average basket and customers, by day, week, month or
   year, with your best sellers.
 - **Notifications** for new orders and for stock running low.
@@ -90,6 +93,21 @@ phone back, without touching anybody else's.
 - **Several shops**, switched from the menu.
 
 On a computer, press `Cmd`/`Ctrl`+`K` for the command palette, or `?` for the shortcuts.
+
+## In your own language
+
+The app is offered in every language HikaShop is translated into, fifty-eight of them counting the
+regional variants, and it starts in the one your phone or your browser is set to. An Austrian gets
+Austrian German rather than German. You can pick another on the shops screen, and it stays picked
+on that device.
+
+What your shop calls things comes from your shop. Order statuses, the labels of your custom fields
+and the wording of your address forms are read from the HikaShop translation installed on that
+site, so they read as they do in your backend rather than being translated a second time here.
+
+Two of them, Armenian and Kazakh, have not been checked by a native speaker yet, as
+[docs/languages.md](docs/languages.md) notes. If one is yours and something reads badly,
+[tell us](../../issues); a correction is a few lines in a file and no code at all.
 
 ## What you need
 
