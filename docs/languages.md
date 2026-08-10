@@ -14,6 +14,7 @@ else; run the generator and the app picks them up.
 
 | Locale | Strings | Coverage | Source |
 | --- | --- | --- | --- |
+| pl-PL | 526 / 514 | 102% | Written here |
 | de-DE | 514 / 514 | 100% | Written here |
 | es-ES | 514 / 514 | 100% | Written here |
 | it-IT | 514 / 514 | 100% | Written here |
@@ -39,7 +40,6 @@ else; run the generator and the app picks them up.
 | hr-HR | 171 / 514 | 33% | From HikaShop only |
 | sv-SE | 171 / 514 | 33% | From HikaShop only |
 | ms-MY | 170 / 514 | 33% | From HikaShop only |
-| pl-PL | 170 / 514 | 33% | From HikaShop only |
 | es-CL | 169 / 514 | 33% | From HikaShop only |
 | nb-NO | 169 / 514 | 33% | From HikaShop only |
 | da-DK | 168 / 514 | 33% | From HikaShop only |

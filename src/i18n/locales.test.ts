@@ -69,6 +69,22 @@ describe('locales', () => {
 		expect(missing.length, `untranslated in de-DE: ${missing.join(', ')}`).toBeLessThan(12);
 	});
 
+	// Polish counts in three and Russian in four, where English counts in two. A language that
+	// only carried English's two would say "5 warianty", which is the kind of wrong that makes an
+	// app feel machine-made.
+	it('uses the plural forms its language actually has', async () => {
+		for (const tag of ['pl-PL', 'ru-RU']) {
+			if (!LOCALES[tag]) continue;
+			await loadLocale(tag);
+			const cats = new Set([1, 2, 5, 22].map((n) => new Intl.PluralRules(tag).select(n)));
+			// Only checked where the language has been written out; a locale still on HikaShop's
+			// strings alone has nothing of ours to check.
+			if (translate(tag, 'product.variantsSummary', { count: 1, options: 2 }) === en['product.variantsSummary.one']) continue;
+			const said = [...cats].map((c) => translate(tag, `product.variantsSummary.${c}`));
+			expect(new Set(said).size, `${tag} says the same thing for every count`).toBeGreaterThan(1);
+		}
+	});
+
 	it('never leaves a placeholder stranded', async () => {
 		// A translation carrying {count} where the English does not, or missing one it needs,
 		// would render as literal braces to a merchant.
