@@ -176,4 +176,6 @@ export const messages: Partial<Messages> = {
 	'tabs.discounts': "Εκπτώσεις",
 	'tabs.orders': "Παραγγελίες",
 	'tabs.products': "Προϊόντα",
+	'translations.language': "Γλώσσα",
+	'translations.title': "Μεταφράσεις",
 };

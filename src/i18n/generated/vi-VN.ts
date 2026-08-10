@@ -171,4 +171,6 @@ export const messages: Partial<Messages> = {
 	'tabs.discounts': "Giảm giá",
 	'tabs.orders': "Đơn đặt hàng",
 	'tabs.products': "Sản phẩm",
+	'translations.language': "Ngôn ngữ",
+	'translations.title': "Các bản dịch",
 };

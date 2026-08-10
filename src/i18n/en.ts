@@ -541,4 +541,13 @@ export const en: Messages = {
 	'media.editFailed': 'The image could not be edited.',
 	'media.editHint': 'Drag to move, pinch or scroll to zoom, drag the corners to set the shape, and use the buttons to rotate. The original is left untouched: this is saved as a new image.',
 	'media.edit': 'Edit',
+
+	// Content translation: the merchant's own product and category text in the shop's other
+	// languages, which the website backend edits behind the flags on its edit forms.
+	'translations.title': 'Translations',
+	'translations.language': 'Language',
+	'translations.original': 'Original',
+	'translations.shopLanguage': 'shop language',
+	'translations.disabled': 'This shop has one language, or translation editing is turned off in its settings.',
+	'category.pageInfo': 'Product page info',
 };

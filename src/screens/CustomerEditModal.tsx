@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useT, tError } from '../i18n';
 import { useStores } from '../app/store-context';
 import type { CustomerDetail, FieldFile } from '../core';
-import { Modal, Field, Button, CustomFieldInput, DeleteButton } from '../ui';
+import { Modal, Field, Button, CustomFieldInput, DeleteButton, Icon} from '../ui';
 import { editableGroups, buildProfilePatch } from '../app/customers';
 
 function codeOf(e: unknown): string {
@@ -112,7 +112,7 @@ export function CustomerEditModal({ customer, onClose, onSaved, onDeleted }: {
 				))}
 
 				{err && <div className="hk-error-note">{err}</div>}
-				<Button variant="pri" block disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button>
+				<Button variant="pri" block disabled={busy} onClick={() => void save()}><Icon name="save" size={16} /> {busy ? t('product.saving') : t('common.save')}</Button>
 				{onDeleted && (
 					<DeleteButton block disabled={busy} label={t('customers.deleteCustomer')}
 						confirmMessage={t('customers.deleteConfirm')} onConfirm={() => void remove()} />

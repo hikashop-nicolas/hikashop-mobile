@@ -4,7 +4,6 @@
 		"taken from HikaShop's own nb-NO file by tools/build-locales.mjs, so regenerating keeps these.",
 		"Norwegian counts in two like English, so the counted strings need no extra forms."
 	],
-
 	"access.all": "Alle",
 	"access.groupCount": "{count} grupper",
 	"access.groups": "Valgte grupper",
@@ -369,5 +368,11 @@
 	"unsaved.body": "Det er endringer i dette skjemaet som ikke er lagret. Går du bort, forsvinner de.",
 	"unsaved.discard": "Forkast endringene",
 	"unsaved.stay": "Bli og rediger videre",
-	"unsaved.title": "Ulagrede endringer"
+	"unsaved.title": "Ulagrede endringer",
+	"translations.title": "Oversettelser",
+	"translations.language": "Språk",
+	"translations.original": "Original",
+	"translations.disabled": "Denne butikken har ett språk, eller redigering av oversettelser er slått av i innstillingene.",
+	"category.pageInfo": "Informasjon på varesiden",
+	"translations.shopLanguage": "butikkens språk"
 }

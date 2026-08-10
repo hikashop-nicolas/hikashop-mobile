@@ -63,10 +63,17 @@ describe('locales', () => {
 	it('has German complete, since it was translated by hand', async () => {
 		await loadLocale('de-DE');
 		expect(translate('de-DE', 'tabs.orders')).toBe('Bestellungen');
-		const missing = Object.keys(en).filter((k) => !k.endsWith('.one') && !k.endsWith('.other') && translate('de-DE', k) === en[k]);
-		// A handful of words are the same in both languages (SEO, GTIN, Alias, Link), which is
-		// not a hole; anything beyond that is one.
-		expect(missing.length, `untranslated in de-DE: ${missing.join(', ')}`).toBeLessThan(12);
+		// Some words really are the same in both languages. Named rather than counted, so a new
+		// hole says which key it is instead of nudging a number, and so adding one to this list
+		// is a decision somebody makes on purpose.
+		const SAME_IN_GERMAN = new Set([
+			'product.seo', 'product.gtin', 'product.name', 'product.alias', 'product.details',
+			'category.name', 'media.name', 'customers.name', 'customers.details',
+			'scan.enterBarcode', 'rte.link', 'translations.original',
+		]);
+		const missing = Object.keys(en).filter((k) => !k.endsWith('.one') && !k.endsWith('.other')
+			&& !SAME_IN_GERMAN.has(k) && translate('de-DE', k) === en[k]);
+		expect(missing, `untranslated in de-DE: ${missing.join(', ')}`).toEqual([]);
 	});
 
 	// Polish counts in three and Russian in four, where English counts in two. A language that

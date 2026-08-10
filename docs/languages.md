@@ -20,59 +20,59 @@ else; run the generator and the app picks them up.
 
 | Locale | Strings | Coverage | Then reads | Source |
 | --- | --- | --- | --- | --- |
-| cs-CZ | 514 / 514 (+6 plural) | 100% | — | Written here |
-| da-DK | 514 / 514 | 100% | — | Written here |
-| de-DE | 514 / 514 | 100% | — | Written here |
-| es-ES | 514 / 514 | 100% | — | Written here |
-| fi-FI | 514 / 514 | 100% | — | Written here |
-| hu-HU | 514 / 514 | 100% | — | Written here |
-| it-IT | 514 / 514 | 100% | — | Written here |
-| ja-JP | 514 / 514 | 100% | — | Written here |
-| nb-NO | 514 / 514 | 100% | — | Written here |
-| nl-NL | 514 / 514 | 100% | — | Written here |
-| pl-PL | 514 / 514 (+12 plural) | 100% | — | Written here |
-| pt-BR | 514 / 514 | 100% | — | Written here |
-| pt-PT | 514 / 514 | 100% | — | Written here |
-| ro-RO | 514 / 514 (+6 plural) | 100% | — | Written here |
-| ru-RU | 514 / 514 (+12 plural) | 100% | — | Written here |
-| sk-SK | 514 / 514 (+6 plural) | 100% | — | Written here |
-| sv-SE | 514 / 514 | 100% | — | Written here |
-| zh-CN | 514 / 514 | 100% | — | Written here |
-| ar-AA | 173 / 514 | 34% | — | From HikaShop only |
-| ar-AR | 173 / 514 | 34% | — | From HikaShop only |
-| fa-IR | 173 / 514 | 34% | — | From HikaShop only |
-| lv-LV | 173 / 514 | 34% | — | From HikaShop only |
-| sl-SI | 173 / 514 | 34% | — | From HikaShop only |
-| th-TH | 173 / 514 | 34% | — | From HikaShop only |
-| tr-TR | 173 / 514 | 34% | — | From HikaShop only |
-| zh-TW | 173 / 514 | 34% | — | From HikaShop only |
-| el-GR | 172 / 514 | 33% | — | From HikaShop only |
-| hr-HR | 171 / 514 | 33% | — | From HikaShop only |
-| ms-MY | 170 / 514 | 33% | — | From HikaShop only |
-| es-CL | 169 / 514 | 33% | es-ES | From HikaShop only |
-| vi-VN | 167 / 514 | 32% | — | From HikaShop only |
-| lt-LT | 165 / 514 | 32% | — | From HikaShop only |
-| de-AT | 164 / 514 | 32% | de-DE | From HikaShop only |
-| de-CH | 164 / 514 | 32% | de-DE | From HikaShop only |
-| he-IL | 164 / 514 | 32% | — | From HikaShop only |
-| hi-IN | 164 / 514 | 32% | — | From HikaShop only |
-| id-ID | 164 / 514 | 32% | — | From HikaShop only |
-| nl-BE | 159 / 514 | 31% | nl-NL | From HikaShop only |
-| fr-FR | 154 / 514 | 30% | fr | From HikaShop only |
-| uk-UA | 154 / 514 | 30% | — | From HikaShop only |
-| fr-CA | 153 / 514 | 30% | fr-FR | From HikaShop only |
-| bg-BG | 149 / 514 | 29% | — | From HikaShop only |
-| mk-MK | 149 / 514 | 29% | — | From HikaShop only |
-| kz-KZ | 148 / 514 | 29% | — | From HikaShop only |
-| bs-BA | 141 / 514 | 27% | — | From HikaShop only |
-| sr-YU | 138 / 514 | 27% | — | From HikaShop only |
-| srp-ME | 138 / 514 | 27% | — | From HikaShop only |
-| gl-ES | 137 / 514 | 27% | — | From HikaShop only |
-| ar-DZ | 136 / 514 | 26% | ar-AA | From HikaShop only |
-| sr-RS | 136 / 514 | 26% | — | From HikaShop only |
-| eu-ES | 134 / 514 | 26% | — | From HikaShop only |
-| ca-ES | 123 / 514 | 24% | — | From HikaShop only |
-| nl-NL-flemish | 117 / 514 | 23% | nl-NL | From HikaShop only |
-| hy-AM | 42 / 514 | 8% | — | From HikaShop only |
-| ko-KR | 42 / 514 | 8% | — | From HikaShop only |
-| af-ZA | 28 / 514 | 5% | — | From HikaShop only |
+| cs-CZ | 520 / 520 (+6 plural) | 100% | — | Written here |
+| da-DK | 520 / 520 | 100% | — | Written here |
+| de-DE | 520 / 520 | 100% | — | Written here |
+| es-ES | 520 / 520 | 100% | — | Written here |
+| fi-FI | 520 / 520 | 100% | — | Written here |
+| hu-HU | 520 / 520 | 100% | — | Written here |
+| it-IT | 520 / 520 | 100% | — | Written here |
+| ja-JP | 520 / 520 | 100% | — | Written here |
+| nb-NO | 520 / 520 | 100% | — | Written here |
+| nl-NL | 520 / 520 | 100% | — | Written here |
+| pl-PL | 520 / 520 (+12 plural) | 100% | — | Written here |
+| pt-BR | 520 / 520 | 100% | — | Written here |
+| pt-PT | 520 / 520 | 100% | — | Written here |
+| ro-RO | 520 / 520 (+6 plural) | 100% | — | Written here |
+| ru-RU | 520 / 520 (+12 plural) | 100% | — | Written here |
+| sk-SK | 520 / 520 (+6 plural) | 100% | — | Written here |
+| sv-SE | 520 / 520 | 100% | — | Written here |
+| zh-CN | 520 / 520 | 100% | — | Written here |
+| ar-AA | 175 / 520 | 34% | — | From HikaShop only |
+| ar-AR | 175 / 520 | 34% | — | From HikaShop only |
+| fa-IR | 175 / 520 | 34% | — | From HikaShop only |
+| lv-LV | 175 / 520 | 34% | — | From HikaShop only |
+| sl-SI | 175 / 520 | 34% | — | From HikaShop only |
+| th-TH | 175 / 520 | 34% | — | From HikaShop only |
+| tr-TR | 175 / 520 | 34% | — | From HikaShop only |
+| zh-TW | 175 / 520 | 34% | — | From HikaShop only |
+| el-GR | 174 / 520 | 33% | — | From HikaShop only |
+| hr-HR | 173 / 520 | 33% | — | From HikaShop only |
+| ms-MY | 172 / 520 | 33% | — | From HikaShop only |
+| es-CL | 171 / 520 | 33% | es-ES | From HikaShop only |
+| vi-VN | 169 / 520 | 33% | — | From HikaShop only |
+| de-AT | 166 / 520 | 32% | de-DE | From HikaShop only |
+| de-CH | 166 / 520 | 32% | de-DE | From HikaShop only |
+| he-IL | 166 / 520 | 32% | — | From HikaShop only |
+| hi-IN | 166 / 520 | 32% | — | From HikaShop only |
+| id-ID | 166 / 520 | 32% | — | From HikaShop only |
+| lt-LT | 166 / 520 | 32% | — | From HikaShop only |
+| nl-BE | 161 / 520 | 31% | nl-NL | From HikaShop only |
+| fr-FR | 156 / 520 | 30% | fr | From HikaShop only |
+| fr-CA | 155 / 520 | 30% | fr-FR | From HikaShop only |
+| uk-UA | 155 / 520 | 30% | — | From HikaShop only |
+| bg-BG | 149 / 520 | 29% | — | From HikaShop only |
+| mk-MK | 149 / 520 | 29% | — | From HikaShop only |
+| kz-KZ | 148 / 520 | 28% | — | From HikaShop only |
+| bs-BA | 141 / 520 | 27% | — | From HikaShop only |
+| sr-YU | 138 / 520 | 27% | — | From HikaShop only |
+| srp-ME | 138 / 520 | 27% | — | From HikaShop only |
+| gl-ES | 137 / 520 | 26% | — | From HikaShop only |
+| ar-DZ | 136 / 520 | 26% | ar-AA | From HikaShop only |
+| sr-RS | 136 / 520 | 26% | — | From HikaShop only |
+| eu-ES | 134 / 520 | 26% | — | From HikaShop only |
+| ca-ES | 123 / 520 | 24% | — | From HikaShop only |
+| nl-NL-flemish | 117 / 520 | 23% | nl-NL | From HikaShop only |
+| hy-AM | 42 / 520 | 8% | — | From HikaShop only |
+| ko-KR | 42 / 520 | 8% | — | From HikaShop only |
+| af-ZA | 28 / 520 | 5% | — | From HikaShop only |

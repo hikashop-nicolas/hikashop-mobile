@@ -111,7 +111,7 @@ export function VariantEdit() {
 		<Screen
 			title={t('product.editVariant')}
 			left={<button className="hk-iconbtn" onClick={() => nav(`/products/${id}/variants`)} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-			right={form ? <Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button> : undefined}
+			right={form ? <Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}><Icon name="save" size={16} /> {busy ? t('product.saving') : t('common.save')}</Button> : undefined}
 		>
 			{loading || !form || !parent ? (
 				<div className="hk-center-col"><Spinner /></div>

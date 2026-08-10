@@ -168,4 +168,6 @@ export const messages: Partial<Messages> = {
 	'tabs.discounts': "Rabatte",
 	'tabs.orders': "Bestellungen",
 	'tabs.products': "Produkt",
+	'translations.language': "Sprache",
+	'translations.title': "Übersetzungen",
 };

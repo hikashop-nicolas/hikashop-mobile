@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import type { ProductField, ZoneItem } from '../core';
-import { Modal, Field, Button, Spinner } from '../ui';
+import { Modal, Field, Button, Spinner, Icon} from '../ui';
 import { useHk } from '../app/hika-dict';
 import { SearchPicker } from './SearchPicker';
 
@@ -135,7 +135,7 @@ export function AddressFormModal<T>({ title, load, onSave, onClose, onSaved }: {
 						);
 					})}
 					{err && <div className="hk-error-note">{err}</div>}
-					<Button variant="pri" block disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button>
+					<Button variant="pri" block disabled={busy} onClick={() => void save()}><Icon name="save" size={16} /> {busy ? t('product.saving') : t('common.save')}</Button>
 				</div>
 			)}
 		</Modal>

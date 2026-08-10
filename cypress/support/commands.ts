@@ -25,8 +25,13 @@ Cypress.Commands.add('visitApp', (hash = '/') => {
 		role: 'admin',
 		createdAt: 0,
 	};
+	// The read cache lives in IndexedDB and outlives a visit, so a test that stubs an endpoint
+	// leaves its answer behind for the next one. Each test starts from the shop instead.
+	cy.window({ log: false }).then((w) => w.indexedDB?.deleteDatabase('hikashop-cache'));
 	cy.visit('/#' + hash, {
 		onBeforeLoad(win) {
+			win.indexedDB?.deleteDatabase('hikashop-cache');
+			for (const k of Object.keys(win.localStorage)) if (k.startsWith('hk.cache.')) win.localStorage.removeItem(k);
 			win.localStorage.setItem('hk.data.stores', JSON.stringify([store]));
 			win.localStorage.setItem('hk.data.activeStore', String(store.id));
 			win.localStorage.setItem('hk.secret.token.' + store.id, Cypress.env('token'));

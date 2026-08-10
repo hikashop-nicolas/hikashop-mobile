@@ -6,7 +6,6 @@
 		"form for 2 to 4 alongside the two English has.",
 		"Formal address (vykání), matching the tone of the HikaShop backend."
 	],
-
 	"access.all": "Vše",
 	"access.groupCount": "Skupin: {count}",
 	"access.groups": "Vybrané skupiny",
@@ -377,5 +376,11 @@
 	"unsaved.body": "V tomto formuláři jsou neuložené změny. Když odejdete, ztratí se.",
 	"unsaved.discard": "Zahodit změny",
 	"unsaved.stay": "Zůstat a pokračovat v úpravách",
-	"unsaved.title": "Neuložené změny"
+	"unsaved.title": "Neuložené změny",
+	"translations.title": "Překlady",
+	"translations.language": "Jazyk",
+	"translations.original": "Originál",
+	"translations.disabled": "Tento obchod má jeden jazyk, nebo je úprava překladů v nastavení vypnutá.",
+	"category.pageInfo": "Informace na stránce produktu",
+	"translations.shopLanguage": "jazyk obchodu"
 }

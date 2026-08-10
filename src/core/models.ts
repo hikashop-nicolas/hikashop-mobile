@@ -137,6 +137,43 @@ export interface OrderStatusDef {
 	color: string; // merchant-set hex, or ''
 }
 
+// Content translation: the merchant's own product and category text in the shop's other
+// languages. Where the shop stores it (Falang rows or Joomla override files) is the connector's
+// business; the app only sees columns and values.
+export interface ShopLanguage {
+	id: number;
+	code: string; // xx-XX, the tag the shop files its pack under
+	shortcode: string;
+	// The language the shop itself is written in. Offered, since overriding the shop's own wording
+	// is a real thing to want, but never the one the editor opens on.
+	site_default?: boolean;
+}
+
+export interface ShopLanguages {
+	// False when the shop has one language, or translating is off for its edition or settings.
+	enabled: boolean;
+	languages: ShopLanguage[];
+}
+
+export interface TranslatableColumn {
+	name: string; // the shop column, e.g. product_name
+	type: 'text' | 'multiline' | 'html';
+	// Custom fields carry the merchant's own label; HikaShop's own columns carry none, since the
+	// app already names them in the operator's language.
+	label?: string;
+}
+
+// Keyed by language id (as a string, since it arrives as a JSON object key), then by column.
+export type TranslationValues = Record<string, Record<string, string>>;
+
+export interface ContentTranslations {
+	enabled: boolean;
+	languages: ShopLanguage[];
+	columns: TranslatableColumn[];
+	original: Record<string, string>; // the text being translated from
+	values: TranslationValues;
+}
+
 // A shop coupon (from GET /coupons), for the operator to browse and apply to an order.
 export interface Coupon {
 	id: number;

@@ -9,6 +9,7 @@ import type {
 	Access,
 	ProductField,
 	MassAction, MassActionResult,
+	ShopLanguages, ContentTranslations, TranslationValues,
 } from './models';
 import type { LowStockItem } from './notify-settings';
 
@@ -309,8 +310,23 @@ export class ApiClient {
 
 	// Cheap change tokens for the app's cacheable resources (read scope), so big payloads are
 	// only re-downloaded when they actually change on the site.
-	async getVersion(lang: string): Promise<{ i18n: string; statuses: string }> {
-		return (await this.request<{ i18n: string; statuses: string }>('GET', 'version', { query: { lang } })).data;
+	async getVersion(lang: string): Promise<{ i18n: string; statuses: string; languages: string }> {
+		return (await this.request<{ i18n: string; statuses: string; languages: string }>('GET', 'version', { query: { lang } })).data;
+	}
+
+	// The shop's languages, and whether content translation is possible at all (read scope).
+	async getShopLanguages(): Promise<ShopLanguages> {
+		return (await this.request<ShopLanguages>('GET', 'languages')).data;
+	}
+
+	// What can be translated on one product or category, and what each language says today.
+	async getContentTranslations(type: 'products' | 'categories', id: number): Promise<ContentTranslations> {
+		return (await this.request<ContentTranslations>('GET', `${type}/${id}/translations`)).data;
+	}
+
+	// Save translated text, keyed by language id then column (write scope). Send only what changed.
+	async setContentTranslations(type: 'products' | 'categories', id: number, values: TranslationValues): Promise<{ id: number; saved: number }> {
+		return (await this.request<{ id: number; saved: number }>('PUT', `${type}/${id}/translations`, { body: values })).data;
 	}
 
 	// The shop's published order statuses in configured order (read scope).

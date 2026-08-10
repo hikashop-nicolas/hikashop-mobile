@@ -5,7 +5,6 @@
 		"Polish counts in three: 1 wariant, 2 warianty, 5 wariantów. Intl.PluralRules asks for",
 		"one/few/many, so the counted strings carry all three rather than borrowing English's two."
 	],
-
 	"access.all": "Wszyscy",
 	"access.groupCount": "Grupy: {count}",
 	"access.groups": "Wybrane grupy",
@@ -382,5 +381,11 @@
 	"unsaved.body": "W tym formularzu są niezapisane zmiany. Jeśli go opuścisz, zostaną utracone.",
 	"unsaved.discard": "Odrzuć zmiany",
 	"unsaved.stay": "Edytuj dalej",
-	"unsaved.title": "Niezapisane zmiany"
+	"unsaved.title": "Niezapisane zmiany",
+	"translations.title": "Tłumaczenia",
+	"translations.language": "Język",
+	"translations.original": "Oryginał",
+	"translations.disabled": "Ten sklep ma jeden język albo edycja tłumaczeń jest wyłączona w ustawieniach.",
+	"category.pageInfo": "Informacje na stronie produktu",
+	"translations.shopLanguage": "język sklepu"
 }

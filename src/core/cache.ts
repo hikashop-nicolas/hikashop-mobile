@@ -4,7 +4,7 @@
 // shapes on a schema bump until a full migration runner lands (Phase 3 queue/ledger).
 
 import type { KeyValueStore } from './storage';
-import type { OrderSummary, OrderDetail, DashboardStats, Paginated, ProductSummary, ProductDetail, ProductMeta, CategoryListItem, Settings, OrderStatusDef, CustomerSummary, CustomerDetail, Discount } from './models';
+import type { OrderSummary, OrderDetail, DashboardStats, Paginated, ProductSummary, ProductDetail, ProductMeta, CategoryListItem, Settings, OrderStatusDef, CustomerSummary, CustomerDetail, Discount, ShopLanguages } from './models';
 
 export const CACHE_VERSION = 1;
 
@@ -207,6 +207,15 @@ export class CacheRepository {
 	}
 	putSettings(storeId: string, settings: Settings): Promise<Cached<Settings>> {
 		return this.write(this.key(storeId, 'settings'), settings);
+	}
+
+	// The shop's languages, cached against the change token in /version: they move when a
+	// merchant publishes one, which is rarely, and the answer gates a whole screen.
+	getShopLanguages(storeId: string): Promise<Cached<ShopLanguages> | null> {
+		return this.read(this.key(storeId, 'languages'));
+	}
+	putShopLanguages(storeId: string, langs: ShopLanguages): Promise<Cached<ShopLanguages>> {
+		return this.write(this.key(storeId, 'languages'), langs);
 	}
 
 	getCategories(storeId: string, kind: string): Promise<Cached<CategoryListItem[]> | null> {

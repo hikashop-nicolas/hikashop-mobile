@@ -247,7 +247,7 @@ export function OrderDetail() {
 									onFiles={(next) => setCustomFieldFiles(f.namekey, next)} />
 							))}
 							<Button variant="pri" style={{ marginTop: 'var(--hk-s2)' }} disabled={fieldsBusy} onClick={() => void saveFields()}>
-								{fieldsBusy ? t('product.saving') : fieldsSaved ? t('product.saved') : t('common.save')}
+								<Icon name="save" size={16} /> {fieldsBusy ? t('product.saving') : fieldsSaved ? t('product.saved') : t('common.save')}
 							</Button>
 							{fieldsErr && <div className="hk-error-note" style={{ marginTop: 'var(--hk-s3)' }}>{fieldsErr}</div>}
 						</div>

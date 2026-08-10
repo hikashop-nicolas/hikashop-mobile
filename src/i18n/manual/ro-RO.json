@@ -6,7 +6,6 @@
 		"21 de variante. That de is what the other form carries.",
 		"Formal address (dumneavoastră), matching the tone of the HikaShop backend."
 	],
-
 	"access.all": "Toate",
 	"access.groupCount": "{count} grupuri",
 	"access.groups": "Grupuri selectate",
@@ -377,5 +376,11 @@
 	"unsaved.body": "În acest formular există modificări nesalvate. Dacă plecați, se pierd.",
 	"unsaved.discard": "Renunță la modificări",
 	"unsaved.stay": "Rămâi și continuă editarea",
-	"unsaved.title": "Modificări nesalvate"
+	"unsaved.title": "Modificări nesalvate",
+	"translations.title": "Traduceri",
+	"translations.language": "Limbă",
+	"translations.original": "Original",
+	"translations.disabled": "Acest magazin are o singură limbă, sau editarea traducerilor este oprită din setări.",
+	"category.pageInfo": "Informații pe pagina produsului",
+	"translations.shopLanguage": "limba magazinului"
 }

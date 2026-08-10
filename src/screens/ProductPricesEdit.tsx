@@ -163,7 +163,7 @@ export function ProductPricesEdit() {
 		<Screen
 			title={t('product.editPrices')}
 			left={<button className="hk-iconbtn" onClick={() => confirmLeave(() => nav(`/products/${id}`))} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-			right={rows ? <Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button> : undefined}
+			right={rows ? <Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}><Icon name="save" size={16} /> {busy ? t('product.saving') : t('common.save')}</Button> : undefined}
 		>
 			{loading || !rows ? (
 				<div className="hk-center-col"><Spinner /></div>

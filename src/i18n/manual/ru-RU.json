@@ -6,7 +6,6 @@
 		"strings carry one, few and many rather than borrowing English's two.",
 		"Formal address (вы), matching the tone of the HikaShop backend."
 	],
-
 	"access.all": "Все",
 	"access.groupCount": "Групп: {count}",
 	"access.groups": "Выбранные группы",
@@ -383,5 +382,11 @@
 	"unsaved.body": "В этой форме есть несохранённые изменения. Если вы уйдёте, они пропадут.",
 	"unsaved.discard": "Отменить изменения",
 	"unsaved.stay": "Продолжить редактирование",
-	"unsaved.title": "Несохранённые изменения"
+	"unsaved.title": "Несохранённые изменения",
+	"translations.title": "Переводы",
+	"translations.language": "Язык",
+	"translations.original": "Оригинал",
+	"translations.disabled": "В этом магазине один язык, либо редактирование переводов отключено в настройках.",
+	"category.pageInfo": "Информация на странице товара",
+	"translations.shopLanguage": "язык магазина"
 }

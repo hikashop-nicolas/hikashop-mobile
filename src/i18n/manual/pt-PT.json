@@ -5,7 +5,6 @@
 		"these. Formal address, matching the tone of the HikaShop backend. Brazilian Portuguese is",
 		"a separate file: the vocabulary differs (encomenda vs pedido, IVA vs imposto)."
 	],
-
 	"access.all": "Todos",
 	"access.groupCount": "{count} grupo(s)",
 	"access.groups": "Grupos selecionados",
@@ -370,5 +369,11 @@
 	"unsaved.body": "Este formulário tem alterações que não foram guardadas. Se sair, perdem-se.",
 	"unsaved.discard": "Descartar as alterações",
 	"unsaved.stay": "Continuar a editar",
-	"unsaved.title": "Alterações não guardadas"
+	"unsaved.title": "Alterações não guardadas",
+	"translations.title": "Traduções",
+	"translations.language": "Idioma",
+	"translations.original": "Original",
+	"translations.disabled": "Esta loja tem apenas um idioma, ou a edição de traduções está desligada nas definições.",
+	"category.pageInfo": "Informação na página do produto",
+	"translations.shopLanguage": "idioma da loja"
 }

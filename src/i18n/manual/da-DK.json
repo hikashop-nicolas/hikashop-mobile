@@ -4,7 +4,6 @@
 		"from HikaShop's own da-DK file by tools/build-locales.mjs, so regenerating keeps these.",
 		"Danish counts in two like English, so the counted strings need no extra forms."
 	],
-
 	"access.all": "Alle",
 	"access.groupCount": "{count} grupper",
 	"access.groups": "Valgte grupper",
@@ -369,5 +368,11 @@
 	"unsaved.body": "Der er ændringer i denne formular, som ikke er gemt. Går du væk, forsvinder de.",
 	"unsaved.discard": "Kassér ændringer",
 	"unsaved.stay": "Bliv og rediger videre",
-	"unsaved.title": "Ikke-gemte ændringer"
+	"unsaved.title": "Ikke-gemte ændringer",
+	"translations.title": "Oversættelser",
+	"translations.language": "Sprog",
+	"translations.original": "Original",
+	"translations.disabled": "Denne butik har ét sprog, eller redigering af oversættelser er slået fra i indstillingerne.",
+	"category.pageInfo": "Oplysninger på varesiden",
+	"translations.shopLanguage": "butikkens sprog"
 }

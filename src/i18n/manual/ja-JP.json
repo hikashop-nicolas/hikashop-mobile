@@ -6,7 +6,6 @@
 		"the noun instead (1件, 3枚, 5泊).",
 		"Polite ですます throughout, matching the tone of the HikaShop backend."
 	],
-
 	"access.all": "すべて",
 	"access.groupCount": "{count} グループ",
 	"access.groups": "選択中のグループ",
@@ -371,5 +370,11 @@
 	"unsaved.body": "このフォームには保存していない変更があります。移動すると失われます。",
 	"unsaved.discard": "変更を破棄",
 	"unsaved.stay": "編集を続ける",
-	"unsaved.title": "保存していない変更"
+	"unsaved.title": "保存していない変更",
+	"translations.title": "翻訳",
+	"translations.language": "言語",
+	"translations.original": "原文",
+	"translations.disabled": "このショップの言語は一つだけか、設定で翻訳の編集がオフになっています。",
+	"category.pageInfo": "商品ページの案内",
+	"translations.shopLanguage": "ショップの言語"
 }

@@ -4,7 +4,6 @@
 		"from HikaShop's own nl-NL file by tools/build-locales.mjs, so regenerating keeps these.",
 		"Formal address (u), matching the tone of the HikaShop backend."
 	],
-
 	"access.all": "Iedereen",
 	"access.groupCount": "{count} groep(en)",
 	"access.groups": "Geselecteerde groepen",
@@ -364,5 +363,11 @@
 	"unsaved.body": "Dit formulier bevat wijzigingen die niet zijn opgeslagen. Als u weggaat, gaan ze verloren.",
 	"unsaved.discard": "Wijzigingen verwerpen",
 	"unsaved.stay": "Verder bewerken",
-	"unsaved.title": "Niet-opgeslagen wijzigingen"
+	"unsaved.title": "Niet-opgeslagen wijzigingen",
+	"translations.title": "Vertalingen",
+	"translations.language": "Taal",
+	"translations.original": "Origineel",
+	"translations.disabled": "Deze winkel heeft één taal, of het bewerken van vertalingen staat uit in de instellingen.",
+	"category.pageInfo": "Informatie op de productpagina",
+	"translations.shopLanguage": "winkeltaal"
 }

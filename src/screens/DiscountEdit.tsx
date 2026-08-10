@@ -174,7 +174,7 @@ export function DiscountEdit() {
 		<Screen
 			title={editing ? code || t('discount.edit') : t('discounts.newDiscount')}
 			left={<button className="hk-iconbtn" onClick={() => confirmLeave(() => nav('/discounts'))} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-			right={<Button variant="pri" size="sm" disabled={busy || !loaded} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button>}
+			right={<Button variant="pri" size="sm" disabled={busy || !loaded} onClick={() => void save()}><Icon name="save" size={16} /> {busy ? t('product.saving') : t('common.save')}</Button>}
 		>
 			{!loaded ? (
 				<div className="hk-center-col"><Spinner /></div>

@@ -355,5 +355,11 @@
 	"unsaved.body": "Questo modulo contiene modifiche non salvate. Uscendo andranno perse.",
 	"unsaved.discard": "Scarta le modifiche",
 	"unsaved.stay": "Continua a modificare",
-	"unsaved.title": "Modifiche non salvate"
+	"unsaved.title": "Modifiche non salvate",
+	"translations.title": "Traduzioni",
+	"translations.language": "Lingua",
+	"translations.original": "Originale",
+	"translations.disabled": "Questo negozio ha una sola lingua, oppure la modifica delle traduzioni è disattivata nelle impostazioni.",
+	"category.pageInfo": "Informazioni sulla pagina prodotto",
+	"translations.shopLanguage": "lingua del negozio"
 }

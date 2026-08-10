@@ -158,4 +158,5 @@ export const messages: Partial<Messages> = {
 	'tabs.discounts': "Знижки",
 	'tabs.orders': "Замовлення",
 	'tabs.products': "Товари",
+	'translations.title': "Переклади",
 };

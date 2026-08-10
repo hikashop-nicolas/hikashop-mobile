@@ -177,4 +177,6 @@ export const messages: Partial<Messages> = {
 	'tabs.discounts': "التخفيضات",
 	'tabs.orders': "الطلبات",
 	'tabs.products': "المنتوجات",
+	'translations.language': "اللغة",
+	'translations.title': "الترجمات",
 };

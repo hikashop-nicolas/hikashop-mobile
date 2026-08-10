@@ -539,4 +539,10 @@ export const fr: Messages = {
 	'media.editFailed': "L'image n'a pas pu être modifiée.",
 	'media.editHint': "Faites glisser pour déplacer, pincez ou utilisez la molette pour zoomer, tirez les coins pour définir le format, et les boutons pour pivoter. L'originale n'est pas modifiée : ceci est enregistré comme une nouvelle image.",
 	'media.edit': 'Modifier',
+	'translations.title': "Traductions",
+	'translations.language': "Langue",
+	'translations.original': "Original",
+	'translations.disabled': "Cette boutique n'a qu'une langue, ou la modification des traductions est désactivée dans ses paramètres.",
+	'category.pageInfo': "Informations sur la page produit",
+	'translations.shopLanguage': "langue de la boutique",
 };

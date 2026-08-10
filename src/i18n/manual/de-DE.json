@@ -4,24 +4,20 @@
 		"from HikaShop's own de-DE file by tools/build-locales.mjs, so regenerating keeps these.",
 		"Formal address (Sie), matching the tone of the HikaShop backend."
 	],
-
 	"access.all": "Alle",
 	"access.groupCount": "{count} Gruppe(n)",
 	"access.groups": "Ausgewählte Gruppen",
 	"access.noGroups": "Keine Kundengruppen gefunden.",
 	"access.none": "Niemand",
-
 	"address.choose": "Auswählen",
 	"address.searchCountry": "Land suchen",
 	"address.searchState": "Region suchen",
-
 	"categories.choose": "Auswählen",
 	"categories.collapse": "Unterkategorien ausblenden",
 	"categories.noMatch": "Keine Kategorie gefunden.",
 	"categories.none": "Noch keine Kategorien",
 	"categories.openLevel": "{name} öffnen",
 	"categories.search": "Kategorien suchen",
-
 	"category.deleteCategory": "Kategorie löschen",
 	"category.deleteConfirm": "Diese Kategorie und ihre Unterkategorien löschen?",
 	"category.editBrand": "Hersteller bearbeiten",
@@ -32,12 +28,10 @@
 	"category.nameRequired": "Ein Name ist erforderlich",
 	"category.newBrand": "Neuer Hersteller",
 	"category.newCategory": "Neue Kategorie",
-
 	"common.create": "Erstellen",
 	"common.done": "Fertig",
 	"common.loadingFailed": "Laden fehlgeschlagen.",
 	"common.skipToContent": "Zum Inhalt springen",
-
 	"connect.codeHint": "Wird mit dem QR-Code in Ihrem Backend angezeigt.",
 	"connect.errFailed": "Die Verbindung ist fehlgeschlagen.",
 	"connect.errNoCode": "Geben Sie den Kopplungscode ein.",
@@ -51,7 +45,6 @@
 	"connect.scan": "QR-Code scannen",
 	"connect.storeAddress": "Shop-Adresse",
 	"connect.title": "Shop verbinden",
-
 	"customers.addAddress": "{type} hinzufügen",
 	"customers.cannotEditAccount": "Sie haben keine Berechtigung, dieses Konto zu bearbeiten.",
 	"customers.countOf": "{shown} von {total}",
@@ -76,7 +69,6 @@
 	"customers.search": "Name oder E-Mail suchen",
 	"customers.setDefault": "Als Standard festlegen",
 	"customers.since": "Kunde seit {date}",
-
 	"dashboard.avgOrder": "Ø Bestellwert",
 	"dashboard.noRevenue": "Kein Umsatz in diesem Zeitraum.",
 	"dashboard.noSales": "Keine Verkäufe in diesem Zeitraum.",
@@ -87,7 +79,6 @@
 	"dashboard.sold.one": "{count} verkauft",
 	"dashboard.sold.other": "{count} verkauft",
 	"dashboard.topProducts": "Meistverkaufte Produkte",
-
 	"discount.access": "Verfügbar für",
 	"discount.accessHint": "Welche Kundengruppen ihn verwenden dürfen",
 	"discount.autoApplied": "Automatisch angewendet",
@@ -129,12 +120,10 @@
 	"discount.usedOfQuota": "{used} von {quota} verwendet",
 	"discount.usedTimes": "{count}-mal verwendet",
 	"discount.zonesHint": "Leer lassen, um überall zuzulassen",
-
 	"discounts.countOf": "{shown} von {total}",
 	"discounts.newDiscount": "Neuer Rabatt",
 	"discounts.none": "Keine Rabatte gefunden.",
 	"discounts.search": "Nach Code suchen",
-
 	"error.bad_response": "Der Shop hat eine unerwartete Antwort gesendet.",
 	"error.code_taken": "Dieser Gutscheincode wird bereits verwendet.",
 	"error.email_taken": "Diese E-Mail-Adresse wird bereits verwendet.",
@@ -149,7 +138,6 @@
 	"error.not_found": "Nicht gefunden.",
 	"error.unauthorized": "Dieses Gerät ist nicht mehr berechtigt. Verbinden Sie es erneut.",
 	"error.username_taken": "Dieser Benutzername wird bereits verwendet.",
-
 	"field.addFile": "Datei hinzufügen",
 	"field.dateUnavailable": "Dieses Datum ist nicht verfügbar.",
 	"field.maxNights.one": "Höchstens {count} Nacht",
@@ -158,15 +146,12 @@
 	"field.minNights.other": "Mindestens {count} Nächte",
 	"field.pickDate": "Datum wählen",
 	"field.pickRange": "Startdatum wählen",
-
 	"list.countOf": "{shown} von {total}",
 	"list.loadMoreFailed": "Es konnten nicht mehr geladen werden. Zum Wiederholen tippen.",
 	"loading": "Wird geladen",
-
 	"mass.restricted": "Einige davon tun mehr, als Ihr Konto ausführen darf; diese Schritte werden übersprungen.",
 	"mass.selected.one": "{count} ausgewählt",
 	"mass.selected.other": "{count} ausgewählt",
-
 	"media.browse": "Durchsuchen",
 	"media.browseTitle": "Medienbibliothek",
 	"media.dropFileHint": "Dateien zum Hochladen hierher ziehen",
@@ -188,7 +173,6 @@
 	"media.useFile": "Datei verwenden",
 	"media.useImage": "Bild verwenden",
 	"media.viewImage": "Bild ansehen",
-
 	"notifications.alertMe": "Benachrichtigen bei",
 	"notifications.enable": "Gerätebenachrichtigungen",
 	"notifications.foregroundOnly": "Benachrichtigungen kommen an, während die App geöffnet ist. Zustellung im Hintergrund folgt später.",
@@ -205,11 +189,9 @@
 	"notifications.turnOff": "Ausschalten",
 	"notifications.turnOn": "Einschalten",
 	"notifications.unsupported": "Dieses Gerät kann keine Benachrichtigungen anzeigen.",
-
 	"notify.lowStock": "Geringer Lagerbestand",
 	"notify.lowStockBody": "{name} — noch {count}",
 	"notify.newOrder": "Neue Bestellung #{number}",
-
 	"order.addTaxRate": "Steuersatz hinzufügen",
 	"order.adjustFees": "Gebühren anpassen",
 	"order.availableCoupons": "Verfügbare Gutscheine",
@@ -235,16 +217,13 @@
 	"order.title": "Bestellung #{number}",
 	"order.updating": "Wird aktualisiert…",
 	"order.warehouseNo": "Lager {key}",
-
 	"orders.countOf": "{shown} von {total}",
 	"orders.existingCustomer": "Bestehender Kunde",
 	"orders.filterByStatus": "Nach Status filtern",
 	"orders.newOrder": "Neue Bestellung",
 	"orders.search": "Bestellnummer oder Kunde suchen",
-
 	"picker.noResults": "Keine Ergebnisse",
 	"picker.typeToSearch": "Zum Suchen tippen",
-
 	"product.addBrand": "Hersteller hinzufügen",
 	"product.addCategory": "Kategorie hinzufügen",
 	"product.addExistingOption": "Vorhandene Option hinzufügen",
@@ -316,16 +295,13 @@
 	"product.variantsManaged": "Der Lagerbestand wird je Variante verwaltet.",
 	"product.variantsSummary.one": "{options} Optionen · {count} Variante",
 	"product.variantsSummary.other": "{options} Optionen · {count} Varianten",
-
 	"products.allCategories": "Alle Kategorien",
 	"products.countOf": "{shown} von {total}",
 	"products.filterByCategory": "Nach Kategorie filtern",
 	"products.search": "Name oder Artikelnummer suchen",
-
 	"related.bundle": "Paket",
 	"related.pickProduct": "Produkt wählen",
 	"related.related": "Ähnliche Produkte",
-
 	"rte.bold": "Fett",
 	"rte.bulletList": "Aufzählung",
 	"rte.clearFormatting": "Formatierung entfernen",
@@ -335,7 +311,6 @@
 	"rte.numberedList": "Nummerierte Liste",
 	"rte.toolbar": "Formatierung",
 	"rte.underline": "Unterstrichen",
-
 	"scan.action": "Scannen",
 	"scan.denied": "Die Kameraberechtigung wurde verweigert.",
 	"scan.enterBarcode": "Barcode",
@@ -350,7 +325,6 @@
 	"scan.scanAnother": "Weiteres scannen",
 	"scan.unsupported": "Dieses Gerät unterstützt das Scannen nicht.",
 	"scan.useCamera": "Kamera verwenden",
-
 	"shortcut.close": "Geöffnetes schließen",
 	"shortcut.filter": "Zum Filtern tippen",
 	"shortcut.goStores": "Shops",
@@ -361,10 +335,8 @@
 	"shortcut.note": "Während der Eingabe sind Tastenkürzel deaktiviert.",
 	"shortcut.palette": "Diese Palette öffnen, auch während der Eingabe",
 	"shortcut.title": "Tastenkürzel",
-
 	"status.completed": "Abgeschlossen",
 	"status.processing": "In Bearbeitung",
-
 	"stores.active": "Aktiv",
 	"stores.add": "Weiteren Shop hinzufügen",
 	"stores.appearance": "Darstellung",
@@ -377,11 +349,15 @@
 	"stores.removeConfirm": "{name} entfernen?",
 	"stores.themeAuto": "Wie das Gerät",
 	"stores.title": "Ihre Shops",
-
 	"tabs.stores": "Shops",
-
 	"unsaved.body": "Dieses Formular enthält Änderungen, die nicht gespeichert wurden. Wenn Sie es verlassen, gehen sie verloren.",
 	"unsaved.discard": "Änderungen verwerfen",
 	"unsaved.stay": "Weiter bearbeiten",
-	"unsaved.title": "Nicht gespeicherte Änderungen"
+	"unsaved.title": "Nicht gespeicherte Änderungen",
+	"translations.title": "Übersetzungen",
+	"translations.language": "Sprache",
+	"translations.original": "Original",
+	"translations.disabled": "Dieser Shop hat nur eine Sprache, oder das Bearbeiten von Übersetzungen ist in den Einstellungen ausgeschaltet.",
+	"category.pageInfo": "Infos auf der Produktseite",
+	"translations.shopLanguage": "Shopsprache"
 }

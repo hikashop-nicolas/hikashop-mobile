@@ -14,6 +14,7 @@ import { AccessField, ACCESS_ALL, accessSummary, toAccess } from './AccessField'
 import { CategoryPicker } from './CategoryPicker';
 import { useUnsavedChanges, useConfirmLeave } from '../app/unsaved';
 import { useDataChanged } from '../app/data-changed';
+import { useShopLanguages } from '../app/shop-languages';
 
 // Everything the form edits as a scalar. Access is structured, so it has its own state.
 type Form = Record<string, string | boolean>;
@@ -42,6 +43,7 @@ export function ProductEdit() {
 	const nav = useNavigate();
 	const { client, active, cache } = useStores();
 	const confirmLeave = useConfirmLeave();
+	const shopLangs = useShopLanguages();
 	const changed = useDataChanged();
 	const t = useT();
 	const storeId = active?.id ?? '';
@@ -235,7 +237,17 @@ export function ProductEdit() {
 			title={t('product.editTitle')}
 			left={<button className="hk-iconbtn" onClick={() => confirmLeave(() => nav('/products'))} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
 			right={form ? (
-				<Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}>{busy ? t('product.saving') : t('common.save')}</Button>
+				<>
+					{/* The merchant's own text in the shop's other languages. An action rather than a
+					    field, since it leaves this form; only where the shop has somewhere to put a
+					    translation, and only once the product exists to attach one to. */}
+					{shopLangs?.enabled && productId > 0 && (
+						<Button size="sm" onClick={() => confirmLeave(() => nav(`/products/${productId}/translations`))}>
+							<Icon name="translate" size={17} /> {t('translations.title')}
+						</Button>
+					)}
+					<Button variant="pri" size="sm" disabled={busy} onClick={() => void save()}><Icon name="save" size={16} /> {busy ? t('product.saving') : t('common.save')}</Button>
+				</>
 			) : undefined}
 		>
 			{loading || !form ? (

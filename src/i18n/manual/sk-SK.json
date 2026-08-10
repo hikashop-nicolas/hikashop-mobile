@@ -5,7 +5,6 @@
 		"Slovak counts in three like Czech: 1 variant, 2 varianty, 5 variantov.",
 		"Formal address (vykanie), matching the tone of the HikaShop backend."
 	],
-
 	"access.all": "Všetko",
 	"access.groupCount": "Skupín: {count}",
 	"access.groups": "Vybrané skupiny",
@@ -376,5 +375,11 @@
 	"unsaved.body": "V tomto formulári sú neuložené zmeny. Keď odídete, stratia sa.",
 	"unsaved.discard": "Zahodiť zmeny",
 	"unsaved.stay": "Zostať a pokračovať v úpravách",
-	"unsaved.title": "Neuložené zmeny"
+	"unsaved.title": "Neuložené zmeny",
+	"translations.title": "Preklady",
+	"translations.language": "Jazyk",
+	"translations.original": "Originál",
+	"translations.disabled": "Tento obchod má jeden jazyk, alebo je úprava prekladov v nastaveniach vypnutá.",
+	"category.pageInfo": "Informácie na stránke produktu",
+	"translations.shopLanguage": "jazyk obchodu"
 }

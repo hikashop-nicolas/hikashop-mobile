@@ -16,7 +16,7 @@ export function hikaTag(locale: string): string {
 	return 'en-GB';
 }
 
-export interface Versions { i18n: string; statuses: string }
+export interface Versions { i18n: string; statuses: string; languages: string }
 
 const VersionsContext = createContext<{ versions: Versions | null; tag: string }>({ versions: null, tag: 'en-GB' });
 

@@ -21,6 +21,7 @@ import { OrderDetail } from './screens/OrderDetail';
 import { Products } from './screens/Products';
 import { ProductEdit } from './screens/ProductEdit';
 import { ProductPricesEdit } from './screens/ProductPricesEdit';
+import { ContentTranslations } from './screens/ContentTranslations';
 import { OrderFeesEdit } from './screens/OrderFeesEdit';
 import { ProductVariantsEdit } from './screens/ProductVariantsEdit';
 import { VariantEdit } from './screens/VariantEdit';
@@ -246,12 +247,14 @@ function Shell() {
 									<Route path=":id" element={<ProductEdit />} />
 									<Route path=":id/edit" element={<Navigate to=".." relative="path" replace />} />
 									<Route path=":id/prices" element={<ProductPricesEdit />} />
+									<Route path=":id/translations" element={<ContentTranslations type="products" />} />
 									<Route path=":id/variants" element={<ProductVariantsEdit />} />
 									<Route path=":id/variants/:vid" element={<VariantEdit />} />
 								</Route>
 								<Route path="/categories" element={<SplitView list={<Categories />} />}>
 									<Route path="new" element={<CategoryEdit />} />
 									<Route path=":id/edit" element={<CategoryEdit />} />
+									<Route path=":id/translations" element={<ContentTranslations type="categories" />} />
 								</Route>
 								<Route path="/customers" element={<SplitView list={<Customers />} />}>
 									<Route path=":id" element={<CustomerDetail />} />

@@ -4,7 +4,6 @@
 		"from HikaShop's own sv-SE file by tools/build-locales.mjs, so regenerating keeps these.",
 		"Swedish counts in two like English, so the counted strings need no extra forms."
 	],
-
 	"access.all": "Alla",
 	"access.groupCount": "{count} grupper",
 	"access.groups": "Valda grupper",
@@ -369,5 +368,11 @@
 	"unsaved.body": "Det finns ändringar i det här formuläret som inte är sparade. Lämnar du sidan försvinner de.",
 	"unsaved.discard": "Kasta ändringarna",
 	"unsaved.stay": "Stanna och fortsätt redigera",
-	"unsaved.title": "Osparade ändringar"
+	"unsaved.title": "Osparade ändringar",
+	"translations.title": "Översättningar",
+	"translations.language": "Språk",
+	"translations.original": "Original",
+	"translations.disabled": "Den här butiken har ett språk, eller så är redigering av översättningar avstängd i inställningarna.",
+	"category.pageInfo": "Information på produktsidan",
+	"translations.shopLanguage": "butikens språk"
 }

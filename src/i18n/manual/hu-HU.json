@@ -5,7 +5,6 @@
 		"Hungarian counts in two, and a noun after a numeral stays singular: 5 változat, not változatok.",
 		"Formal address (ön), matching the tone of the HikaShop backend."
 	],
-
 	"access.all": "Mind",
 	"access.groupCount": "{count} csoport",
 	"access.groups": "Kiválasztott csoportok",
@@ -370,5 +369,11 @@
 	"unsaved.body": "Ezen az űrlapon nem mentett módosítások vannak. Ha elnavigál, elvesznek.",
 	"unsaved.discard": "Módosítások elvetése",
 	"unsaved.stay": "Maradok és tovább szerkesztem",
-	"unsaved.title": "Nem mentett módosítások"
+	"unsaved.title": "Nem mentett módosítások",
+	"translations.title": "Fordítások",
+	"translations.language": "Nyelv",
+	"translations.original": "Eredeti",
+	"translations.disabled": "Ennek az áruháznak egy nyelve van, vagy a fordítások szerkesztése ki van kapcsolva a beállításokban.",
+	"category.pageInfo": "A termékoldal tájékoztatója",
+	"translations.shopLanguage": "az áruház nyelve"
 }

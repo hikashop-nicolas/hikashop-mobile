@@ -356,5 +356,11 @@
 	"unsaved.body": "Este formulario tiene cambios sin guardar. Si sale, se perderán.",
 	"unsaved.discard": "Descartar los cambios",
 	"unsaved.stay": "Seguir editando",
-	"unsaved.title": "Cambios sin guardar"
+	"unsaved.title": "Cambios sin guardar",
+	"translations.title": "Traducciones",
+	"translations.language": "Idioma",
+	"translations.original": "Original",
+	"translations.disabled": "Esta tienda tiene un solo idioma, o la edición de traducciones está desactivada en sus ajustes.",
+	"category.pageInfo": "Información en la página del producto",
+	"translations.shopLanguage": "idioma de la tienda"
 }

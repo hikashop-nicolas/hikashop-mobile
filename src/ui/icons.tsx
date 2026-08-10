@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 // A small, consistent line-icon set. All icons are drawn on a 24x24 grid, stroked with
 // currentColor so they inherit text colour, and share one stroke weight and round joins.
 
-export type IconName = 'dashboard' | 'orders' | 'store' | 'search' | 'plus' | 'back' | 'scan' | 'bell' | 'products' | 'chevron' | 'check' | 'close' | 'categories' | 'trash' | 'edit' | 'customers' | 'discount' | 'trendUp' | 'trendDown' | 'eye' | 'upload' | 'image' | 'play';
+export type IconName = 'dashboard' | 'orders' | 'store' | 'search' | 'plus' | 'back' | 'scan' | 'bell' | 'products' | 'chevron' | 'check' | 'close' | 'categories' | 'trash' | 'edit' | 'customers' | 'discount' | 'trendUp' | 'trendDown' | 'eye' | 'upload' | 'image' | 'play' | 'translate' | 'save';
 
 const PATHS: Record<IconName, ReactNode> = {
 	discount: (
@@ -97,6 +97,27 @@ const PATHS: Record<IconName, ReactNode> = {
 		<>
 			<path d="M4 20h4l10-10-4-4L4 16z" />
 			<path d="M13.5 6.5l4 4" />
+		</>
+	),
+	// Two scripts side by side: the strokes of 文 and a Latin A. The character is kept clear of
+	// the left edge and its strokes end well inside the box, or at 15px it reads as one that has
+	// been cut off rather than one written small.
+	translate: (
+		<>
+			<path d="M8.2 4v1.6" />
+			<path d="M4.8 5.6h7" />
+			<path d="M9.6 5.6c0 3.4-1.7 5.9-4.8 7.5" />
+			<path d="M6.4 9.6c1.4 2.3 3.2 3.8 5.3 4.7" />
+			<path d="M13.2 20.4L17 11.4 20.8 20.4" />
+			<path d="M14.7 17.2h4.6" />
+		</>
+	),
+	// A floppy disk: the shutter above, the label below, and the corner the sleeve cut off.
+	save: (
+		<>
+			<path d="M6 4.5h9.3L19.5 8.7V18a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 18V6A1.5 1.5 0 0 1 6 4.5z" />
+			<path d="M8.7 4.5v4h6V4.5" />
+			<path d="M8.2 19.5v-4.8h7.6v4.8" />
 		</>
 	),
 	chevron: <path d="M9 6l6 6-6 6" />,

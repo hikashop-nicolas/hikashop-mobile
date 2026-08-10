@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useStores } from '../app/store-context';
 import { useT, tError } from '../i18n';
 import type { ProductFile, Access } from '../core';
-import { Modal, Field, Button } from '../ui';
+import { Modal, Field, Button, Icon} from '../ui';
 import { AccessField, toAccess } from './AccessField';
 
 // Edit one file's options: name, description, access, and (for downloadable files)
@@ -43,7 +43,7 @@ export function FileOptionsModal({ productId, file, kind, onClose, onSaved }: {
 		<Modal title={t('media.editImage')} onClose={onClose}
 			footer={<>
 				<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
-				<Button variant="pri" onClick={() => void save()} disabled={busy}>{busy ? t('product.saving') : t('common.save')}</Button>
+				<Button variant="pri" onClick={() => void save()} disabled={busy}><Icon name="save" size={16} /> {busy ? t('product.saving') : t('common.save')}</Button>
 			</>}
 		>
 			<div className="hk-form">

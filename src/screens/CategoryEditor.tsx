@@ -1,5 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
+import { useShopLanguages } from '../app/shop-languages';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl, WRITABLE_FIELD_TYPES } from '../core';
 import type { ProductMeta, ProductField, CategoryDetail, FieldFile, Access } from '../core';
@@ -25,6 +27,8 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 	presentation?: 'modal' | 'screen';
 }) {
 	const { client } = useStores();
+	const nav = useNavigate();
+	const shopLangs = useShopLanguages();
 	const t = useT();
 	const imgInput = useRef<HTMLInputElement>(null);
 	const editing = !!category;
@@ -185,6 +189,12 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 			</div>
 	);
 
+	const translateBtn = editing && shopLangs?.enabled ? (
+		<Button size="sm" onClick={() => { onClose(); nav(`/categories/${category!.id}/translations`); }}>
+			<Icon name="translate" size={17} /> {t('translations.title')}
+		</Button>
+	) : null;
+
 	const saveLabel = busy ? t('product.saving') : editing ? t('common.save') : t('common.create');
 
 	if (presentation === 'screen') {
@@ -192,7 +202,7 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 			<Screen
 				title={title}
 				left={<button className="hk-iconbtn" onClick={onClose} aria-label={t('common.back')}><Icon name="back" size={24} /></button>}
-				right={<Button variant="pri" size="sm" disabled={busy} onClick={() => void submit()}>{saveLabel}</Button>}
+				right={<>{translateBtn}<Button variant="pri" size="sm" disabled={busy} onClick={() => void submit()}><Icon name="save" size={16} /> {saveLabel}</Button></>}
 			>
 				{body}
 			</Screen>
@@ -202,8 +212,9 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 	return (
 		<Modal title={title} onClose={onClose}
 			footer={<>
+				{translateBtn}
 				<Button onClick={onClose} disabled={busy}>{t('common.cancel')}</Button>
-				<Button variant="pri" onClick={() => void submit()} disabled={busy}>{saveLabel}</Button>
+				<Button variant="pri" onClick={() => void submit()} disabled={busy}><Icon name="save" size={16} /> {saveLabel}</Button>
 			</>}
 		>
 			{body}

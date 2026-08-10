@@ -5,7 +5,6 @@
 		"Finnish counts in two, so the counted strings need no extra forms; what they do need is the",
 		"partitive after a numeral, which is why 1 variantti becomes 5 varianttia."
 	],
-
 	"access.all": "Kaikki",
 	"access.groupCount": "{count} ryhmää",
 	"access.groups": "Valitut ryhmät",
@@ -370,5 +369,11 @@
 	"unsaved.body": "Tässä lomakkeessa on tallentamattomia muutoksia. Jos poistut, ne katoavat.",
 	"unsaved.discard": "Hylkää muutokset",
 	"unsaved.stay": "Jää muokkaamaan",
-	"unsaved.title": "Tallentamattomia muutoksia"
+	"unsaved.title": "Tallentamattomia muutoksia",
+	"translations.title": "Käännökset",
+	"translations.language": "Kieli",
+	"translations.original": "Alkuperäinen",
+	"translations.disabled": "Tässä kaupassa on yksi kieli, tai käännösten muokkaus on kytketty pois asetuksista.",
+	"category.pageInfo": "Tuotesivun tiedot",
+	"translations.shopLanguage": "kaupan kieli"
 }
