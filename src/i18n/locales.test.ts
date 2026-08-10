@@ -130,6 +130,23 @@ describe('locales', () => {
 		}
 	});
 
+	it('keeps the two Serbian alphabets apart, and each in its own', async () => {
+		// Serbian is written in both, and the Latin catalogue is transliterated from the Cyrillic
+		// by tools/serbian-latin.mjs. What matters at runtime is that each locale is in the
+		// alphabet its reader asked for, and that neither borrows from the other.
+		const cyr = (await import('./generated/sr-RS.ts')) as { messages: Record<string, string> };
+		const lat = (await import('./generated/sr-YU.ts')) as { messages: Record<string, string> };
+		const script = (m: Record<string, string>, re: RegExp) =>
+			Object.values(m).join(' ').match(re)?.length ?? 0;
+		expect(script(cyr.messages, /[\u0400-\u04FF]/g), 'sr-RS is Cyrillic').toBeGreaterThan(1000);
+		expect(script(cyr.messages, /[čćđšž]/g), 'sr-RS has no Latin diacritics').toBe(0);
+		expect(script(lat.messages, /[čćđšž]/g), 'sr-YU is Latin').toBeGreaterThan(100);
+		// Not zero: HikaShop's own sr-YU file has Cyrillic letters sitting inside Latin words
+		// (Prikаži, Sаkrij), so a handful arrive with the strings taken from it. What must hold is
+		// that the Latin catalogue is Latin, not that a supplied string is perfect.
+		expect(script(lat.messages, /[\u0400-\u04FF]/g), 'sr-YU is mostly Cyrillic').toBeLessThan(60);
+	});
+
 	it('never leaves a placeholder stranded', async () => {
 		// A translation carrying {count} where the English does not, or missing one it needs,
 		// would render as literal braces to a merchant.

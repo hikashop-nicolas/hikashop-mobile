@@ -47,6 +47,8 @@ else; run the generator and the app picks them up.
 | ru-RU | 520 / 520 (+12 plural) | 100% | — | Written here |
 | sk-SK | 520 / 520 (+6 plural) | 100% | — | Written here |
 | sl-SI | 520 / 520 (+12 plural) | 100% | — | Written here |
+| sr-RS | 520 / 520 (+6 plural) | 100% | — | Written here |
+| sr-YU | 520 / 520 (+6 plural) | 100% | — | Written here |
 | sv-SE | 520 / 520 | 100% | — | Written here |
 | th-TH | 520 / 520 | 100% | — | Written here |
 | tr-TR | 520 / 520 | 100% | — | Written here |
@@ -66,11 +68,9 @@ else; run the generator and the app picks them up.
 | mk-MK | 149 / 520 | 29% | — | From HikaShop only |
 | kz-KZ | 148 / 520 | 28% | — | From HikaShop only |
 | bs-BA | 141 / 520 | 27% | — | From HikaShop only |
-| sr-YU | 138 / 520 | 27% | — | From HikaShop only |
 | srp-ME | 138 / 520 | 27% | — | From HikaShop only |
 | gl-ES | 137 / 520 | 26% | — | From HikaShop only |
 | ar-DZ | 136 / 520 | 26% | ar-AA | From HikaShop only |
-| sr-RS | 136 / 520 | 26% | — | From HikaShop only |
 | eu-ES | 134 / 520 | 26% | — | From HikaShop only |
 | ca-ES | 123 / 520 | 24% | — | From HikaShop only |
 | nl-NL-flemish | 117 / 520 | 23% | nl-NL | From HikaShop only |
