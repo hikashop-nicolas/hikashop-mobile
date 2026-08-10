@@ -28,6 +28,7 @@ else; run the generator and the app picks them up.
 | es-ES | 520 / 520 | 100% | — | Written here |
 | fi-FI | 520 / 520 | 100% | — | Written here |
 | he-IL | 520 / 520 (+6 plural) | 100% | — | Written here |
+| hr-HR | 520 / 520 (+6 plural) | 100% | — | Written here |
 | hu-HU | 520 / 520 | 100% | — | Written here |
 | id-ID | 520 / 520 | 100% | — | Written here |
 | it-IT | 520 / 520 | 100% | — | Written here |
@@ -42,6 +43,7 @@ else; run the generator and the app picks them up.
 | ro-RO | 520 / 520 (+6 plural) | 100% | — | Written here |
 | ru-RU | 520 / 520 (+12 plural) | 100% | — | Written here |
 | sk-SK | 520 / 520 (+6 plural) | 100% | — | Written here |
+| sl-SI | 520 / 520 (+12 plural) | 100% | — | Written here |
 | sv-SE | 520 / 520 | 100% | — | Written here |
 | th-TH | 520 / 520 | 100% | — | Written here |
 | tr-TR | 520 / 520 | 100% | — | Written here |
@@ -51,8 +53,6 @@ else; run the generator and the app picks them up.
 | ar-AR | 175 / 520 | 34% | ar-AA | From HikaShop only |
 | fa-IR | 175 / 520 | 34% | — | From HikaShop only |
 | lv-LV | 175 / 520 | 34% | — | From HikaShop only |
-| sl-SI | 175 / 520 | 34% | — | From HikaShop only |
-| hr-HR | 173 / 520 | 33% | — | From HikaShop only |
 | es-CL | 171 / 520 | 33% | es-ES | From HikaShop only |
 | de-AT | 166 / 520 | 32% | de-DE | From HikaShop only |
 | de-CH | 166 / 520 | 32% | de-DE | From HikaShop only |
