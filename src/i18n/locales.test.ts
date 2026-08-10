@@ -6,6 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { LOCALES, loadLocale, translate, resolveLocale } from './index';
 import { en } from './en';
+import { readFileSync } from 'node:fs';
 
 const tags = Object.keys(LOCALES);
 
@@ -145,6 +146,20 @@ describe('locales', () => {
 		// (Prikаži, Sаkrij), so a handful arrive with the strings taken from it. What must hold is
 		// that the Latin catalogue is Latin, not that a supplied string is perfect.
 		expect(script(lat.messages, /[\u0400-\u04FF]/g), 'sr-YU is mostly Cyrillic').toBeLessThan(60);
+	});
+
+	it('writes Persian with the Persian letters, not their Arabic lookalikes', async () => {
+		// ی and ک are Persian; ي and ك are Arabic and look the same in most fonts. Mixing them is
+		// invisible to a reader and breaks search and sorting, which is exactly how HikaShop's own
+		// Serbian Latin ended up with Cyrillic letters inside its words.
+		// Checked against what is written here. HikaShop's own Persian file uses the Arabic yeh on
+		// 773 of its 4,530 lines, so the strings taken from it carry some in; that is theirs to fix,
+		// and this holds the line for everything added here.
+		const mine = JSON.parse(readFileSync('src/i18n/manual/fa-IR.json', 'utf8')) as Record<string, unknown>;
+		const arabic = Object.entries(mine)
+			.filter(([k]) => k !== '_comment')
+			.filter(([, v]) => typeof v === 'string' && /[\u064A\u0643]/.test(v));
+		expect(arabic.map(([k]) => k), 'Arabic yeh or kaf in Persian').toEqual([]);
 	});
 
 	it('never leaves a placeholder stranded', async () => {
