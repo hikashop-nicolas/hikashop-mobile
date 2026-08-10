@@ -17,6 +17,8 @@ else; run the generator and the app picks them up.
 | de-DE | 514 / 514 | 100% | Written here |
 | es-ES | 514 / 514 | 100% | Written here |
 | it-IT | 514 / 514 | 100% | Written here |
+| nl-NL | 514 / 514 | 100% | Written here |
+| pt-PT | 514 / 514 | 100% | Written here |
 | ru-RU | 174 / 514 | 34% | From HikaShop only |
 | ar-AA | 173 / 514 | 34% | From HikaShop only |
 | ar-AR | 173 / 514 | 34% | From HikaShop only |
@@ -43,7 +45,6 @@ else; run the generator and the app picks them up.
 | da-DK | 168 / 514 | 33% | From HikaShop only |
 | ro-RO | 168 / 514 | 33% | From HikaShop only |
 | vi-VN | 167 / 514 | 32% | From HikaShop only |
-| pt-PT | 166 / 514 | 32% | From HikaShop only |
 | lt-LT | 165 / 514 | 32% | From HikaShop only |
 | de-AT | 164 / 514 | 32% | From HikaShop only |
 | de-CH | 164 / 514 | 32% | From HikaShop only |
@@ -51,7 +52,6 @@ else; run the generator and the app picks them up.
 | hi-IN | 164 / 514 | 32% | From HikaShop only |
 | id-ID | 164 / 514 | 32% | From HikaShop only |
 | nl-BE | 159 / 514 | 31% | From HikaShop only |
-| nl-NL | 159 / 514 | 31% | From HikaShop only |
 | fr-FR | 154 / 514 | 30% | From HikaShop only |
 | uk-UA | 154 / 514 | 30% | From HikaShop only |
 | fr-CA | 153 / 514 | 30% | From HikaShop only |
