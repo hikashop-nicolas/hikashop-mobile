@@ -18,7 +18,7 @@ export interface GeneratedLocale {
 export const GENERATED: Record<string, GeneratedLocale> = {
 	'af-ZA': { name: "Afrikaans", english: "Afrikaans", load: () => import('./af-ZA').then((m) => m.messages) },
 	'ar-AA': { name: "العربية (AA)", english: "Arabic", rtl: true, load: () => import('./ar-AA').then((m) => m.messages) },
-	'ar-AR': { name: "العربية (Argentina)", english: "Arabic", rtl: true, load: () => import('./ar-AR').then((m) => m.messages) },
+	'ar-AR': { name: "العربية (Argentina)", english: "Arabic", rtl: true, base: 'ar-AA', load: () => import('./ar-AR').then((m) => m.messages) },
 	'ar-DZ': { name: "العربية (Algeria)", english: "Arabic", rtl: true, base: 'ar-AA', load: () => import('./ar-DZ').then((m) => m.messages) },
 	'bg-BG': { name: "Български", english: "Bulgarian", load: () => import('./bg-BG').then((m) => m.messages) },
 	'bs-BA': { name: "Bosanski", english: "Bosnian", load: () => import('./bs-BA').then((m) => m.messages) },

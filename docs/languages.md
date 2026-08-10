@@ -20,12 +20,14 @@ else; run the generator and the app picks them up.
 
 | Locale | Strings | Coverage | Then reads | Source |
 | --- | --- | --- | --- | --- |
+| ar-AA | 520 / 520 (+24 plural) | 100% | — | Written here |
 | cs-CZ | 520 / 520 (+6 plural) | 100% | — | Written here |
 | da-DK | 520 / 520 | 100% | — | Written here |
 | de-DE | 520 / 520 | 100% | — | Written here |
 | el-GR | 520 / 520 | 100% | — | Written here |
 | es-ES | 520 / 520 | 100% | — | Written here |
 | fi-FI | 520 / 520 | 100% | — | Written here |
+| he-IL | 520 / 520 (+6 plural) | 100% | — | Written here |
 | hu-HU | 520 / 520 | 100% | — | Written here |
 | id-ID | 520 / 520 | 100% | — | Written here |
 | it-IT | 520 / 520 | 100% | — | Written here |
@@ -46,8 +48,7 @@ else; run the generator and the app picks them up.
 | vi-VN | 520 / 520 | 100% | — | Written here |
 | zh-CN | 520 / 520 | 100% | — | Written here |
 | zh-TW | 520 / 520 | 100% | — | Written here |
-| ar-AA | 175 / 520 | 34% | — | From HikaShop only |
-| ar-AR | 175 / 520 | 34% | — | From HikaShop only |
+| ar-AR | 175 / 520 | 34% | ar-AA | From HikaShop only |
 | fa-IR | 175 / 520 | 34% | — | From HikaShop only |
 | lv-LV | 175 / 520 | 34% | — | From HikaShop only |
 | sl-SI | 175 / 520 | 34% | — | From HikaShop only |
@@ -55,7 +56,6 @@ else; run the generator and the app picks them up.
 | es-CL | 171 / 520 | 33% | es-ES | From HikaShop only |
 | de-AT | 166 / 520 | 32% | de-DE | From HikaShop only |
 | de-CH | 166 / 520 | 32% | de-DE | From HikaShop only |
-| he-IL | 166 / 520 | 32% | — | From HikaShop only |
 | hi-IN | 166 / 520 | 32% | — | From HikaShop only |
 | lt-LT | 166 / 520 | 32% | — | From HikaShop only |
 | nl-BE | 161 / 520 | 31% | nl-NL | From HikaShop only |

@@ -87,12 +87,12 @@ describe('locales', () => {
 		const counted = Object.keys(en)
 			.filter((k) => k.endsWith('.other'))
 			.map((k) => k.slice(0, -'.other'.length));
-		for (const tag of ['pl-PL', 'ru-RU', 'cs-CZ', 'sk-SK', 'ro-RO']) {
+		for (const tag of ['pl-PL', 'ru-RU', 'cs-CZ', 'sk-SK', 'ro-RO', 'he-IL', 'ar-AA']) {
 			const { messages } = (await import(`./generated/${tag}.ts`)) as { messages: Record<string, string> };
 			// Only checked where the language has been written out here; one still on HikaShop's
 			// own strings alone has no plural forms of ours to carry.
 			if (!(`${counted[0]}.one` in messages)) continue;
-			const cats = [...new Set([1, 2, 5, 22].map((n) => new Intl.PluralRules(tag).select(n)))];
+			const cats = [...new Set([0, 1, 2, 5, 22, 100].map((n) => new Intl.PluralRules(tag).select(n)))];
 			let distinguishes = 0;
 			for (const base of counted) {
 				const said = cats.map((c) => {
