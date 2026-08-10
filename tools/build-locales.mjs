@@ -149,7 +149,10 @@ export const messages: Partial<Messages> = {
 ${lines}
 };
 `);
-	report.push({ tag, short, rtl: RTL.has(short), count: Object.keys(out).length, review });
+	// Counted against the English keys, not against everything shipped: a language that carries
+	// plural forms English does not have (Polish's few and many) would otherwise read as 102%.
+	const answered = Object.keys(out).filter((k) => k in app).length;
+	report.push({ tag, short, rtl: RTL.has(short), count: answered, extra: Object.keys(out).length - answered, review });
 }
 
 // The registry the app reads: every locale, its name in its own language, and how to load it.
@@ -205,7 +208,7 @@ const STATUS = {
 };
 const rows = [...report]
 	.sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
-	.map((r) => `| ${r.tag} | ${r.count} / ${Object.keys(app).length} | ${pct(r.count)}% | ${STATUS[r.review] ?? r.review} |`)
+	.map((r) => `| ${r.tag} | ${r.count} / ${Object.keys(app).length}${r.extra ? ` (+${r.extra} plural)` : ''} | ${pct(r.count)}% | ${STATUS[r.review] ?? r.review} |`)
 	.join('\n');
 
 writeFileSync(join('docs', 'languages.md'), `# Languages

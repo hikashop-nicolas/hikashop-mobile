@@ -14,14 +14,14 @@ else; run the generator and the app picks them up.
 
 | Locale | Strings | Coverage | Source |
 | --- | --- | --- | --- |
-| pl-PL | 526 / 514 | 102% | Written here |
 | de-DE | 514 / 514 | 100% | Written here |
 | es-ES | 514 / 514 | 100% | Written here |
 | it-IT | 514 / 514 | 100% | Written here |
 | nl-NL | 514 / 514 | 100% | Written here |
+| pl-PL | 514 / 514 (+12 plural) | 100% | Written here |
 | pt-BR | 514 / 514 | 100% | Written here |
 | pt-PT | 514 / 514 | 100% | Written here |
-| ru-RU | 174 / 514 | 34% | From HikaShop only |
+| ru-RU | 514 / 514 (+12 plural) | 100% | Written here |
 | ar-AA | 173 / 514 | 34% | From HikaShop only |
 | ar-AR | 173 / 514 | 34% | From HikaShop only |
 | fa-IR | 173 / 514 | 34% | From HikaShop only |

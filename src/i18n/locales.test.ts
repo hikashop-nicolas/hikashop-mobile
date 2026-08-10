@@ -73,15 +73,31 @@ describe('locales', () => {
 	// only carried English's two would say "5 warianty", which is the kind of wrong that makes an
 	// app feel machine-made.
 	it('uses the plural forms its language actually has', async () => {
+		// English counts in two, one and other. Polish and Russian count in three, so a catalogue
+		// that carries only English's two would say "5 warianty" for every count above one.
+		// Checked against what ships, not against translate(): a missing .few falls back to English
+		// and would otherwise read as a difference rather than as the hole it is.
+		const counted = Object.keys(en)
+			.filter((k) => k.endsWith('.other'))
+			.map((k) => k.slice(0, -'.other'.length));
 		for (const tag of ['pl-PL', 'ru-RU']) {
-			if (!LOCALES[tag]) continue;
-			await loadLocale(tag);
-			const cats = new Set([1, 2, 5, 22].map((n) => new Intl.PluralRules(tag).select(n)));
-			// Only checked where the language has been written out; a locale still on HikaShop's
-			// strings alone has nothing of ours to check.
-			if (translate(tag, 'product.variantsSummary', { count: 1, options: 2 }) === en['product.variantsSummary.one']) continue;
-			const said = [...cats].map((c) => translate(tag, `product.variantsSummary.${c}`));
-			expect(new Set(said).size, `${tag} says the same thing for every count`).toBeGreaterThan(1);
+			const { messages } = (await import(`./generated/${tag}.ts`)) as { messages: Record<string, string> };
+			// Only checked where the language has been written out here; one still on HikaShop's
+			// own strings alone has no plural forms of ours to carry.
+			if (!(`${counted[0]}.one` in messages)) continue;
+			const cats = [...new Set([1, 2, 5, 22].map((n) => new Intl.PluralRules(tag).select(n)))];
+			let distinguishes = 0;
+			for (const base of counted) {
+				const said = cats.map((c) => {
+					expect(`${base}.${c}`, `${tag} is missing ${base}.${c}`).toSatisfy((k: string) => k in messages);
+					return messages[`${base}.${c}`];
+				});
+				if (new Set(said).size === cats.length) distinguishes++;
+			}
+			// Not every counted string bends: "{count} w magazynie" is right for 1, 2 and 5 alike,
+			// since the number governs no noun there. But if none of them bent, the forms would
+			// have been duplicated to satisfy the check above rather than translated.
+			expect(distinguishes, `${tag} never actually inflects a counted string`).toBeGreaterThan(0);
 		}
 	});
 
