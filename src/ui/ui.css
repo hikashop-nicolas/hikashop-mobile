@@ -531,3 +531,10 @@
 .hk-imgedit-stage { flex: 1; min-width: 0; background: var(--hk-surface-2); border-radius: var(--hk-r2); overflow: hidden; }
 .hk-imgedit-loading { position: absolute; inset: 0; display: grid; place-items: center; background: var(--hk-surface-2); border-radius: var(--hk-r2); }
 
+
+/* The text being translated from, under its field. Two lines by default, since a description can
+   run for paragraphs; the whole of it on a tap. A button rather than a paragraph so a keyboard
+   reaches it, styled as the quiet line of text it is. */
+.hk-orig { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-align: start; width: 100%; margin-top: var(--hk-s2); padding: 0; border: 0; background: none; font: inherit; font-size: .74rem; color: var(--hk-faint); cursor: pointer; }
+.hk-orig--open { -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; }
+.hk-orig-label { font-weight: 600; }

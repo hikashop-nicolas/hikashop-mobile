@@ -99,17 +99,18 @@ const PATHS: Record<IconName, ReactNode> = {
 			<path d="M13.5 6.5l4 4" />
 		</>
 	),
-	// Two scripts side by side: the strokes of 文 and a Latin A. The character is kept clear of
-	// the left edge and its strokes end well inside the box, or at 15px it reads as one that has
-	// been cut off rather than one written small.
+	// Two scripts side by side: 文 and a Latin A. The character's own geometry, drawn across the
+	// full box rather than squeezed into a third of it: the bar, the dot above it, and the two
+	// strokes that cross below. Drawn any smaller, the crossing closes up and it reads as a
+	// character with a piece missing.
 	translate: (
 		<>
-			<path d="M8.2 4v1.6" />
-			<path d="M4.8 5.6h7" />
-			<path d="M9.6 5.6c0 3.4-1.7 5.9-4.8 7.5" />
-			<path d="M6.4 9.6c1.4 2.3 3.2 3.8 5.3 4.7" />
-			<path d="M13.2 20.4L17 11.4 20.8 20.4" />
-			<path d="M14.7 17.2h4.6" />
+			<path d="M2 5h12" />
+			<path d="M7 2h1" />
+			<path d="M5 8l6 6" />
+			<path d="M4 14l6-6 2-3" />
+			<path d="M22 22l-5-10-5 10" />
+			<path d="M14 18h6" />
 		</>
 	),
 	// A floppy disk: the shutter above, the label below, and the corner the sleeve cut off.

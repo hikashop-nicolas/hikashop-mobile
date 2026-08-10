@@ -32,6 +32,16 @@ const APP_LABEL: Record<string, string> = {
 	category_canonical: 'product.canonical',
 };
 
+// The original as a line of text: a description is HTML, and showing it raw would put tags and
+// entities in front of the merchant. Parsed rather than stripped with a regular expression, so
+// &amp; reads as & and not as itself. The parser builds a detached document, so nothing in the
+// markup runs or loads.
+function plainText(html: string): string {
+	if (html === '' || !html.includes('<') && !html.includes('&')) return html.trim();
+	const doc = new DOMParser().parseFromString(html, 'text/html');
+	return (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim();
+}
+
 // A language's name in its own language when the app knows the tag, which it does for every
 // language HikaShop is translated into. Otherwise the tag, which is better than nothing.
 function languageName(code: string): string {
@@ -114,6 +124,9 @@ export function ContentTranslations({ type }: { type: 'products' | 'categories' 
 	}
 
 	const current = values[lang] ?? {};
+	// Which originals are shown in full. A description can run for paragraphs, so it is kept to a
+	// couple of lines and opens on a tap: on a phone there is no hovering to read a title.
+	const [shown, setShown] = useState<Record<string, boolean>>({});
 
 	return (
 		<Screen
@@ -148,11 +161,10 @@ export function ContentTranslations({ type }: { type: 'products' | 'categories' 
 						const label = APP_LABEL[c.name] ? t(APP_LABEL[c.name]) : (c.label || c.name);
 						const original = payload.original[c.name] ?? '';
 						const value = current[c.name] ?? '';
-						// Stripped of markup so a description reads as one line under the input.
-						const from = original.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+						const from = plainText(original);
 						return (
 							<div className="hk-card hk-card--pad hk-form" key={c.name}>
-								<Field label={label} hint={from === '' ? undefined : `${t('translations.original')}: ${from}`}>
+								<Field label={label}>
 									{c.type === 'html' ? (
 										<RichText value={value} onChange={(html) => set(c.name, html)} label={label} />
 									) : c.type === 'multiline' ? (
@@ -161,6 +173,16 @@ export function ContentTranslations({ type }: { type: 'products' | 'categories' 
 										<input className="hk-input" value={value} onChange={(e) => set(c.name, e.target.value)} />
 									)}
 								</Field>
+								{from !== '' && (
+									<button
+										type="button"
+										className={`hk-orig${shown[c.name] ? ' hk-orig--open' : ''}`}
+										aria-expanded={!!shown[c.name]}
+										onClick={() => setShown((v) => ({ ...v, [c.name]: !v[c.name] }))}
+									>
+										<span className="hk-orig-label">{t('translations.original')}:</span> {from}
+									</button>
+								)}
 							</div>
 						);
 					})}

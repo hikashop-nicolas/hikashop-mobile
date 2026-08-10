@@ -39,11 +39,18 @@ describe('Translations', () => {
 
 			// Named in its own language, not by its tag, and the English is shown to translate from.
 			cy.contains('button', 'Français', { timeout: 20000 }).should('exist');
-			cy.contains('.hk-hint', 'Original').should('exist');
+			cy.contains('.hk-orig', 'Original').should('exist');
 
 			// The shop's own language is offered but marked, and is never the one the editor opens
 			// on: text typed into that slot would be filed as English and look like nothing.
-			cy.contains('button', 'shop language').should('exist');
+			cy.contains('.hk-chiprow button', 'shop language').should('exist');
+
+			// A description is HTML, and the merchant is shown the words, not the markup: kept to
+			// two lines until it is asked to open, since one can run for paragraphs.
+			cy.contains('.hk-orig', 'best-selling film camera').should('not.contain', '<').and(($e) => {
+				expect($e[0].getBoundingClientRect().height, 'clamped').to.be.lessThan(40);
+			});
+			cy.contains('.hk-orig', 'best-selling film camera').click().should('have.attr', 'aria-expanded', 'true');
 			cy.contains('button', 'Français').should('have.attr', 'aria-selected', 'true');
 			cy.contains('button', 'Français').click();
 
