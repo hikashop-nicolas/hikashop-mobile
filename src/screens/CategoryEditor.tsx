@@ -70,6 +70,14 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 		setBrowsing(false);
 	}
 
+	// Cropped in the library: the same shape as a file picked off the device, since an edited
+	// image is a new file rather than a reference to the one it came from.
+	async function pickEdited(blob: Blob, name: string) {
+		const data = await readAsDataUrl(new File([blob], name, { type: blob.type }));
+		setImage({ data, name, preview: data });
+		setBrowsing(false);
+	}
+
 	function writableCustom(): Record<string, string> {
 		const out: Record<string, string> = {};
 		for (const f of fields) if (isWritable(f) && f.namekey in custom) out[f.namekey] = custom[f.namekey] ?? '';
@@ -163,7 +171,14 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 						confirmMessage={t('category.deleteConfirm')} onConfirm={onDelete} />
 				)}
 
-				{browsing && <MediaBrowser kind="images" onClose={() => setBrowsing(false)} onPick={pickFromLibrary} />}
+				{browsing && (
+					<MediaBrowser
+						kind="images"
+						onClose={() => setBrowsing(false)}
+						onPick={pickFromLibrary}
+						onPickEdited={pickEdited}
+					/>
+				)}
 				{viewing && preview && (
 					<ImageViewer images={[{ url: preview, label: image?.name ?? name }]} onClose={() => setViewing(false)} />
 				)}

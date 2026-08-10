@@ -13,16 +13,21 @@ import type { ImageEditorHandle } from './ImageEditor';
 // elsewhere in the app, so it reads as the same gesture; kept in step with --hk-detail-ms.
 const PANE_MS = 500;
 
-export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }: {
-	kind?: 'images' | 'files';
+type MediaBrowserProps = {
 	onClose: () => void;
 	// The url comes along so a caller that only shows the choice (rather than attaching it
 	// straight away) can preview it without asking the shop where the file ended up.
 	onPick: (path: string, name: string, url: string) => Promise<void>;
-	// An edited copy, as bytes, for a caller that can upload one. Without it the edit button is
-	// not offered, since there would be nowhere for the result to go.
-	onPickEdited?: (blob: Blob, name: string) => Promise<void>;
-}) {
+} & (
+	// Picking an image and cropping one are the same job, so the editor is not optional here:
+	// a caller that browses images says what to do with an edited one. It was optional once,
+	// and the category editor quietly had no edit button because of it.
+	| { kind?: 'images'; onPickEdited: (blob: Blob, name: string) => Promise<void> }
+	// Downloadable files are not images and there is nothing to crop.
+	| { kind: 'files'; onPickEdited?: undefined }
+);
+
+export function MediaBrowser({ kind = 'images', onClose, onPick, onPickEdited }: MediaBrowserProps) {
 	const { client } = useStores();
 	const t = useT();
 	const PAGE = 60;

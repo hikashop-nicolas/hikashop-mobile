@@ -165,12 +165,22 @@ export function ProductMediaSection({ productId, images, files, onChange }: {
 					onClose={() => setViewing(null)} />
 			)}
 
-			{browsing && (
+			{/* Split rather than one call with a variable kind: the browser asks for an editor
+			    when it is browsing images and refuses one when it is browsing downloads, and a
+			    union in the prop cannot say which this is. */}
+			{browsing === 'images' && (
 				<MediaBrowser
-					kind={browsing}
+					kind="images"
 					onClose={() => setBrowsing(null)}
-					onPick={(path, name) => attachFromBrowser(browsing, path, name)}
-					onPickEdited={browsing === 'images' ? async (blob, name) => { await onEdited(blob, name); setBrowsing(null); } : undefined}
+					onPick={(path, name) => attachFromBrowser('images', path, name)}
+					onPickEdited={async (blob, name) => { await onEdited(blob, name); setBrowsing(null); }}
+				/>
+			)}
+			{browsing === 'files' && (
+				<MediaBrowser
+					kind="files"
+					onClose={() => setBrowsing(null)}
+					onPick={(path, name) => attachFromBrowser('files', path, name)}
 				/>
 			)}
 			{editing && <FileOptionsModal productId={productId} file={editing.file} kind={editing.kind} onClose={() => setEditing(null)} onSaved={onFileEdited} />}

@@ -161,3 +161,31 @@ describe('Image editor', () => {
 		cy.then(() => sweepEdited(productId));
 	});
 });
+
+// The browser is one component, so every screen that picks an image gets the editor. This is
+// here because the category screen quietly did not: the editor was an optional prop and only
+// the product screen passed it. The prop is required for images now, so a new caller cannot
+// repeat it, and this test says so in behaviour rather than in types.
+describe('The editor follows the browser', () => {
+	it('is offered when picking a category image, not only a product one', () => {
+		cy.viewport(1440, 900);
+		cy.visitApp('/categories');
+		cy.get('.hk-row', { timeout: 20000 }).first().click();
+		cy.get('.hk-split-detail, .hk-detail-over', { timeout: 20000 }).should('exist');
+		cy.contains('button', 'Browse', { timeout: 20000 }).first().click();
+		cy.get('.hk-mb-grid .hk-media-cell', { timeout: 20000 }).first().scrollIntoView().click();
+		cy.get('.hk-modal-foot').contains('button', 'Edit').should('not.be.disabled').click();
+
+		cy.get('.cr-image', { timeout: 20000 }).should(($i) => {
+			expect(($i[0] as HTMLImageElement).naturalWidth, 'the image loaded').to.be.greaterThan(0);
+		});
+		cy.wait(700);
+		cy.get('.hk-modal-foot').contains('button', 'Save as new image').click();
+		cy.get('.hk-modal', { timeout: 20000 }).should('not.exist');
+
+		// Staged as an upload, like a file chosen off the device: an edited image is a new file,
+		// not a reference to the library image it came from.
+		cy.get('.hk-cat-imgrow img, .hk-media-cell img').first()
+			.should('have.attr', 'src').and('match', /^data:image\//);
+	});
+});
