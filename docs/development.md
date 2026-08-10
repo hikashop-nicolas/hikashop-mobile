@@ -59,10 +59,19 @@ HikaShop's wording exactly, quirks included. HikaShop's German for `PRODUCTS` is
 the app's menu says "Produkt"; fix it in HikaShop's `de-DE.com_hikashop.ini`, regenerate, and
 the app follows.
 
-Coverage is about 150 of 514 strings per language, which is the visible vocabulary: the menu,
-the buttons, the listing labels, the status words. The rest is app-specific wording that
-HikaShop has no equivalent for. To improve a language, add pairs to `hikashop-keys.json` rather
-than translating by hand, so all 56 gain at once.
+HikaShop covers about 150 of the 514 strings: the visible vocabulary, the menu, the buttons,
+the listing labels, the status words. The rest is app-specific wording it has no equivalent
+for, and that is written by hand in `src/i18n/manual/<tag>.json`, which the generator merges
+over the derived strings. Hand-written entries win, and regenerating never throws them away.
+
+Two ways to improve a language, and the cheaper one first:
+
+1. Add a pair to `hikashop-keys.json`. One line gains all 56 languages at once, and the wording
+   is HikaShop's own.
+2. Write the string in `manual/<tag>.json`, for what HikaShop simply does not say.
+
+Progress, at the time of writing: German is complete. The rest sit at about 30% and fall back
+to English for the remainder, per string.
 
 Each catalogue is a separate lazy chunk of a few KB, so a merchant downloads the one they read.
 

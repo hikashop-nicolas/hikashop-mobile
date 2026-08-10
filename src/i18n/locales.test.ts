@@ -45,11 +45,28 @@ describe('locales', () => {
 	});
 
 	it('falls back to English for a string nobody has translated, per string', async () => {
+		// A locale that is still partial, found rather than named: naming one means this test
+		// breaks the day that language is finished, which is the wrong thing to be told about.
+		let partial: string | undefined;
+		let untranslated: string | undefined;
+		for (const tag of tags) {
+			if (tag === 'en') continue;
+			await loadLocale(tag);
+			const key = Object.keys(en).find((k) => translate(tag, k) === en[k] && en[k].length > 12);
+			if (key) { partial = tag; untranslated = key; break; }
+		}
+		expect(partial, 'every locale is complete, so this test has nothing to check').toBeTruthy();
+		// It reads in English rather than showing the key or an empty string.
+		expect(translate(partial!, untranslated!)).toBe(en[untranslated!]);
+	});
+
+	it('has German complete, since it was translated by hand', async () => {
 		await loadLocale('de-DE');
-		// Translated by HikaShop.
 		expect(translate('de-DE', 'tabs.orders')).toBe('Bestellungen');
-		// Ours alone, so it reads in English rather than as a key.
-		expect(translate('de-DE', 'shortcut.title')).toBe(en['shortcut.title']);
+		const missing = Object.keys(en).filter((k) => !k.endsWith('.one') && !k.endsWith('.other') && translate('de-DE', k) === en[k]);
+		// A handful of words are the same in both languages (SEO, GTIN, Alias, Link), which is
+		// not a hole; anything beyond that is one.
+		expect(missing.length, `untranslated in de-DE: ${missing.join(', ')}`).toBeLessThan(12);
 	});
 
 	it('never leaves a placeholder stranded', async () => {
