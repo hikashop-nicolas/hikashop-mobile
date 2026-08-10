@@ -13,6 +13,8 @@ export interface LocaleDef {
 	/** Its name in its own language, which is how a picker should list it. */
 	name: string;
 	rtl?: boolean;
+	/** A fuller catalogue of the same language and script to read before falling back to English. */
+	base?: string;
 	/** Present for the two catalogues written by hand; the rest arrive through load(). */
 	messages?: Messages;
 	load?: () => Promise<Partial<Messages>>;
@@ -31,15 +33,25 @@ export const LOCALES: Record<string, LocaleDef> = {
 // Catalogues that have arrived, by tag.
 const loaded: Record<string, Partial<Messages>> = { en, fr };
 
+// The catalogues to consult for a locale, nearest first: itself, then any fuller sibling of the
+// same language (fr-FR carries a third of the strings, fr carries all of them), then English.
+function chain(tag: string): string[] {
+	const out: string[] = [];
+	for (let t: string | undefined = tag; t && !out.includes(t); t = LOCALES[t]?.base) out.push(t);
+	return out;
+}
+
 export async function loadLocale(tag: string): Promise<void> {
-	if (loaded[tag]) return;
-	const def = LOCALES[tag];
-	if (!def?.load) return;
-	try {
-		loaded[tag] = await def.load();
-	} catch {
-		// A catalogue that will not load is not worth failing over: English still reads.
-		loaded[tag] = {};
+	for (const t of chain(tag)) {
+		if (loaded[t]) continue;
+		const def = LOCALES[t];
+		if (!def?.load) continue;
+		try {
+			loaded[t] = await def.load();
+		} catch {
+			// A catalogue that will not load is not worth failing over: English still reads.
+			loaded[t] = {};
+		}
 	}
 }
 
@@ -67,15 +79,27 @@ function interpolate(s: string, params?: TParams): string {
 // Resolve a key for a locale: plural-aware (via a `count` param and `.one`/`.other` keys),
 // falling back to the plain key, then to English, then to the key string itself.
 export function translate(locale: string, key: string, params?: TParams): string {
-	const msgs = LOCALES[locale]?.messages ?? loaded[locale] ?? en;
+	// Each catalogue in turn, nearest first, so a thin regional one reads its own language before
+	// English. The plural category is the locale's own throughout: a Canadian sees French plurals
+	// even for a string that came from the base French catalogue.
+	const books = chain(locale)
+		.map((t) => LOCALES[t]?.messages ?? loaded[t])
+		.filter(Boolean) as Partial<Messages>[];
+	books.push(en);
 	let raw: string | undefined;
 
 	if (params && typeof params.count === 'number') {
 		const cat = new Intl.PluralRules(locale).select(params.count);
-		raw = msgs[`${key}.${cat}`] ?? msgs[`${key}.other`] ?? en[`${key}.${cat}`] ?? en[`${key}.other`];
+		for (const b of books) {
+			raw = b[`${key}.${cat}`] ?? b[`${key}.other`];
+			if (raw !== undefined) break;
+		}
 	}
-	if (raw === undefined) raw = msgs[key] ?? en[key] ?? key;
-	return interpolate(raw, params);
+	if (raw === undefined) for (const b of books) {
+		raw = b[key];
+		if (raw !== undefined) break;
+	}
+	return interpolate(raw ?? key, params);
 }
 
 interface I18nValue {

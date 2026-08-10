@@ -101,6 +101,28 @@ describe('locales', () => {
 		}
 	});
 
+	it('reads a fuller sibling before falling back to English', async () => {
+		// fr-FR and fr-CA carry about a third of the strings each; fr carries all of them. Without
+		// a chain, a browser reporting fr-FR matches exactly and the merchant reads mostly English.
+		for (const tag of ['fr-FR', 'fr-CA', 'de-AT', 'nl-BE']) {
+			await loadLocale(tag);
+			const base = LOCALES[tag].base as string;
+			expect(base, `${tag} has no fuller sibling`).toBeTruthy();
+			const said = translate(tag, 'unsaved.discard');
+			expect(said, `${tag} still reads English`).not.toBe(en['unsaved.discard']);
+			expect(said).toBe(translate(base, 'unsaved.discard'));
+		}
+	});
+
+	it('never falls back across alphabets', async () => {
+		// Serbian is written in both, and Chinese in two sets of Han characters no letter count can
+		// tell apart. Neither may borrow from the other: an alphabet nobody asked for is worse than
+		// English.
+		for (const tag of ['sr-RS', 'sr-YU', 'zh-CN', 'zh-TW', 'srp-ME']) {
+			expect(LOCALES[tag]?.base, `${tag} borrows from another alphabet`).toBeUndefined();
+		}
+	});
+
 	it('never leaves a placeholder stranded', async () => {
 		// A translation carrying {count} where the English does not, or missing one it needs,
 		// would render as literal braces to a merchant.

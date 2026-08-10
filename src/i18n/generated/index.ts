@@ -10,6 +10,8 @@ export interface GeneratedLocale {
 	/** Its name in English, for anyone reading the code. */
 	english: string;
 	rtl?: boolean;
+	/** A fuller catalogue of the same language and script to read before falling back to English. */
+	base?: string;
 	load: () => Promise<Partial<Messages>>;
 }
 
@@ -17,23 +19,23 @@ export const GENERATED: Record<string, GeneratedLocale> = {
 	'af-ZA': { name: "Afrikaans", english: "Afrikaans", load: () => import('./af-ZA').then((m) => m.messages) },
 	'ar-AA': { name: "العربية (AA)", english: "Arabic", rtl: true, load: () => import('./ar-AA').then((m) => m.messages) },
 	'ar-AR': { name: "العربية (Argentina)", english: "Arabic", rtl: true, load: () => import('./ar-AR').then((m) => m.messages) },
-	'ar-DZ': { name: "العربية (Algeria)", english: "Arabic", rtl: true, load: () => import('./ar-DZ').then((m) => m.messages) },
+	'ar-DZ': { name: "العربية (Algeria)", english: "Arabic", rtl: true, base: 'ar-AA', load: () => import('./ar-DZ').then((m) => m.messages) },
 	'bg-BG': { name: "Български", english: "Bulgarian", load: () => import('./bg-BG').then((m) => m.messages) },
 	'bs-BA': { name: "Bosanski", english: "Bosnian", load: () => import('./bs-BA').then((m) => m.messages) },
 	'ca-ES': { name: "Català", english: "Catalan", load: () => import('./ca-ES').then((m) => m.messages) },
 	'cs-CZ': { name: "Čeština", english: "Czech", load: () => import('./cs-CZ').then((m) => m.messages) },
 	'da-DK': { name: "Dansk", english: "Danish", load: () => import('./da-DK').then((m) => m.messages) },
-	'de-AT': { name: "Deutsch (Austria)", english: "German", load: () => import('./de-AT').then((m) => m.messages) },
-	'de-CH': { name: "Deutsch (Switzerland)", english: "German", load: () => import('./de-CH').then((m) => m.messages) },
+	'de-AT': { name: "Deutsch (Austria)", english: "German", base: 'de-DE', load: () => import('./de-AT').then((m) => m.messages) },
+	'de-CH': { name: "Deutsch (Switzerland)", english: "German", base: 'de-DE', load: () => import('./de-CH').then((m) => m.messages) },
 	'de-DE': { name: "Deutsch (Germany)", english: "German", load: () => import('./de-DE').then((m) => m.messages) },
 	'el-GR': { name: "Ελληνικά", english: "Greek", load: () => import('./el-GR').then((m) => m.messages) },
-	'es-CL': { name: "Español (Chile)", english: "Spanish", load: () => import('./es-CL').then((m) => m.messages) },
+	'es-CL': { name: "Español (Chile)", english: "Spanish", base: 'es-ES', load: () => import('./es-CL').then((m) => m.messages) },
 	'es-ES': { name: "Español (Spain)", english: "Spanish", load: () => import('./es-ES').then((m) => m.messages) },
 	'eu-ES': { name: "Euskara", english: "Basque", load: () => import('./eu-ES').then((m) => m.messages) },
 	'fa-IR': { name: "فارسی", english: "Persian", rtl: true, load: () => import('./fa-IR').then((m) => m.messages) },
 	'fi-FI': { name: "Suomi", english: "Finnish", load: () => import('./fi-FI').then((m) => m.messages) },
-	'fr-CA': { name: "Français (Canada)", english: "French", load: () => import('./fr-CA').then((m) => m.messages) },
-	'fr-FR': { name: "Français (France)", english: "French", load: () => import('./fr-FR').then((m) => m.messages) },
+	'fr-CA': { name: "Français (Canada)", english: "French", base: 'fr-FR', load: () => import('./fr-CA').then((m) => m.messages) },
+	'fr-FR': { name: "Français (France)", english: "French", base: 'fr', load: () => import('./fr-FR').then((m) => m.messages) },
 	'gl-ES': { name: "Galego", english: "Galician", load: () => import('./gl-ES').then((m) => m.messages) },
 	'he-IL': { name: "עברית", english: "Hebrew", rtl: true, load: () => import('./he-IL').then((m) => m.messages) },
 	'hi-IN': { name: "हिन्दी", english: "Hindi", load: () => import('./hi-IN').then((m) => m.messages) },
@@ -50,9 +52,9 @@ export const GENERATED: Record<string, GeneratedLocale> = {
 	'mk-MK': { name: "Македонски", english: "Macedonian", load: () => import('./mk-MK').then((m) => m.messages) },
 	'ms-MY': { name: "Melayu", english: "Malay", load: () => import('./ms-MY').then((m) => m.messages) },
 	'nb-NO': { name: "Norsk bokmål", english: "Norwegian Bokmål", load: () => import('./nb-NO').then((m) => m.messages) },
-	'nl-BE': { name: "Nederlands (Belgium)", english: "Dutch", load: () => import('./nl-BE').then((m) => m.messages) },
+	'nl-BE': { name: "Nederlands (Belgium)", english: "Dutch", base: 'nl-NL', load: () => import('./nl-BE').then((m) => m.messages) },
 	'nl-NL': { name: "Nederlands (Netherlands)", english: "Dutch", load: () => import('./nl-NL').then((m) => m.messages) },
-	'nl-NL-flemish': { name: "Nederlands (Netherlands)", english: "Dutch", load: () => import('./nl-NL-flemish').then((m) => m.messages) },
+	'nl-NL-flemish': { name: "Nederlands (Netherlands)", english: "Dutch", base: 'nl-NL', load: () => import('./nl-NL-flemish').then((m) => m.messages) },
 	'pl-PL': { name: "Polski", english: "Polish", load: () => import('./pl-PL').then((m) => m.messages) },
 	'pt-BR': { name: "Português (Brazil)", english: "Portuguese", load: () => import('./pt-BR').then((m) => m.messages) },
 	'pt-PT': { name: "Português (Portugal)", english: "Portuguese", load: () => import('./pt-PT').then((m) => m.messages) },
