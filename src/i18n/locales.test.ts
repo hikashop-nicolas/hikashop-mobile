@@ -6,7 +6,6 @@
 import { describe, it, expect } from 'vitest';
 import { LOCALES, loadLocale, translate, resolveLocale } from './index';
 import { en } from './en';
-import { readFileSync } from 'node:fs';
 
 const tags = Object.keys(LOCALES);
 
@@ -142,23 +141,19 @@ describe('locales', () => {
 		expect(script(cyr.messages, /[\u0400-\u04FF]/g), 'sr-RS is Cyrillic').toBeGreaterThan(1000);
 		expect(script(cyr.messages, /[čćđšž]/g), 'sr-RS has no Latin diacritics').toBe(0);
 		expect(script(lat.messages, /[čćđšž]/g), 'sr-YU is Latin').toBeGreaterThan(100);
-		// Not zero: HikaShop's own sr-YU file has Cyrillic letters sitting inside Latin words
-		// (Prikаži, Sаkrij), so a handful arrive with the strings taken from it. What must hold is
-		// that the Latin catalogue is Latin, not that a supplied string is perfect.
-		expect(script(lat.messages, /[\u0400-\u04FF]/g), 'sr-YU is mostly Cyrillic').toBeLessThan(60);
+		// Zero, now that HikaShop's own sr-YU file has been cleaned: it used to carry Cyrillic
+		// letters inside Latin words, which is why this check exists at all.
+		expect(script(lat.messages, /[\u0400-\u04FF]/g), 'sr-YU has Cyrillic in it').toBe(0);
 	});
 
 	it('writes Persian with the Persian letters, not their Arabic lookalikes', async () => {
 		// ی and ک are Persian; ي and ك are Arabic and look the same in most fonts. Mixing them is
 		// invisible to a reader and breaks search and sorting, which is exactly how HikaShop's own
 		// Serbian Latin ended up with Cyrillic letters inside its words.
-		// Checked against what is written here. HikaShop's own Persian file uses the Arabic yeh on
-		// 773 of its 4,530 lines, so the strings taken from it carry some in; that is theirs to fix,
-		// and this holds the line for everything added here.
-		const mine = JSON.parse(readFileSync('src/i18n/manual/fa-IR.json', 'utf8')) as Record<string, unknown>;
-		const arabic = Object.entries(mine)
-			.filter(([k]) => k !== '_comment')
-			.filter(([, v]) => typeof v === 'string' && /[\u064A\u0643]/.test(v));
+		// The whole catalogue now, not only what is written here: HikaShop's own Persian file used
+		// the Arabic yeh on 773 lines and has been corrected, so nothing should bring one back.
+		const { messages } = (await import('./generated/fa-IR.ts')) as { messages: Record<string, string> };
+		const arabic = Object.entries(messages).filter(([, v]) => /[\u064A\u0643]/.test(v));
 		expect(arabic.map(([k]) => k), 'Arabic yeh or kaf in Persian').toEqual([]);
 	});
 
