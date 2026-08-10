@@ -20,6 +20,7 @@ else; run the generator and the app picks them up.
 
 | Locale | Strings | Coverage | Then reads | Source |
 | --- | --- | --- | --- | --- |
+| da-DK | 514 / 514 | 100% | — | Written here |
 | de-DE | 514 / 514 | 100% | — | Written here |
 | es-ES | 514 / 514 | 100% | — | Written here |
 | it-IT | 514 / 514 | 100% | — | Written here |
@@ -28,6 +29,7 @@ else; run the generator and the app picks them up.
 | pt-BR | 514 / 514 | 100% | — | Written here |
 | pt-PT | 514 / 514 | 100% | — | Written here |
 | ru-RU | 514 / 514 (+12 plural) | 100% | — | Written here |
+| sv-SE | 514 / 514 | 100% | — | Written here |
 | ar-AA | 173 / 514 | 34% | — | From HikaShop only |
 | ar-AR | 173 / 514 | 34% | — | From HikaShop only |
 | fa-IR | 173 / 514 | 34% | — | From HikaShop only |
@@ -44,11 +46,9 @@ else; run the generator and the app picks them up.
 | sk-SK | 172 / 514 | 33% | — | From HikaShop only |
 | cs-CZ | 171 / 514 | 33% | — | From HikaShop only |
 | hr-HR | 171 / 514 | 33% | — | From HikaShop only |
-| sv-SE | 171 / 514 | 33% | — | From HikaShop only |
 | ms-MY | 170 / 514 | 33% | — | From HikaShop only |
 | es-CL | 169 / 514 | 33% | es-ES | From HikaShop only |
 | nb-NO | 169 / 514 | 33% | — | From HikaShop only |
-| da-DK | 168 / 514 | 33% | — | From HikaShop only |
 | ro-RO | 168 / 514 | 33% | — | From HikaShop only |
 | vi-VN | 167 / 514 | 32% | — | From HikaShop only |
 | lt-LT | 165 / 514 | 32% | — | From HikaShop only |
