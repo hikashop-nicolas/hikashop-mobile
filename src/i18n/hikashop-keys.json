@@ -1,0 +1,36 @@
+{
+	"_comment": [
+		"App key -> HikaShop language key, for strings whose English differs but whose meaning is",
+		"the same. tools/build-locales.mjs matches identical English on its own; this covers the",
+		"rest, so the app says what the merchant's own backend says, in each of the 60 languages.",
+		"Every pair here was checked against en-GB.com_hikashop.ini, and the generator skips a key",
+		"that does not exist rather than shipping a hole."
+	],
+
+	"product.sku": "HIKA_PRODUCT_CODE",
+	"product.inventory": "HIKA_STOCK",
+	"product.setUnlimited": "UNLIMITED",
+	"product.pricing": "CART_PRODUCT_PRICE",
+	"product.files": "FILES",
+	"product.weight": "PRODUCT_WEIGHT",
+	"product.volume": "PRODUCT_VOLUME",
+	"product.variants": "VARIANTS",
+	"product.related": "RELATED_PRODUCTS",
+	"product.options": "OPTIONS",
+	"product.access": "ACCESS_LEVEL",
+	"product.brand": "MANUFACTURER",
+	"product.brands": "MANUFACTURERS",
+	"product.manufacturer": "MANUFACTURER",
+
+	"order.shipments": "HIKASHOP_CHECKOUT_SHIPPING",
+
+	"discount.start": "HIKA_START",
+	"discount.end": "HIKASHOP_CHECKOUT_END",
+	"discount.quota": "DISCOUNT_QUOTA",
+	"discount.quotaPerUser": "DISCOUNT_QUOTA_PER_USER",
+	"discount.flat": "DISCOUNT_FLAT_AMOUNT",
+	"discount.percent": "DISCOUNT_PERCENT_AMOUNT",
+	"discount.minimumOrder": "MINIMUM_ORDER_VALUE",
+
+	"access.group": "GROUP"
+}

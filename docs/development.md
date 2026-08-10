@@ -40,6 +40,32 @@ a year of orders), use the seeder in the HikaShop repository:
 php tools/demo-shop/seed-demo-shop.php --site=/path/to/joomla
 ```
 
+## Languages
+
+English and French are written by hand in `src/i18n/en.ts` and `fr.ts`. The other 56 are built
+from HikaShop's own translation files:
+
+```sh
+node tools/build-locales.mjs [--hikashop=../hikashop]
+```
+
+It maps the app's keys onto HikaShop's, by identical English and by the hand-written pairs in
+`src/i18n/hikashop-keys.json`, and reads the translation out of each `.ini`. Nothing is
+invented: a string either has an official HikaShop translation or it is left out, and the app
+falls back to English for that one string.
+
+That means the app uses the same words as the merchant's own backend, and it inherits
+HikaShop's wording exactly, quirks included. HikaShop's German for `PRODUCTS` is "Produkt", so
+the app's menu says "Produkt"; fix it in HikaShop's `de-DE.com_hikashop.ini`, regenerate, and
+the app follows.
+
+Coverage is about 150 of 514 strings per language, which is the visible vocabulary: the menu,
+the buttons, the listing labels, the status words. The rest is app-specific wording that
+HikaShop has no equivalent for. To improve a language, add pairs to `hikashop-keys.json` rather
+than translating by hand, so all 56 gain at once.
+
+Each catalogue is a separate lazy chunk of a few KB, so a merchant downloads the one they read.
+
 ## What runs in CI
 
 `.github/workflows/ci.yml` runs typecheck, lint, unit tests and the build on every push, and

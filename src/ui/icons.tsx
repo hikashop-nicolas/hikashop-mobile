@@ -138,7 +138,13 @@ const PATHS: Record<IconName, ReactNode> = {
 	),
 };
 
+// Icons that point somewhere. In a right-to-left language "back" is to the right and a
+// disclosure chevron opens the other way, so these are mirrored rather than left pointing at
+// the wrong side of the screen.
+const DIRECTIONAL = new Set<IconName>(['back', 'chevron']);
+
 export function Icon({ name, size = 22, className }: { name: IconName; size?: number; className?: string }) {
+	const cls = [className, DIRECTIONAL.has(name) ? 'hk-ic-dir' : ''].filter(Boolean).join(' ') || undefined;
 	return (
 		<svg
 			width={size}
@@ -149,7 +155,7 @@ export function Icon({ name, size = 22, className }: { name: IconName; size?: nu
 			strokeWidth={1.8}
 			strokeLinecap="round"
 			strokeLinejoin="round"
-			className={className}
+			className={cls}
 			aria-hidden="true"
 			focusable="false"
 		>

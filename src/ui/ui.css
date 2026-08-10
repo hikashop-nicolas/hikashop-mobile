@@ -349,12 +349,12 @@
 	   An explicit width rather than a flex basis: a basis is a hint the row can still resolve
 	   against its other items, and while it animated the row placed the list away from its own
 	   left edge, which looked like the list arriving from the left. */
-	.hk-split-list { flex: 0 0 100%; border-right: 1px solid var(--hk-line); transition: flex-basis var(--hk-detail-ms) var(--hk-ease); }
+	.hk-split-list { flex: 0 0 100%; border-inline-end: 1px solid var(--hk-line); transition: flex-basis var(--hk-detail-ms) var(--hk-ease); }
 	.hk-split--open .hk-split-list { flex-basis: 380px; }
 	/* The record is placed rather than laid out, so it never adds to the row's width. In the row
 	   it would briefly make it wider than the screen, and a shell that centres itself answers
 	   that by sliding everything sideways -- the list appearing to come in from the left. */
-	.hk-split-detail { position: absolute; top: 0; right: 0; bottom: 0; width: calc(100% - 380px); overflow: clip; }
+	.hk-split-detail { position: absolute; top: 0; inset-inline-end: 0; bottom: 0; width: calc(100% - 380px); overflow: clip; }
 	/* The shell centres content within 1140px, which is for a single pane; inside a split each
 	   pane sets its own padding or the two would be pushed apart by their own gutters. */
 	.hk-split .hk-appbar, .hk-split .hk-body { padding-inline: var(--hk-s4); }
@@ -367,6 +367,11 @@
    arrives from below when you go down the menu, from above when you go back up. Everything else
    in the app appears where it is. */
 :root { --hk-detail-ms: 500ms; --hk-section-ms: 300ms; --hk-ease: cubic-bezier(.22, .61, .36, 1); }
+/* Which way "in from the side" points. A record opens from the right in English and from the
+   left in Arabic, because that is where the next thing is when you read the other way. Every
+   horizontal move below multiplies by this rather than hard-coding a sign. */
+:root { --hk-x: 1; }
+[dir="rtl"] { --hk-x: -1; }
 
 /* What actually slides is the record's contents, clipped by the pane holding them: a pane that
    slid itself would reach past its container and make that container scrollable sideways. */
@@ -378,7 +383,7 @@
    while its SKU wrapped. The controls take their own line instead when the name needs the room. */
 .hk-oitem { flex-wrap: wrap; row-gap: var(--hk-s2); }
 .hk-oitem > .hk-row-grow { min-width: 55%; }
-.hk-oitem-ctl { display: flex; align-items: center; gap: var(--hk-s2); margin-left: auto; }
+.hk-oitem-ctl { display: flex; align-items: center; gap: var(--hk-s2); margin-inline-start: auto; }
 
 .hk-stack { position: relative; flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; }
 /* z-index 0 makes this a stacking context, which keeps the list's sticky app bar (z-index 5)
@@ -390,8 +395,8 @@
 /* On its way out it is a picture of where you were, not something to click: it must not stand
    between you and the list coming back. */
 .hk-detail--out { animation: hk-detail-out var(--hk-detail-ms) var(--hk-ease) both; pointer-events: none; }
-@keyframes hk-detail-in { from { transform: translateX(100%); } to { transform: none; } }
-@keyframes hk-detail-out { from { transform: none; } to { transform: translateX(100%); } }
+@keyframes hk-detail-in { from { transform: translateX(calc(100% * var(--hk-x))); } to { transform: none; } }
+@keyframes hk-detail-out { from { transform: none; } to { transform: translateX(calc(100% * var(--hk-x))); } }
 
 /* Sections. --hk-dir is +1 going down the menu and -1 going back up, so one pair of keyframes
    covers both directions: what arrives comes from the side the one leaving departs towards. */
@@ -479,6 +484,12 @@
 .hk-rowmain { display: flex; align-items: center; gap: var(--hk-s3); flex: 1; min-width: 0; text-decoration: none; color: inherit; }
 .hk-row--picked { background: var(--hk-accent-soft); border-radius: var(--hk-r2); }
 
+/* Right to left. The layout follows <html dir>, which the i18n provider sets from the chosen
+   language, so this only has to correct the things direction alone cannot: icons that point. */
+[dir="rtl"] .hk-ic-dir { transform: scaleX(-1); }
+/* Already rotated a quarter turn to point down when open; mirrored it would point up. */
+[dir="rtl"] .hk-rot90 { transform: rotate(90deg) scaleX(-1); }
+
 /* ---- keyboard shortcut help ------------------------------------------------ */
 .hk-keys-group + .hk-keys-group { margin-top: var(--hk-s4); }
 .hk-keys-title { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--hk-muted); font-weight: 650; margin: 0 0 var(--hk-s2); }
@@ -506,10 +517,12 @@
 /* Off screen and out of the way: not painted, not focusable, and not announced, but still
    holding its scroll position and its selection for when it comes back. */
 .hk-mbpane-view--away { display: none; }
-@keyframes hk-pane-out-left { from { transform: none; } to { transform: translateX(-100%); } }
-@keyframes hk-pane-in-right { from { transform: translateX(100%); } to { transform: none; } }
-@keyframes hk-pane-out-right { from { transform: none; } to { transform: translateX(100%); } }
-@keyframes hk-pane-in-left { from { transform: translateX(-100%); } to { transform: none; } }
+/* Named for the reading order, not the screen: "out-left" is the way the thing you came from
+   goes, which is to the right of the screen in Arabic. */
+@keyframes hk-pane-out-left { from { transform: none; } to { transform: translateX(calc(-100% * var(--hk-x))); } }
+@keyframes hk-pane-in-right { from { transform: translateX(calc(100% * var(--hk-x))); } to { transform: none; } }
+@keyframes hk-pane-out-right { from { transform: none; } to { transform: translateX(calc(100% * var(--hk-x))); } }
+@keyframes hk-pane-in-left { from { transform: translateX(calc(-100% * var(--hk-x))); } to { transform: none; } }
 
 /* ---- image editor ---------------------------------------------------------- */
 .hk-imgedit { display: flex; flex-direction: column; gap: var(--hk-s3); height: 100%; }

@@ -42,7 +42,14 @@ describe('i18n', () => {
 		expect(frKeys).toEqual(enKeys);
 	});
 
-	it('registers the expected locales', () => {
-		expect(Object.keys(LOCALES)).toEqual(['en', 'fr']);
+	// The two written here are the ones this file is about: English because everything falls
+	// back to it and French because it is maintained by hand beside it. The other 56 come from
+	// HikaShop and are covered by locales.test.ts.
+	it('carries the two hand-written catalogues in the bundle', () => {
+		expect(LOCALES.en.messages).toBe(en);
+		expect(LOCALES.fr.messages).toBe(fr);
+		// The rest arrive on demand, so they have a loader instead of messages.
+		expect(LOCALES['de-DE'].messages).toBeUndefined();
+		expect(typeof LOCALES['de-DE'].load).toBe('function');
 	});
 });

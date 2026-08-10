@@ -57,9 +57,13 @@ export function Stores() {
 						<span className="hk-row-title">{t('stores.language')}</span>
 					</div>
 					<select className="hk-select" aria-label={t('stores.language')} value={locale} onChange={(e) => setLocale(e.target.value)}>
-						{Object.entries(LOCALES).map(([code, def]) => (
-							<option key={code} value={code}>{def.name}</option>
-						))}
+						{/* By name rather than by tag: somebody looking for their language scans for
+						    "Deutsch", not for "de-DE". */}
+						{Object.entries(LOCALES)
+							.sort(([, a], [, b]) => a.name.localeCompare(b.name))
+							.map(([code, def]) => (
+								<option key={code} value={code}>{def.name}</option>
+							))}
 					</select>
 				</div>
 
