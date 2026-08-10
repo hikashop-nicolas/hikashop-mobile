@@ -121,7 +121,8 @@ export function ProductEdit() {
 			fetched.tags ?? [],
 		)
 		: null;
-	useUnsavedChanges(!!form && baseline !== null && signature(form, access, cats, manufacturerId, custom, tags) !== baseline);
+	const dirty = !!form && baseline !== null && signature(form, access, cats, manufacturerId, custom, tags) !== baseline;
+	useUnsavedChanges(dirty);
 
 	async function saveStock() {
 		if (!client || stockBusy) return;
@@ -177,7 +178,7 @@ export function ProductEdit() {
 		return out;
 	}
 
-	async function save() {
+	async function save(dest = '/products') {
 		if (!client || !form || busy) return;
 		setSaveErr('');
 		setBusy(true);
@@ -205,7 +206,7 @@ export function ProductEdit() {
 			const categories = await client.setProductCategories(productId, cats);
 			await cache.putProduct(storeId, productId, { ...updated, categories });
 			changed.bump('products');
-			nav('/products');
+			nav(dest);
 		} catch (e) {
 			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
 			setSaveErr(tError(t, code));
@@ -242,7 +243,10 @@ export function ProductEdit() {
 					    field, since it leaves this form; only where the shop has somewhere to put a
 					    translation, and only once the product exists to attach one to. */}
 					{shopLangs?.enabled && productId > 0 && (
-						<Button size="sm" onClick={() => confirmLeave(() => nav(`/products/${productId}/translations`))}>
+						<Button size="sm" disabled={busy} onClick={() => {
+							const to = `/products/${productId}/translations`;
+							if (dirty) void save(to); else nav(to);
+						}}>
 							<Icon name="translate" size={17} /> {t('translations.title')}
 						</Button>
 					)}

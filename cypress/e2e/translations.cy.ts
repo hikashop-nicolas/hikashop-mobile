@@ -78,6 +78,39 @@ describe('Translations', () => {
 		});
 	});
 
+	it('saves an edit in progress rather than dropping it', () => {
+		// Translating needs the product stored: without Falang the translation is keyed by the
+		// original text as saved, and the editor shows that text. Leaving an edit behind would
+		// both lose the merchant's typing and show them an original that is not what they see.
+		openProduct();
+		cy.location('hash').then((hash) => {
+			const id = Number(hash.split('/')[2]);
+			const mark = `Probe ${Date.now()}`;
+			cy.request({ url: `${api()}/products/${id}`, headers: auth() }).then((before) => {
+				const original = before.body.data.description ?? '';
+
+				cy.contains('.hk-field', 'Description').find('[contenteditable]').click().type(` ${mark}`);
+				cy.contains('.hk-appbar button', 'Translations').click();
+
+				// No dialog asking to keep or discard: there is a third answer, and it is taken.
+				cy.contains('保存していない変更').should('not.exist');
+				cy.contains('Unsaved changes').should('not.exist');
+				cy.location('hash', { timeout: 20000 }).should('include', '/translations');
+
+				// The typing survived, and the original shown is what was just saved.
+				cy.contains('.hk-orig', mark, { timeout: 20000 }).should('exist');
+				cy.request({ url: `${api()}/products/${id}`, headers: auth() })
+					.its('body.data.description').should('contain', mark);
+
+				// Put the description back.
+				cy.request({
+					method: 'PUT', url: `${api()}/products/${id}`, headers: auth(),
+					body: { description: original },
+				});
+			});
+		});
+	});
+
 	it('offers nothing where the shop has nowhere to put a translation', () => {
 		// This shop has two languages, so the state cannot be produced here. Stubbed for that
 		// reason alone: a shop with one language, or with translation editing off, must not be

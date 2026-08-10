@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../app/store-context';
 import { useShopLanguages } from '../app/shop-languages';
+import { useDataChanged } from '../app/data-changed';
 import { useT, tError } from '../i18n';
 import { readAsDataUrl, WRITABLE_FIELD_TYPES } from '../core';
 import type { ProductMeta, ProductField, CategoryDetail, FieldFile, Access } from '../core';
@@ -29,6 +30,7 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 	const { client } = useStores();
 	const nav = useNavigate();
 	const shopLangs = useShopLanguages();
+	const changed = useDataChanged();
 	const t = useT();
 	const imgInput = useRef<HTMLInputElement>(null);
 	const editing = !!category;
@@ -88,7 +90,9 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 		return out;
 	}
 
-	async function submit() {
+	// `after` replaces the usual "saved, now close" for an action that needs the category stored
+	// first and then goes somewhere of its own.
+	async function submit(after?: () => void) {
 		if (!client || busy) return;
 		if (name.trim() === '') { setErr(t('category.nameRequired')); return; }
 		setErr('');
@@ -111,7 +115,12 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 			} else {
 				saved = kind === 'manufacturer' ? await client.createManufacturer(body) : await client.createCategory(body);
 			}
-			onSaved({ id: saved.id, name: saved.name, parent_id: saved.parent_id });
+			if (after) {
+				changed.bump('categories');
+				after();
+			} else {
+				onSaved({ id: saved.id, name: saved.name, parent_id: saved.parent_id });
+			}
 		} catch (e) {
 			const code = (e && typeof e === 'object' && typeof (e as { code?: unknown }).code === 'string') ? (e as { code: string }).code : 'generic';
 			setErr(tError(t, code));
@@ -190,7 +199,7 @@ export function CategoryEditor({ kind, category, meta, onClose, onSaved, onDelet
 	);
 
 	const translateBtn = editing && shopLangs?.enabled ? (
-		<Button size="sm" onClick={() => { onClose(); nav(`/categories/${category!.id}/translations`); }}>
+		<Button size="sm" disabled={busy} onClick={() => void submit(() => nav(`/categories/${category!.id}/translations`))}>
 			<Icon name="translate" size={17} /> {t('translations.title')}
 		</Button>
 	) : null;
