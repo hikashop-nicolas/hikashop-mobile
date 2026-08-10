@@ -38,10 +38,12 @@ else; run the generator and the app picks them up.
 | hi-IN | 520 / 520 | 100% | — | Written here |
 | hr-HR | 520 / 520 (+6 plural) | 100% | — | Written here |
 | hu-HU | 520 / 520 | 100% | — | Written here |
+| hy-AM | 520 / 520 | 100% | — | Written here, **not checked by a native speaker** |
 | id-ID | 520 / 520 | 100% | — | Written here |
 | it-IT | 520 / 520 | 100% | — | Written here |
 | ja-JP | 520 / 520 | 100% | — | Written here |
 | ko-KR | 520 / 520 | 100% | — | Written here |
+| kz-KZ | 520 / 520 | 100% | — | Written here, **not checked by a native speaker** |
 | lt-LT | 520 / 520 (+6 plural) | 100% | — | Written here |
 | lv-LV | 520 / 520 (+6 plural) | 100% | — | Written here |
 | mk-MK | 520 / 520 | 100% | — | Written here |
@@ -72,7 +74,5 @@ else; run the generator and the app picks them up.
 | nl-BE | 161 / 520 | 31% | nl-NL | From HikaShop only |
 | fr-FR | 156 / 520 | 30% | fr | From HikaShop only |
 | fr-CA | 155 / 520 | 30% | fr-FR | From HikaShop only |
-| kz-KZ | 148 / 520 | 28% | — | From HikaShop only |
 | ar-DZ | 136 / 520 | 26% | ar-AA | From HikaShop only |
 | nl-NL-flemish | 117 / 520 | 23% | nl-NL | From HikaShop only |
-| hy-AM | 42 / 520 | 8% | — | From HikaShop only |
