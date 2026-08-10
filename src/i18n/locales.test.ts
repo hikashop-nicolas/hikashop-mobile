@@ -80,7 +80,7 @@ describe('locales', () => {
 		const counted = Object.keys(en)
 			.filter((k) => k.endsWith('.other'))
 			.map((k) => k.slice(0, -'.other'.length));
-		for (const tag of ['pl-PL', 'ru-RU', 'cs-CZ']) {
+		for (const tag of ['pl-PL', 'ru-RU', 'cs-CZ', 'sk-SK', 'ro-RO']) {
 			const { messages } = (await import(`./generated/${tag}.ts`)) as { messages: Record<string, string> };
 			// Only checked where the language has been written out here; one still on HikaShop's
 			// own strings alone has no plural forms of ours to carry.

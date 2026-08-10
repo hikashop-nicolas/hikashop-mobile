@@ -32,7 +32,9 @@ else; run the generator and the app picks them up.
 | pl-PL | 514 / 514 (+12 plural) | 100% | — | Written here |
 | pt-BR | 514 / 514 | 100% | — | Written here |
 | pt-PT | 514 / 514 | 100% | — | Written here |
+| ro-RO | 514 / 514 (+6 plural) | 100% | — | Written here |
 | ru-RU | 514 / 514 (+12 plural) | 100% | — | Written here |
+| sk-SK | 514 / 514 (+6 plural) | 100% | — | Written here |
 | sv-SE | 514 / 514 | 100% | — | Written here |
 | ar-AA | 173 / 514 | 34% | — | From HikaShop only |
 | ar-AR | 173 / 514 | 34% | — | From HikaShop only |
@@ -45,11 +47,9 @@ else; run the generator and the app picks them up.
 | zh-CN | 173 / 514 | 34% | — | From HikaShop only |
 | zh-TW | 173 / 514 | 34% | — | From HikaShop only |
 | el-GR | 172 / 514 | 33% | — | From HikaShop only |
-| sk-SK | 172 / 514 | 33% | — | From HikaShop only |
 | hr-HR | 171 / 514 | 33% | — | From HikaShop only |
 | ms-MY | 170 / 514 | 33% | — | From HikaShop only |
 | es-CL | 169 / 514 | 33% | es-ES | From HikaShop only |
-| ro-RO | 168 / 514 | 33% | — | From HikaShop only |
 | vi-VN | 167 / 514 | 32% | — | From HikaShop only |
 | lt-LT | 165 / 514 | 32% | — | From HikaShop only |
 | de-AT | 164 / 514 | 32% | de-DE | From HikaShop only |
