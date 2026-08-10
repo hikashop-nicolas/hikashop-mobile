@@ -20,6 +20,7 @@ else; run the generator and the app picks them up.
 
 | Locale | Strings | Coverage | Then reads | Source |
 | --- | --- | --- | --- | --- |
+| af-ZA | 520 / 520 | 100% | — | Written here |
 | ar-AA | 520 / 520 (+24 plural) | 100% | — | Written here |
 | bg-BG | 520 / 520 | 100% | — | Written here |
 | bs-BA | 520 / 520 (+6 plural) | 100% | — | Written here |
@@ -75,4 +76,3 @@ else; run the generator and the app picks them up.
 | ar-DZ | 136 / 520 | 26% | ar-AA | From HikaShop only |
 | nl-NL-flemish | 117 / 520 | 23% | nl-NL | From HikaShop only |
 | hy-AM | 42 / 520 | 8% | — | From HikaShop only |
-| af-ZA | 28 / 520 | 5% | — | From HikaShop only |
