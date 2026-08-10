@@ -18,6 +18,7 @@ else; run the generator and the app picks them up.
 | es-ES | 514 / 514 | 100% | Written here |
 | it-IT | 514 / 514 | 100% | Written here |
 | nl-NL | 514 / 514 | 100% | Written here |
+| pt-BR | 514 / 514 | 100% | Written here |
 | pt-PT | 514 / 514 | 100% | Written here |
 | ru-RU | 174 / 514 | 34% | From HikaShop only |
 | ar-AA | 173 / 514 | 34% | From HikaShop only |
@@ -36,7 +37,6 @@ else; run the generator and the app picks them up.
 | sk-SK | 172 / 514 | 33% | From HikaShop only |
 | cs-CZ | 171 / 514 | 33% | From HikaShop only |
 | hr-HR | 171 / 514 | 33% | From HikaShop only |
-| pt-BR | 171 / 514 | 33% | From HikaShop only |
 | sv-SE | 171 / 514 | 33% | From HikaShop only |
 | ms-MY | 170 / 514 | 33% | From HikaShop only |
 | pl-PL | 170 / 514 | 33% | From HikaShop only |
