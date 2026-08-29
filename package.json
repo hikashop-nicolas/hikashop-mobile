@@ -27,7 +27,8 @@
 		"e2e": "cypress run",
 		"screenshots": "cypress run --config specPattern=cypress/docs/**/*.cy.ts,screenshotsFolder=docs/screenshots && node tools/flatten-screenshots.mjs",
 		"a11y": "cypress run --config specPattern=cypress/a11y/**/*.cy.ts",
-		"hooks": "git config core.hooksPath .githooks"
+		"hooks": "git config core.hooksPath .githooks",
+		"test:device": "node tools/device/run.mjs"
 	},
 	"dependencies": {
 		"@aparajita/capacitor-secure-storage": "^7.1.6",

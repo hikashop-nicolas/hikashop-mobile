@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug builds only. The device test suite tunnels a throwaway shop to the phone with
+  "adb reverse", which serves plain http on localhost, so the debug build is allowed to talk
+  to it. Release builds never see this file: it lives in the debug source set.
+-->
+<network-security-config>
+	<domain-config cleartextTrafficPermitted="true">
+		<domain includeSubdomains="true">localhost</domain>
+		<domain includeSubdomains="true">127.0.0.1</domain>
+		<domain includeSubdomains="true">10.0.2.2</domain>
+	</domain-config>
+</network-security-config>

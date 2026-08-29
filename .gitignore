@@ -35,3 +35,6 @@ cypress/downloads/
 *.p12
 keystore.b64
 
+
+# device test screenshots
+tools/device/screenshots
