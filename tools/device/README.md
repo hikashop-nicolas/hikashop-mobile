@@ -35,6 +35,23 @@ The debug build exposes its WebView on a devtools socket. The runner forwards it
 protocol directly, in `cdp.mjs`, which is enough to evaluate, fill, click, wait and take a
 screenshot. A failing check leaves a screenshot in `tools/device/screenshots/`.
 
+## What it checks
+
+Reading: the connect screen, pairing, the dashboard figures and its chart, the orders list and
+an order opening, the products list and a product opening, a search narrowing a list, then
+categories, customers, discounts, stores and notifications.
+
+Writing, each putting the shop back as it found it: renaming a product and watching the list
+follow, changing an order's status and changing it back, creating a coupon and deleting it,
+creating a category and deleting it.
+
+Things only a real device can be asked: that the interface follows a change of language, that
+the shop is still paired after the app is closed and reopened (the token lives in the
+keystore, which a browser has no equivalent of), and that a shop it cannot reach is reported
+rather than left blank, by pulling the tunnel out from under it and putting it back.
+
+A last check reads the console back and fails if anything was logged as an error along the way.
+
 ## Pairing
 
 A pairing code is normally minted by hand in System > App Devices. The runner writes the same

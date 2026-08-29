@@ -194,6 +194,9 @@ check('a product search narrows the list', async (p) => {
 	await p.sleep(1500);
 	const after = await p.count('.hk-row');
 	if (after >= before) throw new Error(`search did not narrow anything (${before} then ${after})`);
+	// The app remembers a search per shop, so leaving it set would empty every later list.
+	await p.fill('[data-hk-search] input, input[data-hk-search], .hk-search input', '');
+	await p.waitFor(`document.querySelectorAll('.hk-row').length > 0`, { timeout: 20000, label: 'the list to come back' });
 });
 
 check('the categories screen lists something', async (p) => {
@@ -221,8 +224,188 @@ check('the notifications screen renders', async (p) => {
 	await p.waitFor(`!!document.querySelector('.hk-page, .hk-split-list, .hk-row, .hk-empty')`, { label: 'the notifications screen' });
 });
 
+// ---- actions that change something, each putting the shop back as it found it ----
+
+// The record being edited, whichever side of the split breakpoint the screen is on. A comma
+// separates whole selectors, so each part has to carry the suffix itself.
+const rec = (suffix = '') => `.hk-detail-over ${suffix}, .hk-split-detail ${suffix}`.replace(/\s+,/, ',');
+
+check('a product can be renamed, and the list follows', async (p) => {
+	await p.go('/products');
+	await p.waitFor(`document.querySelectorAll('.hk-row').length > 0`, { timeout: 20000, label: 'products' });
+	const original = await p.text('.hk-row .hk-row-title');
+	const suffix = ` Z${Date.now() % 1000}`;
+
+	await p.click('.hk-row .hk-rowmain, .hk-row a');
+	await p.waitFor(`!!document.querySelector("${rec('input.hk-input')}")`, { label: 'the product form' });
+	await p.fill(rec('input.hk-input'), original + suffix);
+	await p.clickText('button', 'save');
+	await p.waitFor(`[...document.querySelectorAll('.hk-row-title')].some((e) => e.textContent.includes(${JSON.stringify(suffix.trim())}))`,
+		{ timeout: 20000, label: 'the renamed product in the list' });
+
+	// Put the catalogue back, so a reused shop does not drift with every run.
+	await p.evaluate(`
+		const row = [...document.querySelectorAll('.hk-row')].find((r) => r.textContent.includes(${JSON.stringify(suffix.trim())}));
+		row.querySelector('.hk-rowmain, a').click();
+		return true;
+	`);
+	await p.waitFor(`!!document.querySelector("${rec('input.hk-input')}")`, { label: 'the product form again' });
+	await p.fill(rec('input.hk-input'), original);
+	await p.clickText('button', 'save');
+	await p.waitFor(`![...document.querySelectorAll('.hk-row-title')].some((e) => e.textContent.includes(${JSON.stringify(suffix.trim())}))`,
+		{ timeout: 20000, label: 'the original name back' });
+});
+
+check("an order's status can be changed, and changed back", async (p) => {
+	await p.go('/orders');
+	await p.waitFor(`document.querySelectorAll('.hk-row').length > 0`, { timeout: 20000, label: 'orders' });
+	await p.click('.hk-row .hk-rowmain, .hk-row a');
+	await p.waitFor(`!!document.querySelector('select.hk-select')`, { timeout: 20000, label: 'the status dropdown' });
+
+	const pick = (value) => p.evaluate(`
+		const sel = document.querySelector('select.hk-select');
+		Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set.call(sel, ${JSON.stringify(value)});
+		sel.dispatchEvent(new Event('change', { bubbles: true }));
+		return ${JSON.stringify(value)};
+	`);
+
+	const before = await p.evaluate(`return document.querySelector('select.hk-select').value;`);
+	const options = await p.evaluate(`return [...document.querySelector('select.hk-select').options].map((o) => o.value).filter(Boolean);`);
+	const after = options.find((o) => o !== before);
+	if (!after) throw new Error(`only one status offered: ${options.join(', ')}`);
+	await pick(after);
+	await p.waitFor(`document.querySelector('select.hk-select')?.value === ${JSON.stringify(after)}`,
+		{ timeout: 20000, label: `the status to become ${after}` });
+
+	await pick(before);
+	await p.waitFor(`document.querySelector('select.hk-select')?.value === ${JSON.stringify(before)}`,
+		{ timeout: 20000, label: 'the status to go back' });
+});
+
+check('a coupon can be created and deleted', async (p) => {
+	const code = `DEV${Date.now() % 100000}`;
+	await p.go('/discounts');
+	await p.waitFor(`!!document.querySelector('.hk-title')`, { label: 'the discounts screen' });
+	await p.clickText('button', 'new');
+	await p.waitFor(`location.hash.includes('/discounts/new')`, { label: 'the new discount form' });
+	// The form slides in, and the button that commits it sits in the app bar above; clicking
+	// before the transition ends hits a bar that is still off screen. A new record says Create,
+	// an existing one says Save.
+	await p.waitFor(`[...document.querySelectorAll('button')].some((b) => /save|create/i.test(b.textContent || ''))`,
+		{ timeout: 20000, label: 'the button that commits the form' });
+	await p.fill(rec('input'), code);
+	await p.clickText('.hk-seg', 'percentage').catch(() => {});
+	await p.evaluate(`
+		const n = document.querySelector('.hk-detail-over input[type=number], .hk-split-detail input[type=number]');
+		if (n) {
+			Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(n, '12');
+			n.dispatchEvent(new Event('input', { bubbles: true }));
+		}
+		return true;
+	`);
+	await p.clickText('button', 'save');
+	await p.waitFor(`document.body.textContent.includes(${JSON.stringify(code)})`, { timeout: 20000, label: 'the coupon in the list' });
+
+	await p.evaluate(`
+		const row = [...document.querySelectorAll('.hk-row')].find((r) => r.textContent.includes(${JSON.stringify(code)}));
+		if (!row) throw new Error('the coupon left the list');
+		(row.querySelector('.hk-rowmain, a') ?? row).click();
+		return true;
+	`);
+	await p.waitFor(`/\\/discounts\\/\\d+/.test(location.hash)`, { label: 'the coupon to open' });
+	await p.waitFor(`[...document.querySelectorAll('button')].some((b) => /delete/i.test(b.textContent || ''))`,
+		{ timeout: 20000, label: 'the delete button' });
+	await p.clickText('button', 'delete');
+	await p.sleep(400);
+	// Deleting asks first, and the confirmation is a second button saying just that.
+	await p.evaluate(`
+		const el = [...document.querySelectorAll('button')].reverse()
+			.find((b) => /^\\s*delete\\s*$/i.test(b.textContent || ''));
+		if (el) el.click();
+		return true;
+	`);
+	await p.waitFor(`!document.body.textContent.includes(${JSON.stringify(code)})`, { timeout: 20000, label: 'the coupon to disappear' });
+});
+
+check('a category can be created and deleted', async (p) => {
+	const name = `Dev ${Date.now() % 100000}`;
+	await p.go('/categories');
+	await p.waitFor(`document.querySelectorAll('.hk-row').length > 0`, { timeout: 20000, label: 'categories' });
+	await p.clickText('button', 'new');
+	await p.waitFor(`location.hash.includes('/categories/new')`, { label: 'the new category form' });
+	// The form slides in, and the button that commits it sits in the app bar above; clicking
+	// before the transition ends hits a bar that is still off screen. A new record says Create,
+	// an existing one says Save.
+	await p.waitFor(`[...document.querySelectorAll('button')].some((b) => /save|create/i.test(b.textContent || ''))`,
+		{ timeout: 20000, label: 'the button that commits the form' });
+	await p.fill(rec('input.hk-input'), name);
+	await p.evaluate(`
+		const el = [...document.querySelectorAll('button')].find((b) => /save|create/i.test(b.textContent || ''));
+		if (!el) throw new Error('nothing to commit the form with');
+		el.click();
+		return true;
+	`);
+	await p.waitFor(`document.body.textContent.includes(${JSON.stringify(name)})`, { timeout: 20000, label: 'the category in the list' });
+
+	await p.evaluate(`
+		const row = [...document.querySelectorAll('.hk-row')].find((r) => r.textContent.includes(${JSON.stringify(name)}));
+		if (!row) throw new Error('the category left the list');
+		(row.querySelector('.hk-row-btn, .hk-rowmain, a, button') ?? row).click();
+		return true;
+	`);
+	await p.waitFor(`/\\/categories\\/\\d+/.test(location.hash)`, { timeout: 20000, label: 'the category to open' });
+	await p.waitFor(`[...document.querySelectorAll('button')].some((b) => /delete/i.test(b.textContent || ''))`,
+		{ timeout: 20000, label: 'the delete button' });
+	await p.clickText('button', 'delete');
+	await p.sleep(400);
+	await p.evaluate(`
+		const el = [...document.querySelectorAll('button')].reverse()
+			.find((b) => /^\\s*delete\\s*$/i.test(b.textContent || ''));
+		if (el) el.click();
+		return true;
+	`);
+	await p.waitFor(`!document.body.textContent.includes(${JSON.stringify(name)})`, { timeout: 20000, label: 'the category to disappear' });
+});
+
+check('the interface follows a change of language', async (p) => {
+	await p.go('/dashboard');
+	const labels = `[...document.querySelectorAll('.hk-stat')].map((e) => e.textContent.trim()).join(' | ') || null`;
+	const english = await p.waitFor(labels, { timeout: 25000, label: 'the dashboard tiles' });
+	await p.evaluate(`localStorage.setItem('hk.locale', 'fr'); location.reload(); return true;`);
+	await p.sleep(3000);
+	const french = await p.waitFor(labels, { timeout: 25000, label: 'the dashboard tiles in French' });
+	if (french === english) throw new Error(`the tiles did not change with the language (still "${english}")`);
+	await p.evaluate(`localStorage.setItem('hk.locale', 'en'); location.reload(); return true;`);
+	await p.sleep(3000);
+});
+
+// Only a real device can be sent away and brought back, which is where a token kept in the
+// keystore either survives or does not.
+check('the shop is still paired after the app is closed and reopened', async (p, ctx) => {
+	await ctx.restart();
+	await p.waitFor(`!location.hash.includes('/connect')`, { timeout: 30000, label: 'the app to come back paired' });
+	await p.go('/dashboard');
+	await p.waitFor(`document.querySelectorAll('.hk-stat').length >= 3`, { timeout: 25000, label: 'the dashboard after the restart' });
+});
+
+check('a shop it cannot reach is reported, not left blank', async (p, ctx) => {
+	await ctx.tunnel(false);
+	await p.evaluate(`location.reload(); return true;`);
+	await p.sleep(3000);
+	await p.go('/orders');
+	await p.waitFor(
+		`(document.body.textContent || '').length > 40 && !!document.querySelector('.hk-error-note, .hk-empty, .hk-banner, .hk-toast, .hk-row')`,
+		{ timeout: 25000, label: 'something on screen rather than nothing' });
+	await ctx.tunnel(true);
+	await p.evaluate(`location.reload(); return true;`);
+	await p.sleep(3000);
+	await p.go('/orders');
+	await p.waitFor(`document.querySelectorAll('.hk-row').length > 0`, { timeout: 25000, label: 'the orders to come back' });
+});
+
 check('nothing was logged as an error', async (p) => {
-	const bad = p.logs.filter((l) => l.level === 'error' && !/favicon|ERR_INTERNET_DISCONNECTED/i.test(l.text));
+	const bad = p.logs.filter((l) => l.level === 'error'
+		&& !/favicon|ERR_INTERNET_DISCONNECTED|ERR_CONNECTION_REFUSED|Failed to load resource|Failed to fetch/i.test(l.text));
 	if (bad.length) throw new Error(`${bad.length} console error(s), first: ${bad[0].text.slice(0, 200)}`);
 });
 
@@ -249,11 +432,31 @@ async function main() {
 	if (!socket) throw new Error('the app is not exposing a debuggable WebView; is this the debug build?');
 	await adb('forward', '--remove-all').catch(() => {});
 	await adb('forward', 'tcp:9222', `localabstract:${socket}`);
-	const page = await attach(9222);
+	let page = await attach(9222);
 	say(`  attached to ${page.pageUrl}`);
 
 	await mkdir(SHOTS, { recursive: true });
-	const ctx = { code, storeUrl: `http://localhost:8080/${SITE}` };
+	const ctx = {
+		code,
+		storeUrl: `http://localhost:8080/${SITE}`,
+		// Close and reopen the app, then attach to the WebView it comes back with.
+		async restart() {
+			await adb('shell', 'am', 'force-stop', APP_ID);
+			await new Promise((r) => setTimeout(r, 1500));
+			await adb('shell', 'am', 'start', '-n', `${APP_ID}/.MainActivity`);
+			await new Promise((r) => setTimeout(r, 6000));
+			const sock = (await adb('shell', 'cat', '/proc/net/unix')).match(/webview_devtools_remote_\d+/)?.[0];
+			await adb('forward', '--remove-all').catch(() => {});
+			await adb('forward', 'tcp:9222', `localabstract:${sock}`);
+			const fresh = await attach(9222);
+			Object.assign(page, fresh);
+		},
+		// Open or close the cable the shop arrives through.
+		async tunnel(on) {
+			if (on) await adb('reverse', 'tcp:8080', 'tcp:8080');
+			else await adb('reverse', '--remove', 'tcp:8080').catch(() => {});
+		},
+	};
 	const results = [];
 
 	step('Checks');
