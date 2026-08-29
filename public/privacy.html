@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HikaShop app privacy policy</title>
+<style>
+	body { max-width: 46rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1c2b33; }
+	h1 { font-size: 1.7rem; margin-bottom: 0.25rem; }
+	h2 { font-size: 1.15rem; margin-top: 2rem; }
+	.date { color: #62727c; margin-top: 0; }
+	code { background: #f2f5f7; padding: 0.1em 0.35em; border-radius: 3px; }
+	@media (prefers-color-scheme: dark) {
+		body { background: #12181c; color: #e6edf1; }
+		.date { color: #9aa8b1; }
+		code { background: #1e272d; }
+		a { color: #6eaccd; }
+	}
+</style>
+</head>
+<body>
+
+<h1>Privacy policy of the HikaShop application</h1>
+<p class="date">Applies to the Android application and to the web application, package <code>com.hikashop.app</code>. Last updated on the 29th of August 2026.</p>
+
+<p>
+	The HikaShop application is published by Hikari Software. It is a client for a shop you already
+	run: it talks to your own HikaShop installation, on your own server, and to nothing else.
+</p>
+
+<h2>What we collect</h2>
+<p>
+	Nothing. The application has no account, no analytics, no advertising, no crash reporting and no
+	third party service of any kind. Hikari Software receives no data from it and operates no server
+	it talks to.
+</p>
+
+<h2>What is kept on your device</h2>
+<p>
+	The address of each shop you connect, and one key per shop, which is what lets the application
+	speak to that shop. On Android the key is held in the system's encrypted storage. The application
+	also keeps your own preferences, such as the language and the filters you last used, and a copy of
+	what it last read from your shop so it can be displayed again quickly.
+</p>
+<p>
+	All of it stays on the device. Uninstalling the application removes it. You can also revoke a
+	device from your shop's backend, under System &gt; App Devices, which makes its key useless
+	immediately.
+</p>
+
+<h2>What is sent, and to whom</h2>
+<p>
+	Requests go to the address of the shop you connected, over HTTPS, carrying that shop's key. They
+	contain what you asked for: the orders you are reading, the product you are saving, and so on.
+	They go to your server and to no one else. What your shop then does with that data is governed by
+	your own shop's privacy policy.
+</p>
+
+<h2>Permissions, and why</h2>
+<ul>
+	<li><strong>Internet</strong>: to reach your shop. Without it the application has nothing to show.</li>
+	<li><strong>Camera</strong>, optional: to read a barcode when you scan a product, and to take a
+		picture when you add one to a product. Images are handled on the device and are only ever sent
+		to your own shop, when you save. The application works without the camera.</li>
+	<li><strong>Notifications</strong>, optional: to raise a notification when your shop reports a new
+		order or a product running low. These are produced on the device from what your shop answers.
+		There is no push service and no third party involved.</li>
+</ul>
+
+<h2>Children</h2>
+<p>
+	The application is a tool for merchants and is not directed at children.
+</p>
+
+<h2>Changes</h2>
+<p>
+	If this policy changes, the new version appears at this address with a new date. The source of
+	the application, including this page, is public at
+	<a href="https://github.com/hikashop-nicolas/hikashop-mobile">github.com/hikashop-nicolas/hikashop-mobile</a>.
+</p>
+
+<h2>Contact</h2>
+<p>
+	Questions about this policy: <a href="https://www.hikashop.com/support/contact-us.html">the Hikari
+	Software contact form</a>. Bugs and ideas are better placed in the
+	<a href="https://github.com/hikashop-nicolas/hikashop-mobile/issues">issues of the repository</a>.
+</p>
+
+</body>
+</html>

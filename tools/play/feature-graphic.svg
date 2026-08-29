@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500" role="img" aria-label="HikaShop, run your shop from your phone">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e5f8e"/>
+      <stop offset="100%" stop-color="#297EBA"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="500" fill="url(#bg)"/>
+
+  <!-- The mark of public/icon.svg, drawn at 3x and kept clear of the edges Play may crop. -->
+  <g transform="translate(190 250) scale(3) translate(-48 -48)">
+    <circle cx="48" cy="48" r="46" fill="#FBE8D4" opacity="0.12"/>
+    <g fill="#FBE8D4">
+      <rect x="46" y="14" width="4" height="14" rx="2" opacity="1"   transform="rotate(0 48 48)"/>
+      <rect x="46" y="14" width="4" height="14" rx="2" opacity="0.5" transform="rotate(45 48 48)"/>
+      <rect x="46" y="14" width="4" height="14" rx="2" opacity="1"   transform="rotate(90 48 48)"/>
+      <rect x="46" y="14" width="4" height="14" rx="2" opacity="0.5" transform="rotate(135 48 48)"/>
+      <rect x="46" y="14" width="4" height="14" rx="2" opacity="1"   transform="rotate(180 48 48)"/>
+      <rect x="46" y="14" width="4" height="14" rx="2" opacity="0.5" transform="rotate(225 48 48)"/>
+      <rect x="46" y="14" width="4" height="14" rx="2" opacity="1"   transform="rotate(270 48 48)"/>
+      <rect x="46" y="14" width="4" height="14" rx="2" opacity="0.5" transform="rotate(315 48 48)"/>
+    </g>
+    <circle cx="48" cy="48" r="14" fill="#FBE8D4"/>
+  </g>
+
+  <text x="360" y="228" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="86" font-weight="bold" letter-spacing="-1">HikaShop</text>
+  <text x="360" y="292" fill="#FBE8D4" font-family="Helvetica, Arial, sans-serif" font-size="38">Run your shop from your phone</text>
+  <text x="362" y="344" fill="#cfe4f2" font-family="Helvetica, Arial, sans-serif" font-size="26">Orders, products and sales, from your own shop</text>
+</svg>
