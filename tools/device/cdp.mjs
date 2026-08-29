@@ -17,7 +17,8 @@ export async function attach(port = 9222, { onConsole } = {}) {
 		if (m.id && pending.has(m.id)) {
 			const { resolve, reject } = pending.get(m.id);
 			pending.delete(m.id);
-			m.error ? reject(new Error(m.error.message)) : resolve(m.result);
+			if (m.error) reject(new Error(m.error.message));
+			else resolve(m.result);
 			return;
 		}
 		if (m.method === 'Log.entryAdded') {
