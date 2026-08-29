@@ -96,23 +96,28 @@ rsvg-convert -w 512 -h 512 public/icon.svg -o docs/play/store-icon-512.png
 
 ## App access
 
-The app is a client for a shop, so a reviewer cannot see anything past the first screen without
-one. Declare **All or some functionality is restricted** and give a demo shop:
+The app is a client for a shop, so a reviewer cannot see anything past the first screen
+without one. Declare **All or some functionality is restricted**, and give the demo shop
+below. Its account details are on the demo server, in `~/appdemo-review-credentials.txt`,
+and belong in the Play form only, never in this repository.
 
-> The app manages an existing HikaShop shop (a Joomla or WordPress e-commerce site). It shows
-> nothing until it is paired with one.
+Instruction name: **Pair the app with the demo shop**
+
+> The app manages an existing HikaShop shop, which is a Joomla or WordPress e-commerce site.
+> It shows nothing until it is paired with one, so please use the demo shop below.
 >
-> A demo shop is available at <URL>. To pair:
-> 1. Open <URL>/administrator and log in with the account below.
+> 1. Open https://appdemo.hikashop.com/administrator and sign in with the account provided.
 > 2. Go to Components > HikaShop > System > App Devices, and press New.
-> 3. A QR code and a short code appear. In the app, press Add a shop, then Scan, or type the code.
-> The code lasts five minutes and works once; generate another if it expires.
+> 3. A QR code and a short code appear. In the app, press Add a shop, then Scan the code with
+>    the camera, or press Type a code and enter the short code by hand.
+> 4. The code lasts five minutes and works once. If it expires, press New again for another.
 >
-> Username: <demo account>
-> Password: <demo password>
+> Once paired, the app shows that shop's dashboard, its orders, its products, its categories
+> and its customers.
 
-That demo shop still has to be set up, with its own account, and it has to stay up while the app
-is listed. Put the credentials into the Play form only, never in this repository.
+The shop runs HikaShop Business 6.6.0 on Joomla 6.1, with 141 products and a handful of
+orders so the dashboard and the order list have something in them. It must stay up for as
+long as the app is listed, since reviewers pair with it again at every update.
 
 ## Data safety
 
