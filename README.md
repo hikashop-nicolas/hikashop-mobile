@@ -119,9 +119,11 @@ Two of them, Armenian and Kazakh, have not been checked by a native speaker yet,
 
 ## Getting it
 
-- **Android:** install the APK from the [latest release](../../releases/tag/android-latest).
-  Android will warn you about installing from outside the Play Store. A Play listing is on its
-  way.
+- **Android:** get it on
+  [Google Play](https://play.google.com/store/apps/details?id=com.hikashop.app). If you would
+  rather not go through the store, the same build is on the
+  [latest release](../../releases/tag/android-latest) as an APK; Android will warn you about
+  installing from outside the Play Store.
 - **Computer, or any browser:** open the
   [web version](https://hikashop-nicolas.github.io/hikashop-mobile/). It installs as a normal
   app from your browser's menu and behaves the same as the Android one.
