@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Камераны тауардың штрих-кодына бағыттаңыз",
 	'scan.productTitle': "Тауарды сканерлеу",
 	'scan.scanAnother': "Тағы бірін сканерлеу",
+	'scan.switchCamera': "Камераны ауыстыру",
 	'scan.unsupported': "Бұл құрылғы сканерлей алмайды.",
 	'scan.useCamera': "Камераны пайдалану",
 	'shortcut.close': "Ашық тұрғанды жабу",

@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Rikta kameran mot produktens streckkod",
 	'scan.productTitle': "Skanna en produkt",
 	'scan.scanAnother': "Skanna en till",
+	'scan.switchCamera': "Byt kamera",
 	'scan.unsupported': "Den här enheten kan inte skanna.",
 	'scan.useCamera': "Använd kameran",
 	'shortcut.close': "Stäng det som är öppet",

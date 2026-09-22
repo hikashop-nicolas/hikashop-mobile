@@ -474,6 +474,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Kamero usmerite v črtno kodo izdelka",
 	'scan.productTitle': "Skeniraj izdelek",
 	'scan.scanAnother': "Skeniraj naslednjega",
+	'scan.switchCamera': "Zamenjaj kamero",
 	'scan.unsupported': "Ta naprava ne more skenirati.",
 	'scan.useCamera': "Uporabi kamero",
 	'shortcut.close': "Zapri odprto",

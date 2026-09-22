@@ -425,6 +425,7 @@ export const en: Messages = {
 	'scan.openProduct': 'Open product',
 	'scan.scanAnother': 'Scan another',
 	'scan.noMatch': 'No product matches {code}.',
+	'scan.switchCamera': 'Switch camera',
 	'stores.appearance': 'Appearance',
 	'stores.themeAuto': 'Match device',
 	'stores.themeLight': 'Light',

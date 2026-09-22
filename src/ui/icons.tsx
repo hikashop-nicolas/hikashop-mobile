@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 // A small, consistent line-icon set. All icons are drawn on a 24x24 grid, stroked with
 // currentColor so they inherit text colour, and share one stroke weight and round joins.
 
-export type IconName = 'dashboard' | 'orders' | 'store' | 'search' | 'plus' | 'back' | 'scan' | 'bell' | 'products' | 'chevron' | 'check' | 'close' | 'categories' | 'trash' | 'edit' | 'customers' | 'discount' | 'trendUp' | 'trendDown' | 'eye' | 'upload' | 'image' | 'play' | 'translate' | 'save';
+export type IconName = 'dashboard' | 'orders' | 'store' | 'search' | 'plus' | 'back' | 'scan' | 'bell' | 'products' | 'chevron' | 'check' | 'close' | 'categories' | 'trash' | 'edit' | 'customers' | 'discount' | 'trendUp' | 'trendDown' | 'eye' | 'upload' | 'image' | 'play' | 'translate' | 'save' | 'switchCamera';
 
 const PATHS: Record<IconName, ReactNode> = {
 	discount: (
@@ -152,6 +152,16 @@ const PATHS: Record<IconName, ReactNode> = {
 	trendUp: <><path d="M5 18L18 5" /><path d="M9 5h9v9" /></>,
 	trendDown: <><path d="M5 5l13 13" /><path d="M18 9v9H9" /></>,
 	check: <path d="M5 12.5l4.5 4.5L19 7" />,
+	// A camera body with two turning arrows inside: use the phone's next camera.
+	switchCamera: (
+		<>
+			<path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
+			<path d="M8.5 12a3.5 3.5 0 0 1 6.2-2.2" />
+			<path d="M15.5 14a3.5 3.5 0 0 1-6.2 2.2" />
+			<path d="M15 7.8v2.2h-2.2" />
+			<path d="M9 18.2V16h2.2" />
+		</>
+	),
 	close: (
 		<>
 			<path d="M6 6l12 12" />

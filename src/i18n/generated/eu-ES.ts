@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Zuzendu kamera produktuaren barra-kodera",
 	'scan.productTitle': "Eskaneatu produktua",
 	'scan.scanAnother': "Eskaneatu beste bat",
+	'scan.switchCamera': "Aldatu kamera",
 	'scan.unsupported': "Gailu honek ezin du eskaneatu.",
 	'scan.useCamera': "Erabili kamera",
 	'shortcut.close': "Itxi irekita dagoena",

@@ -468,6 +468,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Namiřte kameru na čárový kód produktu",
 	'scan.productTitle': "Naskenovat produkt",
 	'scan.scanAnother': "Naskenovat další",
+	'scan.switchCamera': "Přepnout kameru",
 	'scan.unsupported': "Toto zařízení neumí skenovat.",
 	'scan.useCamera': "Použít kameru",
 	'shortcut.close': "Zavřít otevřené",

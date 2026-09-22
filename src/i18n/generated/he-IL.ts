@@ -468,6 +468,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "יש לכוון את המצלמה לברקוד של המוצר",
 	'scan.productTitle': "סריקת מוצר",
 	'scan.scanAnother': "סריקה נוספת",
+	'scan.switchCamera': "החלפת מצלמה",
 	'scan.unsupported': "המכשיר הזה אינו יכול לסרוק.",
 	'scan.useCamera': "שימוש במצלמה",
 	'shortcut.close': "סגירת מה שפתוח",

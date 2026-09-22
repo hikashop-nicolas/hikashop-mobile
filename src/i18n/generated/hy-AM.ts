@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Ուղղեք տեսախցիկը ապրանքի շտրիխ կոդին",
 	'scan.productTitle': "Սկանավորել ապրանք",
 	'scan.scanAnother': "Սկանավորել ևս մեկը",
+	'scan.switchCamera': "Փոխել տեսախցիկը",
 	'scan.unsupported': "Այս սարքը չի կարող սկանավորել։",
 	'scan.useCamera': "Օգտագործել տեսախցիկը",
 	'shortcut.close': "Փակել բացվածը",

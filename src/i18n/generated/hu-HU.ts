@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Irányítsa a kamerát a termék vonalkódjára",
 	'scan.productTitle': "Termék beolvasása",
 	'scan.scanAnother': "Újabb beolvasása",
+	'scan.switchCamera': "Kameraváltás",
 	'scan.unsupported': "Ez az eszköz nem tud kódot beolvasni.",
 	'scan.useCamera': "Kamera használata",
 	'shortcut.close': "A megnyitott bezárása",

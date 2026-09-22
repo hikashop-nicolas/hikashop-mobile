@@ -122,6 +122,8 @@
 .hk-scan-video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hk-scan-reticle { position: absolute; inset: 16%; border: 3px solid rgba(255, 255, 255, .9); border-radius: var(--hk-r2); box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .35); }
 .hk-scan-hint { text-align: center; }
+.hk-scan-switch { position: absolute; top: var(--hk-s2); inset-inline-end: var(--hk-s2); color: #fff; background: rgba(0, 0, 0, .45); border-radius: 50%; }
+.hk-scan-switch:hover { color: #fff; background: rgba(0, 0, 0, .65); }
 
 .hk-lead-ic { display: inline-flex; color: var(--hk-muted); flex: none; }
 

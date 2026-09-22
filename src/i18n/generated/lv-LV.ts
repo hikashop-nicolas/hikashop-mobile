@@ -468,6 +468,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Pavērsiet kameru pret preces svītrkodu",
 	'scan.productTitle': "Skenēt preci",
 	'scan.scanAnother': "Skenēt nākamo",
+	'scan.switchCamera': "Pārslēgt kameru",
 	'scan.unsupported': "Šī ierīce nevar skenēt.",
 	'scan.useCamera': "Izmantot kameru",
 	'shortcut.close': "Aizvērt atvērto",

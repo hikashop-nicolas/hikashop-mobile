@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Hướng máy ảnh vào mã vạch của sản phẩm",
 	'scan.productTitle': "Quét sản phẩm",
 	'scan.scanAnother': "Quét tiếp",
+	'scan.switchCamera': "Đổi camera",
 	'scan.unsupported': "Thiết bị này không quét được.",
 	'scan.useCamera': "Dùng máy ảnh",
 	'shortcut.close': "Đóng mục đang mở",

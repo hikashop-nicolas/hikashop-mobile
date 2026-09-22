@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "将相机对准商品条形码",
 	'scan.productTitle': "扫描商品",
 	'scan.scanAnother': "继续扫描",
+	'scan.switchCamera': "切换摄像头",
 	'scan.unsupported': "此设备不支持扫描。",
 	'scan.useCamera': "使用相机",
 	'shortcut.close': "关闭已打开的内容",

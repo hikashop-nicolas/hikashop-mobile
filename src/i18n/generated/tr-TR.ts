@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Kamerayı ürünün barkoduna tutun",
 	'scan.productTitle': "Ürün tara",
 	'scan.scanAnother': "Bir tane daha tara",
+	'scan.switchCamera': "Kamerayı değiştir",
 	'scan.unsupported': "Bu cihaz tarama yapamıyor.",
 	'scan.useCamera': "Kamerayı kullan",
 	'shortcut.close': "Açık olanı kapat",

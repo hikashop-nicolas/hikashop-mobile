@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Halakan kamera ke kod bar produk",
 	'scan.productTitle': "Imbas produk",
 	'scan.scanAnother': "Imbas satu lagi",
+	'scan.switchCamera': "Tukar kamera",
 	'scan.unsupported': "Peranti ini tidak boleh mengimbas.",
 	'scan.useCamera': "Guna kamera",
 	'shortcut.close': "Tutup yang terbuka",

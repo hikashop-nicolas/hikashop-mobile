@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "商品のバーコードにカメラを向けてください",
 	'scan.productTitle': "商品をスキャン",
 	'scan.scanAnother': "続けてスキャン",
+	'scan.switchCamera': "カメラを切り替え",
 	'scan.unsupported': "この端末はスキャンに対応していません。",
 	'scan.useCamera': "カメラを使う",
 	'shortcut.close': "開いているものを閉じる",

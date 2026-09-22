@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Suuntaa kamera tuotteen viivakoodiin",
 	'scan.productTitle': "Lue tuote",
 	'scan.scanAnother': "Lue toinen",
+	'scan.switchCamera': "Vaihda kameraa",
 	'scan.unsupported': "Tämä laite ei osaa lukea koodeja.",
 	'scan.useCamera': "Käytä kameraa",
 	'shortcut.close': "Sulje avoinna oleva",

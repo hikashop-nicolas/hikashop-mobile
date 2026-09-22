@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Apunteu la càmera al codi de barres del producte",
 	'scan.productTitle': "Escaneja un producte",
 	'scan.scanAnother': "Escaneja'n un altre",
+	'scan.switchCamera': "Canvia de càmera",
 	'scan.unsupported': "Aquest dispositiu no pot escanejar.",
 	'scan.useCamera': "Fes servir la càmera",
 	'shortcut.close': "Tanca el que hi ha obert",

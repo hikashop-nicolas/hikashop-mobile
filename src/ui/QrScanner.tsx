@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useT } from '../i18n';
 import { Button } from './atoms';
+import { Icon } from './icons';
+import { nextCamera, openScanCamera, saveCamera, savedCamera, stopStream } from './scan-camera';
 
 // Pure-web QR scanner: BarcodeDetector over a getUserMedia stream. Works in the PWA and in the
 // Capacitor Android WebView (Chromium), so no native plugin is needed. Callers must only mount
@@ -42,6 +44,11 @@ export function QrScanner({ onResult, onClose, formats = QR_FORMATS, title }: {
 	// Fixed for the life of a scan session, so the camera effect need not restart on a re-render.
 	const formatsRef = useRef(formats);
 	const [errorKey, setErrorKey] = useState('');
+	// The camera asked for (null lets the pick decide), the one actually running, and the list
+	// the switch button cycles through.
+	const [cameraId, setCameraId] = useState<string | null>(savedCamera);
+	const [activeId, setActiveId] = useState<string | null>(null);
+	const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
 
 	useEffect(() => {
 		const Ctor = detectorCtor();
@@ -57,16 +64,25 @@ export function QrScanner({ onResult, onClose, formats = QR_FORMATS, title }: {
 		const stop = () => {
 			stopped = true;
 			if (raf) cancelAnimationFrame(raf);
-			stream?.getTracks().forEach((t) => t.stop());
+			if (stream) stopStream(stream);
 		};
 
 		void (async () => {
 			try {
-				stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+				stream = await openScanCamera(cameraId);
 				if (stopped) {
-					stream.getTracks().forEach((t) => t.stop());
+					stopStream(stream);
 					return;
 				}
+				const track = stream.getVideoTracks()[0];
+				const id = track?.getSettings().deviceId ?? null;
+				setActiveId(id);
+				if (id) saveCamera(id);
+				// Labels are only filled in once the camera permission is granted, so list them now.
+				const all = await navigator.mediaDevices.enumerateDevices().catch(() => []);
+				if (!stopped) setCameras(all.filter((d) => d.kind === 'videoinput'));
+				// Barcodes are read up close; ask for continuous focus where the camera offers it.
+				track?.applyConstraints({ advanced: [{ focusMode: 'continuous' } as MediaTrackConstraintSet] }).catch(() => {});
 				const v = videoRef.current;
 				if (!v) return;
 				v.srcObject = stream;
@@ -93,13 +109,20 @@ export function QrScanner({ onResult, onClose, formats = QR_FORMATS, title }: {
 		})();
 
 		return stop;
-	}, []);
+	}, [cameraId]);
+
+	const switchTo = nextCamera(cameras, activeId);
 
 	return (
 		<div className="hk-scan">
 			<div className="hk-scan-stage">
 				<video ref={videoRef} className="hk-scan-video" playsInline muted />
 				<div className="hk-scan-reticle" aria-hidden="true" />
+				{switchTo && (
+					<button type="button" className="hk-iconbtn hk-scan-switch" aria-label={t('scan.switchCamera')} onClick={() => setCameraId(switchTo)}>
+						<Icon name="switchCamera" />
+					</button>
+				)}
 			</div>
 			{errorKey ? (
 				<div className="hk-error-note">{t(errorKey)}</div>

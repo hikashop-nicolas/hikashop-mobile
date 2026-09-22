@@ -468,6 +468,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Nukreipkite kamerą į prekės brūkšninį kodą",
 	'scan.productTitle': "Nuskaityti prekę",
 	'scan.scanAnother': "Nuskaityti kitą",
+	'scan.switchCamera': "Perjungti kamerą",
 	'scan.unsupported': "Šis įrenginys nuskaityti negali.",
 	'scan.useCamera': "Naudoti kamerą",
 	'shortcut.close': "Užverti tai, kas atverta",

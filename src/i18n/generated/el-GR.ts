@@ -462,6 +462,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "Στρέψτε την κάμερα στον γραμμωτό κώδικα του προϊόντος",
 	'scan.productTitle': "Σάρωση προϊόντος",
 	'scan.scanAnother': "Σάρωση επόμενου",
+	'scan.switchCamera': "Αλλαγή κάμερας",
 	'scan.unsupported': "Αυτή η συσκευή δεν μπορεί να σαρώσει.",
 	'scan.useCamera': "Χρήση κάμερας",
 	'shortcut.close': "Κλείσιμο ανοιχτού",

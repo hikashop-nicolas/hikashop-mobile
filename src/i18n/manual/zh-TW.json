@@ -342,6 +342,7 @@
 	"scan.productHint": "請將相機對準商品條碼",
 	"scan.productTitle": "掃描商品",
 	"scan.scanAnother": "繼續掃描",
+	"scan.switchCamera": "切換相機",
 	"scan.unsupported": "這台裝置不支援掃描。",
 	"scan.useCamera": "使用相機",
 	"shortcut.close": "關閉開啟中的項目",

@@ -486,6 +486,7 @@ export const messages: Partial<Messages> = {
 	'scan.productHint': "وجّه الكاميرا إلى باركود المنتج",
 	'scan.productTitle': "مسح منتج",
 	'scan.scanAnother': "مسح آخر",
+	'scan.switchCamera': "تبديل الكاميرا",
 	'scan.unsupported': "لا يستطيع هذا الجهاز المسح.",
 	'scan.useCamera': "استخدام الكاميرا",
 	'shortcut.close': "إغلاق المفتوح",
