@@ -48,6 +48,9 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: android-actions/setup-android@v3
+        with:
+          # Its default also asks for the retired 'tools' package, which sdkmanager 16 no longer has.
+          packages: platform-tools
 
       # Pin what the build actually asks for rather than trusting the runner image to keep
       # shipping it; see android/variables.gradle.
