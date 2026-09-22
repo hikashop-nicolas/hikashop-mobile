@@ -89,6 +89,15 @@ async function buildAndInstall() {
 
 // ---------------------------------------------------------------- the shop
 
+// The app's own WebView socket. Other apps on the phone expose one too, so it is found by the
+// app's process id rather than by taking the first one listed.
+async function appSocket() {
+	const pid = (await adb('shell', 'pidof', APP_ID).catch(() => '')).trim();
+	if (!pid) return undefined;
+	const name = `webview_devtools_remote_${pid}`;
+	return (await adb('shell', 'cat', '/proc/net/unix')).includes(name) ? name : undefined;
+}
+
 async function hatchSite() {
 	step(`Hatching the shop "${SITE}"`);
 	const hatch = path.join(HIKASHOP, 'tools/hatch/hatch.sh');
@@ -170,18 +179,20 @@ check('the dashboard shows its figures and its chart', async (p) => {
 
 check('the orders list fills and an order opens', async (p, ctx) => {
 	await p.go('/orders');
-	await p.waitFor(`document.querySelectorAll('.hk-row').length > 0`, { timeout: 20000, label: 'orders' });
+	// The previous screen's rows linger through the tab transition, so wait for this list's own.
+	await p.waitFor(`!!document.querySelector('.hk-row a[href^="#/orders/"]')`, { timeout: 20000, label: 'orders' });
 	ctx.orders = await p.count('.hk-row');
-	await p.click('.hk-row .hk-rowmain, .hk-row a');
+	await p.click('.hk-row a[href^="#/orders/"]');
 	await p.waitFor(`/\\/orders\\/\\d+/.test(location.hash)`, { label: 'an order to open' });
 	await p.waitFor(`!!document.querySelector('.hk-detail-over, .hk-split-detail')`, { label: 'the order detail' });
 });
 
 check('the products list fills and a product opens', async (p, ctx) => {
 	await p.go('/products');
-	await p.waitFor(`document.querySelectorAll('.hk-row').length > 0`, { timeout: 20000, label: 'products' });
+	// The previous screen's rows linger through the tab transition, so wait for this list's own.
+	await p.waitFor(`!!document.querySelector('.hk-row a[href^="#/products/"]')`, { timeout: 20000, label: 'products' });
 	ctx.products = await p.count('.hk-row');
-	await p.click('.hk-row .hk-rowmain, .hk-row a');
+	await p.click('.hk-row a[href^="#/products/"]');
 	await p.waitFor(`/\\/products\\/\\d+/.test(location.hash)`, { label: 'a product to open' });
 	await p.waitFor(`!!document.querySelector('.hk-detail-over input.hk-input, .hk-split-detail input.hk-input')`, { label: 'the product form' });
 });
@@ -425,10 +436,18 @@ async function main() {
 	say('  phone localhost:8080 now reaches this machine');
 
 	step('Starting the app');
+	// A screen that is off or locked stops the WebView drawing: animations freeze mid-slide and
+	// every later check times out on a screen that never finishes changing.
+	await adb('shell', 'input', 'keyevent', 'KEYCODE_WAKEUP');
+	await adb('shell', 'wm', 'dismiss-keyguard').catch(() => {});
+	await new Promise((r) => setTimeout(r, 1000));
+	if (/isKeyguardShowing=true/.test(await adb('shell', 'dumpsys', 'window'))) {
+		throw new Error('the phone is locked; unlock it and leave it on the charger, then run again');
+	}
 	await adb('shell', 'pm', 'clear', APP_ID);
 	await adb('shell', 'am', 'start', '-n', `${APP_ID}/.MainActivity`);
 	await new Promise((r) => setTimeout(r, 6000));
-	const socket = (await adb('shell', 'cat', '/proc/net/unix')).match(/webview_devtools_remote_\d+/)?.[0];
+	const socket = await appSocket();
 	if (!socket) throw new Error('the app is not exposing a debuggable WebView; is this the debug build?');
 	await adb('forward', '--remove-all').catch(() => {});
 	await adb('forward', 'tcp:9222', `localabstract:${socket}`);
@@ -445,7 +464,7 @@ async function main() {
 			await new Promise((r) => setTimeout(r, 1500));
 			await adb('shell', 'am', 'start', '-n', `${APP_ID}/.MainActivity`);
 			await new Promise((r) => setTimeout(r, 6000));
-			const sock = (await adb('shell', 'cat', '/proc/net/unix')).match(/webview_devtools_remote_\d+/)?.[0];
+			const sock = await appSocket();
 			await adb('forward', '--remove-all').catch(() => {});
 			await adb('forward', 'tcp:9222', `localabstract:${sock}`);
 			const fresh = await attach(9222);

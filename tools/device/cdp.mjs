@@ -119,7 +119,12 @@ export async function attach(port = 9222, { onConsole } = {}) {
 
 	const go = async (hash) => {
 		await evaluate(`location.hash = ${JSON.stringify(hash)}; return true;`);
-		await sleep(600);
+		await sleep(300);
+		// Screens slide in and out; until they settle the old screen's elements are still there to
+		// be found and clicked. Endless ones (a loading spinner) never settle, so they are ignored.
+		await waitFor(`document.getAnimations().every((a) => a.playState !== 'running' || a.effect?.getTiming().iterations === Infinity)`,
+			{ timeout: 5000, label: 'the screen transition to end' }).catch(() => {});
+		await sleep(150);
 	};
 
 	const route = () => evaluate('return location.hash;');
