@@ -47,7 +47,9 @@ export default defineConfig({
       workbox: {
         // Precache the app shell + assets; the API is never precached (it is
         // authenticated and handled by the app's own cache-then-network layer).
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // wasm is the barcode reader Safari needs, so scanning keeps working offline too.
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,wasm}'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: 'index.html',
       },
       devOptions: { enabled: false },

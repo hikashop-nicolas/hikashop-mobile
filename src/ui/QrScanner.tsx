@@ -3,27 +3,15 @@ import { useT } from '../i18n';
 import { Button } from './atoms';
 import { Icon } from './icons';
 import { nextCamera, openScanCamera, saveCamera, savedCamera, stopStream } from './scan-camera';
+import { canDetectBarcodes, getDetectorCtor } from './barcode-detector';
+import type { BarcodeDetectorLike } from './barcode-detector';
 
-// Pure-web QR scanner: BarcodeDetector over a getUserMedia stream. Works in the PWA and in the
-// Capacitor Android WebView (Chromium), so no native plugin is needed. Callers must only mount
-// it when isQrScanSupported() is true; it still degrades to an error message if the camera fails.
-
-interface DetectedBarcode {
-	rawValue: string;
-}
-interface BarcodeDetectorLike {
-	detect(source: CanvasImageSource): Promise<DetectedBarcode[]>;
-}
-interface BarcodeDetectorCtor {
-	new (opts?: { formats?: string[] }): BarcodeDetectorLike;
-}
-
-function detectorCtor(): BarcodeDetectorCtor | null {
-	return (window as unknown as { BarcodeDetector?: BarcodeDetectorCtor }).BarcodeDetector ?? null;
-}
+// Pure-web scanner over a getUserMedia stream: the browser's BarcodeDetector where it has one,
+// else a zxing-wasm ponyfill (Safari and iOS), so no native plugin is needed. Callers mount it
+// when isQrScanSupported() is true; it still degrades to an error message if the camera fails.
 
 export function isQrScanSupported(): boolean {
-	return !!detectorCtor() && !!navigator.mediaDevices?.getUserMedia;
+	return canDetectBarcodes();
 }
 
 // The retail barcode symbologies worth scanning, plus qr_code for device pairing. The caller
@@ -51,15 +39,14 @@ export function QrScanner({ onResult, onClose, formats = QR_FORMATS, title }: {
 	const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
 
 	useEffect(() => {
-		const Ctor = detectorCtor();
-		if (!Ctor || !navigator.mediaDevices?.getUserMedia) {
+		if (!canDetectBarcodes()) {
 			setErrorKey('scan.unsupported');
 			return;
 		}
 		let stream: MediaStream | null = null;
 		let raf = 0;
 		let stopped = false;
-		const detector = new Ctor({ formats: formatsRef.current });
+		let detector: BarcodeDetectorLike;
 
 		const stop = () => {
 			stopped = true;
@@ -69,6 +56,8 @@ export function QrScanner({ onResult, onClose, formats = QR_FORMATS, title }: {
 
 		void (async () => {
 			try {
+				detector = new (await getDetectorCtor(formatsRef.current))({ formats: formatsRef.current });
+				if (stopped) return;
 				stream = await openScanCamera(cameraId);
 				if (stopped) {
 					stopStream(stream);
