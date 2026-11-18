@@ -199,6 +199,8 @@
 	"notifications.alertMe": "התראה על",
 	"notifications.enable": "התראות במכשיר הזה",
 	"notifications.foregroundOnly": "ההתראות מגיעות כל עוד היישום פתוח. קבלה ברקע תגיע בהמשך.",
+	"notifications.background": "ההתראות מגיעות גם כשהיישום סגור.",
+	"notifications.homeScreen": "ב-iPhone וב-iPad יש להוסיף תחילה את היישום למסך הבית (שיתוף, ואז הוספה למסך הבית) כדי לקבל התראות.",
 	"notifications.lowStock": "מלאי נמוך",
 	"notifications.newOrders": "הזמנות חדשות",
 	"notifications.off": "כבוי",

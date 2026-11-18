@@ -767,3 +767,12 @@ export interface Store {
 	permissions?: SiteInfo['permissions'];
 	createdAt: number;
 }
+
+// What the app registers with a shop for Web Push: the browser's subscription, which alerts it
+// wants, and their texts in the operator's language (the shop fills in the placeholders).
+export interface PushSubscriptionBody {
+	endpoint: string;
+	keys: { p256dh: string; auth: string };
+	prefs: { new_orders: boolean; low_stock: boolean; threshold: number };
+	texts: { new_order: string; low_stock: string; low_stock_body: string; guest: string };
+}

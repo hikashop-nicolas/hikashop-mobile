@@ -198,6 +198,8 @@
 	"notifications.alertMe": "Не туралы хабарлау",
 	"notifications.enable": "Осы құрылғыдағы хабарландырулар",
 	"notifications.foregroundOnly": "Хабарландырулар қолданба ашық тұрғанда келеді. Фондық режимде алу кейінірек қосылады.",
+	"notifications.background": "Қолданба жабық тұрғанда да хабарландырулар келеді.",
+	"notifications.homeScreen": "iPhone мен iPad құрылғыларында хабарландыру алу үшін алдымен қолданбаны Басты экранға қосыңыз (Бөлісу, содан кейін Басты экранға қосу).",
 	"notifications.lowStock": "Қор азайды",
 	"notifications.newOrders": "Жаңа тапсырыстар",
 	"notifications.off": "Өшірулі",

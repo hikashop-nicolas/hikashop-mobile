@@ -10,6 +10,7 @@ import { composeProviders } from './app/compose-providers';
 import { ShortcutProvider } from './app/use-shortcuts';
 import { ShortcutHelp } from './screens/ShortcutHelp';
 import { useOrderPoll } from './app/use-order-poll';
+import { usePushSync } from './app/use-push-sync';
 import { I18nProvider, useT } from './i18n';
 import { TabBar, Spinner, Icon, CurrencyProvider, StoreLogo } from './ui';
 import type { TabDef, IconName } from './ui';
@@ -200,12 +201,45 @@ function CurrencyGate({ children }: { children: React.ReactNode }) {
 }
 
 // Runs the foreground poller (new orders + low stock) whenever a store is active and
-// notifications are enabled.
+// notifications are enabled, and keeps Web Push subscribed for every shop that can push.
+// A shop pushing to this browser alerts through the push, so its poll stays silent.
 function OrderPoller() {
-	const { client, active, notifyEnabled, notifySettings } = useStores();
+	const { client, active, stores, registry, notifyEnabled, notifySettings } = useStores();
 	const t = useT();
-	useOrderPoll(client, active, notifyEnabled, t, notifySettings);
+	const pushing = usePushSync(stores, registry, notifyEnabled, notifySettings, t);
+	useOrderPoll(client, active, notifyEnabled, t, notifySettings, undefined, !!active && pushing.includes(active.id));
+	useOpenFromNotification();
 	return null;
+}
+
+// A tapped push notification opens #/path?store=<id>: switch to that shop, then drop the parameter.
+// When the app is already open the push worker posts the address instead of opening a window.
+function useOpenFromNotification() {
+	const { stores, active, setActive } = useStores();
+	const nav = useNavigate();
+	const loc = useLocation();
+	const storeParam = new URLSearchParams(loc.search).get('store');
+
+	useEffect(() => {
+		if (!storeParam) return;
+		const go = async () => {
+			if (active?.id !== storeParam && stores.some((s) => s.id === storeParam)) await setActive(storeParam);
+			nav(loc.pathname, { replace: true });
+		};
+		void go();
+	}, [storeParam, active, stores, setActive, nav, loc.pathname]);
+
+	useEffect(() => {
+		if (!('serviceWorker' in navigator)) return;
+		const onMessage = (e: MessageEvent) => {
+			const data = e.data as { type?: string; url?: string } | null;
+			if (data?.type !== 'hikashop-open' || typeof data.url !== 'string') return;
+			const hash = data.url.indexOf('#');
+			if (hash >= 0) nav(data.url.slice(hash + 1));
+		};
+		navigator.serviceWorker.addEventListener('message', onMessage);
+		return () => navigator.serviceWorker.removeEventListener('message', onMessage);
+	}, [nav]);
 }
 
 function Shell() {

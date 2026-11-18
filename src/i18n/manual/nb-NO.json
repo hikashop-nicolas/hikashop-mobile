@@ -183,6 +183,8 @@
 	"notifications.alertMe": "Varsle om",
 	"notifications.enable": "Varsler på denne enheten",
 	"notifications.foregroundOnly": "Varsler kommer mens appen er åpen. Levering i bakgrunnen kommer senere.",
+	"notifications.background": "Varsler kommer også mens appen er lukket.",
+	"notifications.homeScreen": "På iPhone og iPad må du først legge appen til på Hjem-skjermen (Del, deretter Legg til på Hjem-skjerm) for å få varsler.",
 	"notifications.lowStock": "Lav lagerbeholdning",
 	"notifications.newOrders": "Nye bestillinger",
 	"notifications.off": "Av",

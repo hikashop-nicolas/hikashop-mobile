@@ -204,6 +204,8 @@
 	"notifications.alertMe": "التنبيه إلى",
 	"notifications.enable": "الإشعارات على هذا الجهاز",
 	"notifications.foregroundOnly": "تصل الإشعارات ما دام التطبيق مفتوحًا. أما التسليم في الخلفية فسيأتي لاحقًا.",
+	"notifications.background": "تصل التنبيهات أيضًا عندما يكون التطبيق مغلقًا.",
+	"notifications.homeScreen": "على iPhone وiPad، أضف التطبيق أولًا إلى الشاشة الرئيسية (مشاركة، ثم إضافة إلى الشاشة الرئيسية) لتلقي الإشعارات.",
 	"notifications.lowStock": "المخزون منخفض",
 	"notifications.newOrders": "طلبات جديدة",
 	"notifications.off": "مُعطَّلة",

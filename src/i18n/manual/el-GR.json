@@ -186,6 +186,8 @@
 	"notifications.alertMe": "Να ειδοποιούμαι για",
 	"notifications.enable": "Ειδοποιήσεις σε αυτή τη συσκευή",
 	"notifications.foregroundOnly": "Οι ειδοποιήσεις φτάνουν όσο η εφαρμογή είναι ανοιχτή. Η παράδοση στο παρασκήνιο θα έρθει αργότερα.",
+	"notifications.background": "Οι ειδοποιήσεις φτάνουν και όταν η εφαρμογή είναι κλειστή.",
+	"notifications.homeScreen": "Σε iPhone και iPad, προσθέστε πρώτα την εφαρμογή στην οθόνη Αφετηρίας (Κοινή χρήση, έπειτα Προσθήκη στην οθόνη Αφετηρίας) για να λαμβάνετε ειδοποιήσεις.",
 	"notifications.lowStock": "Χαμηλό απόθεμα",
 	"notifications.newOrders": "Νέες παραγγελίες",
 	"notifications.off": "Ανενεργές",

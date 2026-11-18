@@ -195,6 +195,8 @@
 	"notifications.alertMe": "किस बारे में सूचित करें",
 	"notifications.enable": "इस उपकरण पर सूचनाएँ",
 	"notifications.foregroundOnly": "ऐप खुला रहने तक सूचनाएँ आती हैं। पृष्ठभूमि में मिलना बाद में आएगा।",
+	"notifications.background": "ऐप बंद होने पर भी सूचनाएँ आती हैं।",
+	"notifications.homeScreen": "iPhone और iPad पर सूचनाएँ पाने के लिए, आप पहले ऐप को होम स्क्रीन में जोड़ें (शेयर करें, फिर होम स्क्रीन में जोड़ें)।",
 	"notifications.lowStock": "स्टॉक कम",
 	"notifications.newOrders": "नए ऑर्डर",
 	"notifications.off": "बंद",

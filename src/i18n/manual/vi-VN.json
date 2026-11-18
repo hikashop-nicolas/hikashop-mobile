@@ -191,6 +191,8 @@
 	"notifications.alertMe": "Thông báo về",
 	"notifications.enable": "Thông báo trên thiết bị này",
 	"notifications.foregroundOnly": "Thông báo đến khi ứng dụng đang mở. Nhận thông báo nền sẽ có sau.",
+	"notifications.background": "Thông báo cũng đến khi ứng dụng đã đóng.",
+	"notifications.homeScreen": "Trên iPhone và iPad, hãy thêm ứng dụng vào Màn hình chính trước (Chia sẻ, rồi Thêm vào Màn hình chính) để nhận thông báo.",
 	"notifications.lowStock": "Sắp hết hàng",
 	"notifications.newOrders": "Đơn hàng mới",
 	"notifications.off": "Tắt",

@@ -184,6 +184,8 @@
 	"notifications.alertMe": "Avisar sobre",
 	"notifications.enable": "Notificações do dispositivo",
 	"notifications.foregroundOnly": "Os avisos chegam enquanto o aplicativo está aberto. A entrega em segundo plano virá depois.",
+	"notifications.background": "Os avisos chegam também com o aplicativo fechado.",
+	"notifications.homeScreen": "No iPhone e no iPad, adicione primeiro o aplicativo à Tela de Início (Compartilhar, depois Adicionar à Tela de Início) para receber notificações.",
 	"notifications.lowStock": "Estoque baixo",
 	"notifications.newOrders": "Novos pedidos",
 	"notifications.off": "Desativadas",

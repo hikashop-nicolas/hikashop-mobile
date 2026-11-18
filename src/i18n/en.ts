@@ -413,6 +413,8 @@ export const en: Messages = {
 	'notifications.playSound': 'Play a sound for new orders',
 	'notifications.testSound': 'Test sound',
 	'notifications.foregroundOnly': 'Alerts arrive while the app is open. Background delivery comes later.',
+	'notifications.background': 'Alerts also arrive while the app is closed.',
+	'notifications.homeScreen': 'On iPhone and iPad, add the app to your Home Screen first (Share, then Add to Home Screen) to get notifications.',
 	'notify.lowStock': 'Low stock',
 	'notify.lowStockBody': '{name} — {count} left',
 	'scan.action': 'Scan',

@@ -177,6 +177,8 @@
 	"notifications.alertMe": "Avvisami di",
 	"notifications.enable": "Notifiche del dispositivo",
 	"notifications.foregroundOnly": "Gli avvisi arrivano mentre l'app è aperta. La consegna in background arriverà più avanti.",
+	"notifications.background": "Gli avvisi arrivano anche quando l'app è chiusa.",
+	"notifications.homeScreen": "Su iPhone e iPad, aggiunga prima l'app alla schermata Home (Condividi, poi Aggiungi a Home) per ricevere le notifiche.",
 	"notifications.lowStock": "Scorte in esaurimento",
 	"notifications.newOrders": "Nuovi ordini",
 	"notifications.off": "Disattivate",

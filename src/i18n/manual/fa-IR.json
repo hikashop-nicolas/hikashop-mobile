@@ -187,6 +187,8 @@
 	"notifications.alertMe": "آگاه شدن دربارهٔ",
 	"notifications.enable": "اعلان‌ها روی این دستگاه",
 	"notifications.foregroundOnly": "اعلان‌ها تا وقتی برنامه باز است می‌رسند. دریافت در پس‌زمینه بعداً می‌آید.",
+	"notifications.background": "اعلان‌ها حتی وقتی برنامه بسته است هم می‌رسند.",
+	"notifications.homeScreen": "در iPhone و iPad، برای دریافت اعلان‌ها ابتدا برنامه را به صفحه اصلی اضافه کنید (اشتراک‌گذاری، سپس افزودن به صفحه اصلی).",
 	"notifications.lowStock": "موجودی کم",
 	"notifications.newOrders": "سفارش‌های تازه",
 	"notifications.off": "خاموش",

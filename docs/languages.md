@@ -20,59 +20,59 @@ else; run the generator and the app picks them up.
 
 | Locale | Strings | Coverage | Then reads | Source |
 | --- | --- | --- | --- | --- |
-| af-ZA | 520 / 520 | 100% | — | Written here |
-| ar-AA | 520 / 520 (+24 plural) | 100% | — | Written here |
-| bg-BG | 520 / 520 | 100% | — | Written here |
-| bs-BA | 520 / 520 (+6 plural) | 100% | — | Written here |
-| ca-ES | 520 / 520 | 100% | — | Written here |
-| cs-CZ | 520 / 520 (+6 plural) | 100% | — | Written here |
-| da-DK | 520 / 520 | 100% | — | Written here |
-| de-DE | 520 / 520 | 100% | — | Written here |
-| el-GR | 520 / 520 | 100% | — | Written here |
-| es-ES | 520 / 520 | 100% | — | Written here |
-| eu-ES | 520 / 520 | 100% | — | Written here |
-| fa-IR | 520 / 520 | 100% | — | Written here |
-| fi-FI | 520 / 520 | 100% | — | Written here |
-| gl-ES | 520 / 520 | 100% | — | Written here |
-| he-IL | 520 / 520 (+6 plural) | 100% | — | Written here |
-| hi-IN | 520 / 520 | 100% | — | Written here |
-| hr-HR | 520 / 520 (+6 plural) | 100% | — | Written here |
-| hu-HU | 520 / 520 | 100% | — | Written here |
-| hy-AM | 520 / 520 | 100% | — | Written here, **not checked by a native speaker** |
-| id-ID | 520 / 520 | 100% | — | Written here |
-| it-IT | 520 / 520 | 100% | — | Written here |
-| ja-JP | 520 / 520 | 100% | — | Written here |
-| ko-KR | 520 / 520 | 100% | — | Written here |
-| kz-KZ | 520 / 520 | 100% | — | Written here, **not checked by a native speaker** |
-| lt-LT | 520 / 520 (+6 plural) | 100% | — | Written here |
-| lv-LV | 520 / 520 (+6 plural) | 100% | — | Written here |
-| mk-MK | 520 / 520 | 100% | — | Written here |
-| ms-MY | 520 / 520 | 100% | — | Written here |
-| nb-NO | 520 / 520 | 100% | — | Written here |
-| nl-NL | 520 / 520 | 100% | — | Written here |
-| pl-PL | 520 / 520 (+12 plural) | 100% | — | Written here |
-| pt-BR | 520 / 520 | 100% | — | Written here |
-| pt-PT | 520 / 520 | 100% | — | Written here |
-| ro-RO | 520 / 520 (+6 plural) | 100% | — | Written here |
-| ru-RU | 520 / 520 (+12 plural) | 100% | — | Written here |
-| sk-SK | 520 / 520 (+6 plural) | 100% | — | Written here |
-| sl-SI | 520 / 520 (+12 plural) | 100% | — | Written here |
-| sr-RS | 520 / 520 (+6 plural) | 100% | — | Written here |
-| sr-YU | 520 / 520 (+6 plural) | 100% | — | Written here |
-| srp-ME | 520 / 520 (+6 plural) | 100% | — | Written here |
-| sv-SE | 520 / 520 | 100% | — | Written here |
-| th-TH | 520 / 520 | 100% | — | Written here |
-| tr-TR | 520 / 520 | 100% | — | Written here |
-| uk-UA | 520 / 520 (+12 plural) | 100% | — | Written here |
-| vi-VN | 520 / 520 | 100% | — | Written here |
-| zh-CN | 520 / 520 | 100% | — | Written here |
-| zh-TW | 520 / 520 | 100% | — | Written here |
-| ar-AR | 175 / 520 | 34% | ar-AA | From HikaShop only |
-| es-CL | 171 / 520 | 33% | es-ES | From HikaShop only |
-| de-AT | 166 / 520 | 32% | de-DE | From HikaShop only |
-| de-CH | 166 / 520 | 32% | de-DE | From HikaShop only |
-| nl-BE | 161 / 520 | 31% | nl-NL | From HikaShop only |
-| fr-FR | 156 / 520 | 30% | fr | From HikaShop only |
-| fr-CA | 155 / 520 | 30% | fr-FR | From HikaShop only |
-| ar-DZ | 136 / 520 | 26% | ar-AA | From HikaShop only |
-| nl-NL-flemish | 117 / 520 | 23% | nl-NL | From HikaShop only |
+| af-ZA | 523 / 523 | 100% | — | Written here |
+| ar-AA | 523 / 523 (+24 plural) | 100% | — | Written here |
+| bg-BG | 523 / 523 | 100% | — | Written here |
+| bs-BA | 523 / 523 (+6 plural) | 100% | — | Written here |
+| ca-ES | 523 / 523 | 100% | — | Written here |
+| cs-CZ | 523 / 523 (+6 plural) | 100% | — | Written here |
+| da-DK | 523 / 523 | 100% | — | Written here |
+| de-DE | 523 / 523 | 100% | — | Written here |
+| el-GR | 523 / 523 | 100% | — | Written here |
+| es-ES | 523 / 523 | 100% | — | Written here |
+| eu-ES | 523 / 523 | 100% | — | Written here |
+| fa-IR | 523 / 523 | 100% | — | Written here |
+| fi-FI | 523 / 523 | 100% | — | Written here |
+| gl-ES | 523 / 523 | 100% | — | Written here |
+| he-IL | 523 / 523 (+6 plural) | 100% | — | Written here |
+| hi-IN | 523 / 523 | 100% | — | Written here |
+| hr-HR | 523 / 523 (+6 plural) | 100% | — | Written here |
+| hu-HU | 523 / 523 | 100% | — | Written here |
+| hy-AM | 523 / 523 | 100% | — | Written here, **not checked by a native speaker** |
+| id-ID | 523 / 523 | 100% | — | Written here |
+| it-IT | 523 / 523 | 100% | — | Written here |
+| ja-JP | 523 / 523 | 100% | — | Written here |
+| ko-KR | 523 / 523 | 100% | — | Written here |
+| kz-KZ | 523 / 523 | 100% | — | Written here, **not checked by a native speaker** |
+| lt-LT | 523 / 523 (+6 plural) | 100% | — | Written here |
+| lv-LV | 523 / 523 (+6 plural) | 100% | — | Written here |
+| mk-MK | 523 / 523 | 100% | — | Written here |
+| ms-MY | 523 / 523 | 100% | — | Written here |
+| nb-NO | 523 / 523 | 100% | — | Written here |
+| nl-NL | 523 / 523 | 100% | — | Written here |
+| pl-PL | 523 / 523 (+12 plural) | 100% | — | Written here |
+| pt-BR | 523 / 523 | 100% | — | Written here |
+| pt-PT | 523 / 523 | 100% | — | Written here |
+| ro-RO | 523 / 523 (+6 plural) | 100% | — | Written here |
+| ru-RU | 523 / 523 (+12 plural) | 100% | — | Written here |
+| sk-SK | 523 / 523 (+6 plural) | 100% | — | Written here |
+| sl-SI | 523 / 523 (+12 plural) | 100% | — | Written here |
+| sr-RS | 523 / 523 (+6 plural) | 100% | — | Written here |
+| sr-YU | 523 / 523 (+6 plural) | 100% | — | Written here |
+| srp-ME | 523 / 523 (+6 plural) | 100% | — | Written here |
+| sv-SE | 523 / 523 | 100% | — | Written here |
+| th-TH | 523 / 523 | 100% | — | Written here |
+| tr-TR | 523 / 523 | 100% | — | Written here |
+| uk-UA | 523 / 523 (+12 plural) | 100% | — | Written here |
+| vi-VN | 523 / 523 | 100% | — | Written here |
+| zh-CN | 523 / 523 | 100% | — | Written here |
+| zh-TW | 523 / 523 | 100% | — | Written here |
+| ar-AR | 182 / 523 | 35% | ar-AA | From HikaShop only |
+| es-CL | 178 / 523 | 34% | es-ES | From HikaShop only |
+| de-AT | 173 / 523 | 33% | de-DE | From HikaShop only |
+| de-CH | 173 / 523 | 33% | de-DE | From HikaShop only |
+| nl-BE | 168 / 523 | 32% | nl-NL | From HikaShop only |
+| fr-FR | 163 / 523 | 31% | fr | From HikaShop only |
+| fr-CA | 162 / 523 | 31% | fr-FR | From HikaShop only |
+| ar-DZ | 143 / 523 | 27% | ar-AA | From HikaShop only |
+| nl-NL-flemish | 124 / 523 | 24% | nl-NL | From HikaShop only |

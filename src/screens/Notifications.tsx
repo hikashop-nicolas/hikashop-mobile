@@ -4,6 +4,7 @@ import { useT } from '../i18n';
 import { clampThreshold } from '../core';
 import { Screen, Field, Button, Icon } from '../ui';
 import { playChime, primeAudio } from '../app/chime';
+import { needsHomeScreen, webPushSupported } from '../app/web-push';
 
 // Alerting preferences: which events raise a notification, the low-stock threshold and the
 // sound. Permission is requested here too, since that is what actually enables delivery.
@@ -12,8 +13,10 @@ export function Notifications() {
 	const t = useT();
 	const {
 		notifyEnabled, notifySupported, enableNotifications, disableNotifications,
-		notifySettings: s, setNotifySettings,
+		notifySettings: s, setNotifySettings, active,
 	} = useStores();
+	const homeScreen = needsHomeScreen();
+	const background = webPushSupported() && !!active?.capabilities?.push;
 
 	async function togglePermission() {
 		if (notifyEnabled) { disableNotifications(); return; }
@@ -32,7 +35,9 @@ export function Notifications() {
 					<div className="hk-row-grow">
 						<span className="hk-row-title">{t('notifications.enable')}</span>
 						<span className="hk-row-sub">
-							{!notifySupported
+							{homeScreen
+								? t('notifications.homeScreen')
+								: !notifySupported
 								? t('notifications.unsupported')
 								: notifyEnabled ? t('notifications.on') : t('notifications.off')}
 						</span>
@@ -73,7 +78,7 @@ export function Notifications() {
 				</label>
 				{/* alignSelf keeps it button-sized: hk-form is a column flex, which stretches children. */}
 				<Button size="sm" style={{ alignSelf: 'flex-start' }} onClick={() => void playChime()}><Icon name="play" size={15} /> {t('notifications.testSound')}</Button>
-				<span className="hk-row-sub">{t('notifications.foregroundOnly')}</span>
+				<span className="hk-row-sub">{t(background ? 'notifications.background' : 'notifications.foregroundOnly')}</span>
 			</div>
 		</Screen>
 	);

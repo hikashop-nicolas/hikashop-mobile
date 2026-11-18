@@ -187,6 +187,8 @@
 	"notifications.alertMe": "Şunlar için bildir",
 	"notifications.enable": "Bu cihazdaki bildirimler",
 	"notifications.foregroundOnly": "Bildirimler uygulama açıkken gelir. Arka planda teslim sonra gelecek.",
+	"notifications.background": "Bildirimler uygulama kapalıyken de gelir.",
+	"notifications.homeScreen": "iPhone ve iPad'de bildirim almak için önce uygulamayı Ana Ekrana ekleyin (Paylaş, ardından Ana Ekrana Ekle).",
 	"notifications.lowStock": "Stok azaldı",
 	"notifications.newOrders": "Yeni siparişler",
 	"notifications.off": "Kapalı",

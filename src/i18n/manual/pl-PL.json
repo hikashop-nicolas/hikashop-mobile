@@ -192,6 +192,8 @@
 	"notifications.alertMe": "Powiadamiaj o",
 	"notifications.enable": "Powiadomienia na urządzeniu",
 	"notifications.foregroundOnly": "Powiadomienia docierają, gdy aplikacja jest otwarta. Dostarczanie w tle pojawi się później.",
+	"notifications.background": "Powiadomienia docierają także wtedy, gdy aplikacja jest zamknięta.",
+	"notifications.homeScreen": "Na iPhonie i iPadzie najpierw dodaj aplikację do ekranu początkowego (Udostępnij, potem Dodaj do ekranu początkowego), aby otrzymywać powiadomienia.",
 	"notifications.lowStock": "Niski stan magazynowy",
 	"notifications.newOrders": "Nowe zamówienia",
 	"notifications.off": "Wyłączone",

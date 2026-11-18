@@ -184,6 +184,8 @@
 	"notifications.alertMe": "Ilmoita minulle",
 	"notifications.enable": "Ilmoitukset tällä laitteella",
 	"notifications.foregroundOnly": "Ilmoitukset tulevat, kun sovellus on auki. Taustatoimitus tulee myöhemmin.",
+	"notifications.background": "Ilmoitukset tulevat myös, kun sovellus on suljettu.",
+	"notifications.homeScreen": "iPhonessa ja iPadissa lisää sovellus ensin Koti-valikkoon (Jaa, sitten Lisää Koti-valikkoon), jotta saat ilmoituksia.",
 	"notifications.lowStock": "Varasto vähissä",
 	"notifications.newOrders": "Uudet tilaukset",
 	"notifications.off": "Pois",

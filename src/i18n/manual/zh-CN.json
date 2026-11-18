@@ -186,6 +186,8 @@
 	"notifications.alertMe": "通知内容",
 	"notifications.enable": "此设备上的通知",
 	"notifications.foregroundOnly": "应用打开时会收到通知。后台推送将在以后支持。",
+	"notifications.background": "应用关闭时也会收到通知。",
+	"notifications.homeScreen": "在 iPhone 和 iPad 上，请先将应用添加到主屏幕（分享，然后添加到主屏幕），才能收到通知。",
 	"notifications.lowStock": "库存不足",
 	"notifications.newOrders": "新订单",
 	"notifications.off": "关闭",

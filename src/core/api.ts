@@ -10,6 +10,7 @@ import type {
 	ProductField,
 	MassAction, MassActionResult,
 	ShopLanguages, ContentTranslations, TranslationValues,
+	PushSubscriptionBody,
 } from './models';
 import type { LowStockItem } from './notify-settings';
 
@@ -405,6 +406,19 @@ export class ApiClient {
 	// not_found ApiError when nothing matches, which the caller shows as "unknown barcode".
 	async lookupBarcode(barcode: string): Promise<BarcodeMatch> {
 		return (await this.request<BarcodeMatch>('GET', 'products/lookup', { query: { barcode } })).data;
+	}
+
+	// Web Push: the shop's own VAPID public key, then registering or dropping this browser.
+	async getPushKey(): Promise<{ available: boolean; public_key: string }> {
+		return (await this.request<{ available: boolean; public_key: string }>('GET', 'push/key')).data;
+	}
+
+	async putPushSubscription(body: PushSubscriptionBody): Promise<void> {
+		await this.request('PUT', 'push/subscription', { body });
+	}
+
+	async deletePushSubscription(endpoint: string): Promise<void> {
+		await this.request('DELETE', 'push/subscription', { body: { endpoint } });
 	}
 
 	// Sellable items at or below a stock threshold, lowest first (read scope), for stock alerts.

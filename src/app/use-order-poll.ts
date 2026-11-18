@@ -21,6 +21,8 @@ export function useOrderPoll(
 	t: TFunc,
 	settings: NotifySettings,
 	onNew?: (count: number) => void,
+	// The shop pushes to this browser: keep the cursors moving but leave the alerting to the push.
+	silent = false,
 ): void {
 	const onNewRef = useRef(onNew);
 	onNewRef.current = onNew;
@@ -29,6 +31,8 @@ export function useOrderPoll(
 	// Kept in a ref so changing a preference does not tear down and restart the poll loop.
 	const settingsRef = useRef(settings);
 	settingsRef.current = settings;
+	const silentRef = useRef(silent);
+	silentRef.current = silent;
 
 	useEffect(() => {
 		if (!client || !store || !enabled) return;
@@ -51,14 +55,14 @@ export function useOrderPoll(
 			}
 			const fresh = newOrdersSince(page.items, cursor);
 			if (!fresh.length) return;
-			for (const o of fresh) {
+			for (const o of silentRef.current ? [] : fresh) {
 				await notifier.show({
 					title: tRef.current('notify.newOrder', { number: o.number }),
 					body: `${o.customer.name || o.customer.email || tRef.current('common.guest')} · ${o.total.toFixed(2)}`,
 					tag: `order-${o.id}`,
 				});
 			}
-			if (s.sound) void playChime();
+			if (s.sound && !silentRef.current) void playChime();
 			writeCursor(Math.max(cursor, maxOrderId(page.items)));
 			onNewRef.current?.(fresh.length);
 		};
@@ -72,7 +76,7 @@ export function useOrderPoll(
 			let seen: Record<string, number> = {};
 			try { seen = JSON.parse(localStorage.getItem(seenKey) || '{}') as Record<string, number>; } catch { seen = {}; }
 			const fresh = newLowStock(items, seen);
-			for (const i of fresh) {
+			for (const i of silentRef.current ? [] : fresh) {
 				await notifier.show({
 					title: tRef.current('notify.lowStock'),
 					body: tRef.current('notify.lowStockBody', { name: i.name, count: i.quantity }),

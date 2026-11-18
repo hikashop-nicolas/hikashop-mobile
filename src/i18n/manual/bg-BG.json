@@ -193,6 +193,8 @@
 	"notifications.alertMe": "Известяване за",
 	"notifications.enable": "Известия на това устройство",
 	"notifications.foregroundOnly": "Известията идват, докато приложението е отворено. Получаването във фонов режим ще дойде по-късно.",
+	"notifications.background": "Известията пристигат и когато приложението е затворено.",
+	"notifications.homeScreen": "На iPhone и iPad първо добавете приложението към началния екран (Споделяне, после Добавяне към началния екран), за да получавате известия.",
 	"notifications.lowStock": "Нисък склад",
 	"notifications.newOrders": "Нови поръчки",
 	"notifications.off": "Изключени",

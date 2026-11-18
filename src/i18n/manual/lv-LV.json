@@ -192,6 +192,8 @@
 	"notifications.alertMe": "Paziņot par",
 	"notifications.enable": "Paziņojumi šajā ierīcē",
 	"notifications.foregroundOnly": "Paziņojumi pienāk, kamēr lietotne ir atvērta. Saņemšana fonā būs vēlāk.",
+	"notifications.background": "Paziņojumi pienāk arī tad, kad lietotne ir aizvērta.",
+	"notifications.homeScreen": "iPhone un iPad ierīcēs, lai saņemtu paziņojumus, vispirms pievienojiet lietotni sākuma ekrānam (Kopīgot, pēc tam Pievienot sākuma ekrānam).",
 	"notifications.lowStock": "Zems krājums",
 	"notifications.newOrders": "Jauni pasūtījumi",
 	"notifications.off": "Izslēgti",

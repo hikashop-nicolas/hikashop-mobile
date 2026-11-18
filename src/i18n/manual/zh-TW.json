@@ -190,6 +190,8 @@
 	"notifications.alertMe": "通知內容",
 	"notifications.enable": "這台裝置的通知",
 	"notifications.foregroundOnly": "應用程式開著時才會收到通知。背景推播之後才會支援。",
+	"notifications.background": "應用程式關閉時也會收到通知。",
+	"notifications.homeScreen": "在 iPhone 和 iPad 上，請先將應用程式加入主畫面（分享，然後加入主畫面），才能收到通知。",
 	"notifications.lowStock": "庫存不足",
 	"notifications.newOrders": "新訂單",
 	"notifications.off": "關閉",

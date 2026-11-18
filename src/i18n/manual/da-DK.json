@@ -183,6 +183,8 @@
 	"notifications.alertMe": "Giv besked om",
 	"notifications.enable": "Beskeder på denne enhed",
 	"notifications.foregroundOnly": "Beskeder kommer, mens appen er åben. Levering i baggrunden kommer senere.",
+	"notifications.background": "Beskeder kommer også, mens appen er lukket.",
+	"notifications.homeScreen": "På iPhone og iPad skal du først føje appen til hjemmeskærmen (Del, derefter Føj til hjemmeskærm) for at få beskeder.",
 	"notifications.lowStock": "Lav lagerbeholdning",
 	"notifications.newOrders": "Nye ordrer",
 	"notifications.off": "Fra",

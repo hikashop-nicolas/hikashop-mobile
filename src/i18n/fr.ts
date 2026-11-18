@@ -411,6 +411,8 @@ export const fr: Messages = {
 	'notifications.playSound': 'Jouer un son pour les nouvelles commandes',
 	'notifications.testSound': 'Tester le son',
 	'notifications.foregroundOnly': 'Les alertes arrivent quand l\'application est ouverte. La réception en arrière-plan viendra plus tard.',
+	'notifications.background': 'Les alertes arrivent aussi quand l\'application est fermée.',
+	'notifications.homeScreen': 'Sur iPhone et iPad, ajoutez d\'abord l\'application à l\'écran d\'accueil (Partager, puis Sur l\'écran d\'accueil) pour recevoir les notifications.',
 	'notify.lowStock': 'Stock faible',
 	'notify.lowStockBody': '{name} — il en reste {count}',
 	'scan.action': 'Scanner',

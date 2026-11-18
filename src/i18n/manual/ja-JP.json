@@ -185,6 +185,8 @@
 	"notifications.alertMe": "通知する内容",
 	"notifications.enable": "この端末での通知",
 	"notifications.foregroundOnly": "通知はアプリを開いている間に届きます。バックグラウンドでの受信は今後対応します。",
+	"notifications.background": "アプリを閉じている間も通知が届きます。",
+	"notifications.homeScreen": "iPhoneとiPadで通知を受け取るには、先にアプリをホーム画面に追加してください（「共有」、続いて「ホーム画面に追加」）。",
 	"notifications.lowStock": "在庫僅少",
 	"notifications.newOrders": "新しい注文",
 	"notifications.off": "オフ",

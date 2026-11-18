@@ -193,6 +193,8 @@
 	"notifications.alertMe": "Извести ме за",
 	"notifications.enable": "Известувања на овој уред",
 	"notifications.foregroundOnly": "Известувањата пристигнуваат додека апликацијата е отворена. Испораката во заднина доаѓа подоцна.",
+	"notifications.background": "Известувањата пристигнуваат и кога апликацијата е затворена.",
+	"notifications.homeScreen": "На iPhone и iPad, за да добивате известувања, прво додадете ја апликацијата на почетниот екран (Сподели, потоа Додај на почетниот екран).",
 	"notifications.lowStock": "Мала залиха",
 	"notifications.newOrders": "Нови нарачки",
 	"notifications.off": "Исклучени",

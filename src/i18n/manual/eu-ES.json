@@ -199,6 +199,8 @@
 	"notifications.alertMe": "Jakinarazi honi buruz",
 	"notifications.enable": "Gailu honetako jakinarazpenak",
 	"notifications.foregroundOnly": "Jakinarazpenak aplikazioa irekita dagoen bitartean iristen dira. Atzeko planoko jasotzea geroago etorriko da.",
+	"notifications.background": "Jakinarazpenak aplikazioa itxita dagoenean ere iristen dira.",
+	"notifications.homeScreen": "iPhone eta iPad gailuetan, gehitu lehenik aplikazioa hasierako pantailan (Partekatu, gero Gehitu hasierako pantailan) jakinarazpenak jasotzeko.",
 	"notifications.lowStock": "Stock gutxi",
 	"notifications.newOrders": "Eskaera berriak",
 	"notifications.off": "Desaktibatuta",

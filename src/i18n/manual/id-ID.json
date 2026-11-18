@@ -195,6 +195,8 @@
 	"notifications.alertMe": "Beri tahu tentang",
 	"notifications.enable": "Notifikasi di perangkat ini",
 	"notifications.foregroundOnly": "Notifikasi datang selama aplikasi terbuka. Pengiriman di latar belakang menyusul nanti.",
+	"notifications.background": "Notifikasi juga datang saat aplikasi tertutup.",
+	"notifications.homeScreen": "Di iPhone dan iPad, tambahkan aplikasi ke Layar Utama terlebih dahulu (Bagikan, lalu Tambah ke Layar Utama) agar Anda dapat menerima notifikasi.",
 	"notifications.lowStock": "Stok menipis",
 	"notifications.newOrders": "Pesanan baru",
 	"notifications.off": "Mati",

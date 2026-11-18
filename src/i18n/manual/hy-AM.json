@@ -238,6 +238,8 @@
 	"notifications.alertMe": "Տեղեկացնել այս մասին",
 	"notifications.enable": "Ծանուցումներ այս սարքում",
 	"notifications.foregroundOnly": "Ծանուցումները գալիս են, քանի դեռ հավելվածը բաց է։ Ֆոնային ստացումը կլինի ավելի ուշ։",
+	"notifications.background": "Ծանուցումները գալիս են նաև այն ժամանակ, երբ հավելվածը փակ է։",
+	"notifications.homeScreen": "iPhone-ում և iPad-ում ծանուցումներ ստանալու համար նախ ավելացրեք հավելվածը Գլխավոր էկրանին (Կիսվել, ապա Ավելացնել Գլխավոր էկրանին)։",
 	"notifications.lowStock": "Պաշարը քիչ է",
 	"notifications.newOrders": "Նոր պատվերներ",
 	"notifications.off": "Անջատված",

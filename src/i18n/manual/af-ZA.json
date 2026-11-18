@@ -247,6 +247,8 @@
 	"notifications.alertMe": "Laat weet my van",
 	"notifications.enable": "Kennisgewings op hierdie toestel",
 	"notifications.foregroundOnly": "Kennisgewings kom deur terwyl die toepassing oop is. Aflewering op die agtergrond kom later.",
+	"notifications.background": "Kennisgewings kom ook deur terwyl die toepassing toe is.",
+	"notifications.homeScreen": "Op iPhone en iPad moet jy die toepassing eers by jou Tuisskerm voeg (Deel, dan Voeg by Tuisskerm) om kennisgewings te kry.",
 	"notifications.lowStock": "Min voorraad",
 	"notifications.newOrders": "Nuwe bestellings",
 	"notifications.off": "Af",

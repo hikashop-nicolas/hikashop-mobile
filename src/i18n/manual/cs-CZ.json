@@ -189,6 +189,8 @@
 	"notifications.alertMe": "Upozorňovat na",
 	"notifications.enable": "Oznámení na tomto zařízení",
 	"notifications.foregroundOnly": "Oznámení chodí, dokud je aplikace otevřená. Doručování na pozadí přijde později.",
+	"notifications.background": "Oznámení chodí i tehdy, když je aplikace zavřená.",
+	"notifications.homeScreen": "Na iPhonu a iPadu nejprve přidejte aplikaci na plochu (Sdílet, poté Přidat na plochu), abyste mohli dostávat oznámení.",
 	"notifications.lowStock": "Docházející zásoba",
 	"notifications.newOrders": "Nové objednávky",
 	"notifications.off": "Vypnuto",

@@ -202,6 +202,8 @@
 	"notifications.alertMe": "Avisa'm de",
 	"notifications.enable": "Notificacions en aquest dispositiu",
 	"notifications.foregroundOnly": "Les notificacions arriben mentre l'aplicació és oberta. L'entrega en segon pla vindrà més endavant.",
+	"notifications.background": "Les notificacions també arriben quan l'aplicació és tancada.",
+	"notifications.homeScreen": "A l'iPhone i l'iPad, afegeix primer l'aplicació a la pantalla d'inici (Comparteix, després Afegeix a la pantalla d'inici) per rebre notificacions.",
 	"notifications.lowStock": "Estoc baix",
 	"notifications.newOrders": "Comandes noves",
 	"notifications.off": "Desactivades",

@@ -189,6 +189,8 @@
 	"notifications.alertMe": "Anunță-mă despre",
 	"notifications.enable": "Notificări pe acest dispozitiv",
 	"notifications.foregroundOnly": "Notificările sosesc cât timp aplicația este deschisă. Livrarea în fundal va veni mai târziu.",
+	"notifications.background": "Notificările sosesc și când aplicația este închisă.",
+	"notifications.homeScreen": "Pe iPhone și iPad, adăugați mai întâi aplicația pe ecranul principal (Partajare, apoi Adăugați la ecranul principal) pentru a primi notificări.",
 	"notifications.lowStock": "Stoc pe terminate",
 	"notifications.newOrders": "Comenzi noi",
 	"notifications.off": "Oprite",

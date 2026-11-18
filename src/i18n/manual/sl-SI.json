@@ -195,6 +195,8 @@
 	"notifications.alertMe": "Obvesti me o",
 	"notifications.enable": "Obvestila na tej napravi",
 	"notifications.foregroundOnly": "Obvestila prihajajo, dokler je aplikacija odprta. Dostava v ozadju pride pozneje.",
+	"notifications.background": "Obvestila prihajajo tudi, ko je aplikacija zaprta.",
+	"notifications.homeScreen": "Na iPhonu in iPadu najprej dodajte aplikacijo na začetni zaslon (Deli, nato Dodaj na začetni zaslon), da boste prejemali obvestila.",
 	"notifications.lowStock": "Nizka zaloga",
 	"notifications.newOrders": "Nova naročila",
 	"notifications.off": "Izklopljeno",

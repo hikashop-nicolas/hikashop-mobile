@@ -183,6 +183,8 @@
 	"notifications.alertMe": "Meddela om",
 	"notifications.enable": "Aviseringar på den här enheten",
 	"notifications.foregroundOnly": "Aviseringar kommer medan appen är öppen. Leverans i bakgrunden kommer senare.",
+	"notifications.background": "Aviseringar kommer även när appen är stängd.",
+	"notifications.homeScreen": "På iPhone och iPad lägger du först till appen på hemskärmen (Dela, sedan Lägg till på hemskärmen) för att få aviseringar.",
 	"notifications.lowStock": "Lågt lagersaldo",
 	"notifications.newOrders": "Nya beställningar",
 	"notifications.off": "Av",
